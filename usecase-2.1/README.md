@@ -13,8 +13,8 @@ The analysis pipeline demonstrated here only uses the tabular data that is inclu
 The complete input data consists of 5585 files with a combined size of 30.67GB. The analysis only requires a few of those files to be downloaded.
 
 ```console
-mkdir input
-cd input
+mkdir inputdir
+cd inputdir
 wget https://s3.amazonaws.com/openneuro.org/ds004148/participants.tsv
 wget https://s3.amazonaws.com/openneuro.org/ds004148/participants.json
 wget https://s3.amazonaws.com/openneuro.org/ds004148/dataset_description.json
@@ -38,7 +38,7 @@ The output data consist of a `results.tsv` file that contains the averaged age, 
 The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
 
 ```console
-mkdir output
+mkdir outputdir
 ```
 
 ## Analysis pipeline
@@ -60,7 +60,7 @@ The R-software can be installed on a Linux, MacOS or Windows computer, specifica
 Alternatively, you can install the software in an Apptainer container image.
 
 ```console
-cd wp15/usecase-2.1
+cd wp15/usecase-2.1 && cp work/pipeline.R pipeline.R
 apptainer build usecase-2.1.sif container-r.def
 ```
 
@@ -70,13 +70,12 @@ Executing the pipeline from the Linux terminal is done like this:
 
 ```console
 cd wp15/usecase-2.1
-Rscript work/pipeline.R --inputdir input --outputdir output  
+Rscript work/pipeline.R --inputdir inputdir --outputdir outputdir
 ```
 
 Executing the pipeline from the R-based Apptainer image is done like this:
 
 ```console
-mkdir output
 apptainer run usecase-2.1.sif inputdir outputdir participant
 apptainer run usecase-2.1.sif inputdir outputdir group
 ```
@@ -122,7 +121,7 @@ Cleaning up the input and output data can be done using:
 rm -rf inputdir outputdir
 ```
 
-## Scrambled data
+# Scrambled data
 
 As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly. 
 
@@ -133,3 +132,30 @@ scramble inputdir outputdir stub
 scramble inputdir outputdir tsv permute -s participants.tsv
 scramble inputdir outputdir json -p '.*' -s participants.json
 ```
+
+# DatLeak
+
+While working with scrambled data, you can ensure that to what degree intended patterns or information are leaked from the original dataset where you can use [DatLeak](https://github.com/SIESTA-eu/DatLeak) repository. This repository provides a method to test for potential data leakage, checking whether the scrambled variables still contain any identifiable patterns that could be traced back to the original participants. Running DatLeak on scrambled datasets helps confirm that the anonymization process is robust and protects participant privacy.
+
+DatLeak detects data leakage in anonymized datasets by comparing the original data with the scrambled version. It calculates percentage of full leakage (where all variables in a row match) and partial leakage (where some, but not all, variables match). These calculation help assess the effectiveness of the anonymization process.
+
+Assuming you are in **usecase-2.1** directory. Clone the repo:
+```console
+cd ../../
+git clone https://github.com/SIESTA-eu/DatLeak.git && cd DatLeak/
+```
+
+### Usage
+
+```console
+python DatLeak.py test_files/data_original.tsv test_files/data_scramble.tsv -999 
+```
+
+### Ouput 
+
+- Partial Leakage: The percentage of rows with partial leakage.
+- Full Leakage: The percentage of rows with full leakage.
+- Average Matching cells per row.
+- Standard Deviation of matching cells per row.
+
+To read more about DatLeak, please visit [DatLeak](https://github.com/SIESTA-eu/DatLeak)
