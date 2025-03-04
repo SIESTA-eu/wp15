@@ -5,15 +5,18 @@ import re
 import mne
 from tqdm import tqdm
 from pathlib import Path
+from typing import List
 from . import get_inputfiles
 
 
-def do_permute(data: np.ndarray) -> np.ndarray:
-    """scramble the samples in each channel"""
+def do_permute(data: np.ndarray, dims: List[str]=()) -> np.ndarray:
+    axis = dict([(d, i) for i, d in enumerate(['channel' 'time'])])
 
+    # scramble the samples across time
     rng = np.random.default_rng()
-    for channel in range(data.shape[0]):
-        data[channel] = rng.permutation(data[channel])
+    for dim in range(len(dims)):
+        print(axis[dims[dim]])
+        rng.permutation(data, axis=axis[dims[dim]])
 
     return data
 
@@ -24,7 +27,7 @@ def do_null(data: np.ndarray) -> np.ndarray:
     return data
 
 
-def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str='null', dryrun: bool=False, **_):
+def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str='null', dims: List[str]=(), dryrun: bool=False, **_):
 
     # Defaults
     inputdir  = Path(inputdir).resolve()
@@ -35,10 +38,9 @@ def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
     for inputfile in tqdm(inputfiles, unit='file', colour='green', leave=False):
 
         # Figure out which reader function to use, fif-files with time-series data come in 3 flavours
-        fiffstuff = mne.io.show_fiff(inputfile)
-        isevoked  = re.search('FIFFB_EVOKED', fiffstuff) is not None
-        isepoched = re.search('FIFFB_MNE_EPOCHS', fiffstuff) is not None
-        israw     = not isepoched and not isevoked
+        isevoked  = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=104))
+        isepoched = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=373))
+        israw     = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=102))
 
         # Read the data
         if israw:
@@ -50,10 +52,18 @@ def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
 
         # Apply the scrambling method
         if method == 'permute':
-            obj.apply_function(do_permute)
+            axis = dict([(d, i) for i, d in enumerate(['channel', 'time'])])
+
+            if not type(dims) is list:
+                dims = [dims]
+
+            # scramble the samples across the requested dimension(s)
+            rng = np.random.default_rng()
+            for dim in range(len(dims)):
+                rng.shuffle(obj._data, axis=axis[dims[dim]])
 
         elif method in ('null', None):
-            obj.apply_function(do_null)
+            obj._data *= 0
 
         else:
             raise ValueError(f"Unknown fif-scramble method: {method}")
