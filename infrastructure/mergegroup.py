@@ -1,41 +1,44 @@
 import os, csv, re, sys
 import numpy as np
 
-if len(sys.argv) < 3:
-    print("Usage: apptainer run mergegroup.sif <output dir> <output file>")
+if len(sys.argv) < 4:
+    print("Usage: apptainer run mergegroup.sif <input dir 1> <input dir 2> <input dir 3> ... <output dir> <whitelist.txt>")
     sys.exit(1)
 
-
-output_file = sys.argv[2]
-output_dir = sys.argv[1]
+try:
+    with open(sys.argv[-1], "r") as file:
+        whitelist = file.read()
+except FileNotFoundError:
+    print("Please provide a valid path to whitelist.txt")
+    sys.exit(1)
+    
+output_dir = sys.argv[-2]
 os.makedirs(output_dir, exist_ok=True)
 
-folders = sorted(
-    [f for f in os.listdir() if re.match(r"group-\d+", f)], 
-    key=lambda x: int(x.split('-')[1])
-)
+input_dirs = sorted([f"{item}/{whitelist}" for item in sys.argv[1:-2]], 
+	     key=lambda x:[int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
 
 data_matrix = []
-for folder in folders:
-    file_path = os.path.join(folder, "group", "results.tsv")
-    if os.path.exists(file_path):
+for input_dir in input_dirs:
+    if os.path.exists(input_dir):
         try:
-            with open(file_path, 'r') as f:
-                print(f"Processing: {file_path} -> {output_dir}/{output_file}")
+            with open(input_dir, 'r') as f:
+                print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                 reader = csv.reader(f, delimiter='\t')
                 row = [float(x) for x in next(reader)]
                 data_matrix.append(row)
+                
         except (ValueError, StopIteration) as e:
             print(e)
             continue
     else:
-        print(f"File not found: {file_path}")
+        print(f"File not found: {input_dir}")
+        
 
 if data_matrix:
-    if output_file:
-        np.savetxt(output_dir+"/"+output_file, np.array(data_matrix), delimiter='\t', fmt='%.15f')
-    else:
-        np.savetxt(output_dir+"/"+"whitelist.txt", np.array(data_matrix), delimiter='\t', fmt='%.15f')
+    with open(output_dir+"/group-merged.tsv", "w") as file:
+        for row in data_matrix:
+            val = "\t".join(f"{value}" for value in row)
+            file.write(val + "\n")
 else:
     print("No valid data found.")
-
