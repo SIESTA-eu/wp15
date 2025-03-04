@@ -9,24 +9,6 @@ from typing import List
 from . import get_inputfiles
 
 
-def do_permute(data: np.ndarray, dims: List[str]=()) -> np.ndarray:
-    axis = dict([(d, i) for i, d in enumerate(['channel' 'time'])])
-
-    # scramble the samples across time
-    rng = np.random.default_rng()
-    for dim in range(len(dims)):
-        print(axis[dims[dim]])
-        rng.permutation(data, axis=axis[dims[dim]])
-
-    return data
-
-
-def do_null(data: np.ndarray) -> np.ndarray:
-    data *= 0
-
-    return data
-
-
 def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str='null', dims: List[str]=(), dryrun: bool=False, **_):
 
     # Defaults
