@@ -20,9 +20,9 @@ def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
     for inputfile in tqdm(inputfiles, unit='file', colour='green', leave=False):
 
         # Figure out which reader function to use, fif-files with time-series data come in 3 flavours
-        isevoked  = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=104))
-        isepoched = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=373))
-        israw     = not all(len(l) == 0 for l in mne.io.show_fiff(inputfile,output=list,tag=102))
+        isevoked  = any(mne.io.show_fiff(inputfile,output=list,tag=104))
+        isepoched = any(mne.io.show_fiff(inputfile,output=list,tag=373))
+        israw     = any(mne.io.show_fiff(inputfile,output=list,tag=102))
 
         # Read the data
         if israw:
