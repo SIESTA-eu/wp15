@@ -22,7 +22,7 @@ def scramble_tsv(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
         # Permute the data in each of the columns of no interest, preserve the order of the data in the columns of interest
         if method == 'permute':
             for column in tsvdata.columns:
-                if not re.fullmatch(preserve or '^$', column):
+                if not re.fullmatch(preserve or '^$', column or 'unspecified'):
                     tsvdata[column] = np.random.permutation(tsvdata[column])
         elif method in ('null', None):
             tsvdata = pd.DataFrame(columns=tsvdata.columns, index=tsvdata.index)

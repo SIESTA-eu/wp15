@@ -10,7 +10,7 @@ def clearvalues(data: dict, preserve: str):
     for key, value in data.items():
         if isinstance(value, dict):
             clearvalues(value, preserve)        # Recursively clear the dictionary
-        elif re.fullmatch(preserve, str(key)):
+        elif re.fullmatch(preserve, str(key or 'unspecified')):
             pass                                # Preserve the value
         else:
             data[key] = type(value)()           # Clear the value

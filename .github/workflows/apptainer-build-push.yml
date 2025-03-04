@@ -65,7 +65,7 @@ jobs:
 
       - name: Build pipeline containers
         run: |
-          cd ${GITHUB_WORKSPACE}/usecase-2.1 && apptainer build pipeline.sif container-r.def  # there are also containers based on MATLAB, Python, and Julia
+          cd ${GITHUB_WORKSPACE}/usecase-2.1 && apptainer build pipeline.sif pipeline-r.def  # there are also container definition files for the same pipeline based on MATLAB, Python, and Julia
           # usecase-2.2 does not use a pipeline container from this repository
           cd ${GITHUB_WORKSPACE}/usecase-2.3 && apptainer build pipeline.sif pipeline.def
           cd ${GITHUB_WORKSPACE}/usecase-2.4 && apptainer build pipeline.sif pipeline.def
