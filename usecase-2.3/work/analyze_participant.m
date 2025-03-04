@@ -11,7 +11,8 @@ function analyze_participant(inputprefix, outputprefix)
     participants = ft_read_tsv(fullfile(inputprefix, 'participants.tsv'));
 
     % be sure that the emptyroom is not there
-    participants = participants(~isnan(participants.age), :);
+    % participants = participants(~isnan(participants.age), :);
+    participants = participants(~contains(participants.participant_id, 'emptyroom'));    
 
     nsubj = size(participants,1);
     nruns = 2; % do the computations for the first few runs only
