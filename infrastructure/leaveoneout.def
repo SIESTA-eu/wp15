@@ -34,3 +34,5 @@ Stage: final
         exit 1
     fi
     exec scramble $1 $2 pseudo original -s "(?!$PID(/|$)).*"
+    exec scramble $1 $2 pseudo original -s "derivatives/.*/(?!$PID(/|$)).*"
+
