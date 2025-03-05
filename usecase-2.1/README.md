@@ -139,6 +139,18 @@ The documention provided here is for Apptainer imagines, which allows wp15 membe
 
 The documentation provided here is also just for a minimal test that does not consider differential privacy yet.
 
+### Transferring the data
+
+The platform operator can download the data using the corresponding container (only for testing purposes) and the following instructions:
+
+```console
+cd wp15/usecase-2.1
+apptainer build download.sif download.def
+apptainer run download.sif ../../data/usecase-2.1/input
+```
+
+You may have to replace the `input` directory in the example above with the desired location on your computer.
+
 ### Containerizing the pipeline
 
 You can install the software in an Apptainer container image like this:
