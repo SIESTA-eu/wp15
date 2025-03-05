@@ -186,8 +186,8 @@ Executing the pipeline from the Linux terminal is done like this:
 
 ```console
 cd wp15/usecase-2.4
-matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab source; bidsapp input output participant"
-matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab source; bidsapp input output group"
+matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab work; bidsapp input output participant"
+matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab work; bidsapp input output group"
 ```
 
 You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written. For the prototype you can test the pipeline both on the original input data and on the scrambled data in the `scrambled` directory.
