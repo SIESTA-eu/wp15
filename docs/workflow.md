@@ -7,8 +7,7 @@ Note that whenever `filename.sif` is mentioned below, it is assumed that this mi
 Transfer the data to the platform and provide a scrambled version.
 
     ./download.sif input
-    ./scramble.sif input scrambled
-    ./privacy.sif input scrambled
+    ./privacy.sif input scrambled  # this includes the interactive scrambling process and the privacy review
 
 ## Data user
 
@@ -55,13 +54,12 @@ Run the group-level analysis on all subjects together and add the calibrated noi
 
 Review the group-level results with the calibrated noise and release them to the data user.
 
-    ./privacy.sif group-with-noise
+    ./privacy.sif input group-with-noise
 
 # Required applications or containers
 
 - download.sif
-- scramble.sif
-- privacy.sif (on the scrambled input data)
+- privacy.sif (for the interactive scrambling process and the privacy review)
 - singlesubject.sif
 - pipeline.sif (participant-level, on single-subject data)
 - mergederivatives.sif
@@ -73,7 +71,7 @@ Review the group-level results with the calibrated noise and release them to the
 - compare.sif
 - calibratenoise.sif
 - addnoise.sif
-- privacy.sif (on the differentially private output data)
+- privacy.sif (for the privacy review on the output data)
 
 # Required data directories or volumes
 
