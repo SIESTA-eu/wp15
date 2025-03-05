@@ -10,7 +10,7 @@ From: python:3
     org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
 %files
-    mergegroup.py /opt/mergegroup.py
+    mergegroup/mergegroup.py /opt/mergegroup.py
 
 %post
     ################################################################################

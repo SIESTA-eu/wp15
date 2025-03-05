@@ -18,6 +18,8 @@ os.makedirs(output_dir, exist_ok=True)
 input_dirs = sorted([f"{item}/{whitelist}" for item in sys.argv[1:-2]], 
 	     key=lambda x:[int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
 
+print(input_dirs)
+
 data_matrix = []
 for input_dir in input_dirs:
     if os.path.exists(input_dir):
