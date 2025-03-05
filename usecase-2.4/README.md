@@ -4,30 +4,6 @@ This implements the [Event-Related Potential](https://en.wikipedia.org/wiki/Even
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
-## Input data
-
-The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN).
-
-The input data consists of about 2000 files with a combined size of 24.1GB.
-
-Included in this dataset are:
-
-1. Raw data files for all 7 ERP components from 40 participants
-2. The event code schemes for all experiment paradigms
-3. The task stimuli used for eliciting N170, MMN, and N400, located in the stimuli folder
-4. Demographic information for all 40 participants ("participants.tsv & participants.json")
-
-The data can be downloaded from [ERPCore BIDS dataset](https://osf.io/9f5w7/files/osfstorage) or by installing and running the [osfclient](https://github.com/osfclient/osfclient). The osfclient downloads the data an order of magnitude faster, is more stable for long downloads, and ensures that the directory structure is preserved.
-
-```console
-python -m venv venv
-source venv/bin/activate
-pip install osfclient
-osf -p 9f5w7 clone download
-mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input
-rm -rf download
-```
-
 ### Data citation
 
 Emily S. Kappenman, Jaclyn L. Farrens, Wendy Zhang, Andrew X. Stewart, Steven J. Luck (2021). ERP CORE: An open resource for human event-related potential research. NeuroImage. doi:j.neuroimage.2020.117465
@@ -35,17 +11,6 @@ Emily S. Kappenman, Jaclyn L. Farrens, Wendy Zhang, Andrew X. Stewart, Steven J.
 ### Legal aspects of the input data
 
 The input dataset has been released under the [CC-BY-4.0](https://spdx.org/licenses/CC-BY-4.0.html) license.
-
-## Output data
-
-The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
-
-The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
-
-```console
-cd wp15/usecase-2.4
-mkdir output
-```
 
 ## Analysis pipeline
 
@@ -69,7 +34,7 @@ There are also a number of additional EEGLAB plugins/dependencies (bids-matlab-t
 
 ```console
 git clone https://github.com/SIESTA-eu/wp15.git
-cd wp15/usecase2.4
+cd wp15/usecase-2.4
 
 wget https://github.com/sccn/eeglab/archive/refs/tags/2024.2.1.zip
 unzip 2024.2.1.zip
@@ -108,6 +73,45 @@ mv zapline-plus-1.2.1   eeglab/plugins/apline-plus1.2.1
 mv picard-matlab        eeglab/plugins/PICARD1.0
 mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 ```
+
+
+### Input data
+
+The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN).
+
+The input data consists of about 2000 files with a combined size of 24.1GB.
+
+Included in this dataset are:
+
+1. Raw data files for all 7 ERP components from 40 participants
+2. The event code schemes for all experiment paradigms
+3. The task stimuli used for eliciting N170, MMN, and N400, located in the stimuli folder
+4. Demographic information for all 40 participants ("participants.tsv & participants.json")
+
+The data can be downloaded from [ERPCore BIDS dataset](https://osf.io/9f5w7/files/osfstorage) or by installing and running the [osfclient](https://github.com/osfclient/osfclient). The osfclient downloads the data an order of magnitude faster, is more stable for long downloads, and ensures that the directory structure is preserved.
+
+```console
+cd wp15/usecase-2.4
+python -m venv venv
+source venv/bin/activate
+pip install osfclient
+osf -p 9f5w7 clone download
+mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input
+rm -rf download
+```
+
+### Output data
+
+The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
+
+The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
+
+```console
+cd wp15/usecase-2.4
+mkdir output
+```
+
+### Checking the installation
 
 Once all is installed, it should look like this
 
@@ -185,7 +189,7 @@ apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output group
 
 It may be neccessay to use the `--bind` option to map the external and internal directories with input and output data.
 
-## Cleaning up
+### Cleaning up
 
 Cleaning up the input and output data is done using:
 
@@ -194,7 +198,7 @@ cd wp15/usecase-2.4
 rm -rf input output
 ```
 
-## Scrambled data
+### Scrambled data
 
 As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly. 
 

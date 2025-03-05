@@ -276,6 +276,9 @@ if strcmpi(AnalysisLevel,'1')
             [STUDY, ALLEEG] = pop_importbids(InputDataset, 'bidsevent','on','bidschanloc','on', ...
                 'bidstask',TaskLabel{t},'eventtype', 'value', 'outputdir' ,outdir, 'studyName',TaskLabel{t}, 'subjects', sublist);
         end
+        if length(ALLEEG) == 1
+            ALLEEG = eeg_checkset(ALLEEG, 'loaddata');
+        end
         ALLEEG = pop_select( ALLEEG, 'nochannel',{'HEOG_left','HEOG_right','VEOG_lower'});
         STUDY = pop_statparams(STUDY, 'default');
         [STUDY,~,AvgChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on');
@@ -298,43 +301,45 @@ if strcmpi(AnalysisLevel,'1')
         for s=1:size(ALLEEG,2)
             try
                 % downsample
-                if EEG(s).srate ~= 250
-                    EEG(s) = pop_resample(EEG(s), 250);
+                EEGTMP = eeg_checkset(EEG(s), 'loaddata');
+                if EEGTMP.srate ~= 250
+                    EEGTMP = pop_resample(EEGTMP, 250);
                 end
                 % line freq removal
-                EEG(s) = pop_zapline_plus(EEG(s),'noisefreqs','line',...
+                EEGTMP = pop_zapline_plus(EEGTMP,'noisefreqs','line',...
                     'coarseFreqDetectPowerDiff',4,'chunkLength',30,...
                     'adaptiveNremove',1,'fixedNremove',1,'plotResults',0);
                 % remove bad channels
-                EEG(s) = pop_clean_rawdata(EEG(s),'FlatlineCriterion',5,'ChannelCriterion',0.8,...
+                EEGTMP = pop_clean_rawdata(EEGTMP,'FlatlineCriterion',5,'ChannelCriterion',0.8,...
                     'LineNoiseCriterion',4,'Highpass',[high_pass-0.25 high_pass+0.25] ,...
                     'BurstCriterion','off','WindowCriterion','off','BurstRejection','off',...
                     'Distance','Euclidian','WindowCriterionTolerances','off' );
                 % interpolate missing channels and reference
-                [~,idx] = setdiff({AvgChanlocs.expected_chanlocs.labels},{EEG(s).chanlocs.labels});
+                [~,idx] = setdiff({AvgChanlocs.expected_chanlocs.labels},{EEGTMP.chanlocs.labels});
                 if ~isempty(idx)
-                    EEG(s) = pop_interp(EEG(s), AvgChanlocs.expected_chanlocs(idx), 'sphericalKang');
+                    EEGTMP = pop_interp(EEGTMP, AvgChanlocs.expected_chanlocs(idx), 'sphericalKang');
                 end
 
                 % ICA cleaning
                 if strcmpi(ICAname,'picard')
-                    EEG(s) = pop_runica(EEG(s), 'icatype',ICAname,'maxiter',500,'mode','standard','concatcond','on', 'options',{'pca',EEG(s).nbchan-1});
+                    EEGTMP = pop_runica(EEGTMP, 'icatype',ICAname,'maxiter',500,'mode','standard','concatcond','on', 'options',{'pca',EEGTMP.nbchan-1});
                 else 
-                    EEG(s) = pop_runica(EEG(s), 'icatype',ICAname,'concatcond','on', 'options',{'pca',EEG(s).nbchan-1});
+                    EEGTMP = pop_runica(EEGTMP, 'icatype',ICAname,'concatcond','on', 'options',{'pca',EEGTMP.nbchan-1});
                 end
-                EEG(s) = pop_iclabel(EEG(s), 'default');
-                EEG(s) = pop_icflag(EEG(s),[NaN NaN;0.8 1;0.8 1;NaN NaN;NaN NaN;NaN NaN;NaN NaN]);
-                EEG(s) = pop_subcomp(EEG(s),[],0);
+                EEGTMP = pop_iclabel(EEGTMP, 'default');
+                EEGTMP = pop_icflag(EEGTMP,[NaN NaN;0.8 1;0.8 1;NaN NaN;NaN NaN;NaN NaN;NaN NaN]);
+                EEGTMP = pop_subcomp(EEGTMP,[],0);
 
                 % clean data using ASR - just the bad segment
-                EEG(s) = pop_clean_rawdata(EEG(s),'FlatlineCriterion','off','ChannelCriterion','off',...
+                EEGTMP = pop_clean_rawdata(EEGTMP,'FlatlineCriterion','off','ChannelCriterion','off',...
                     'LineNoiseCriterion','off','Highpass','off','BurstCriterion',20,...
                     'WindowCriterion',0.25,'BurstRejection','on','Distance','Euclidian',...
                     'WindowCriterionTolerances',[-Inf 7] );
 
                 % re-reference
-                EEG(s) = pop_reref(EEG(s),[],'interpchan','off');
-                EEG(s) = pop_saveset(EEG(s),'savemode','resave');
+                EEGTMP = pop_reref(EEGTMP,[],'interpchan','off');
+                EEGTMP = pop_saveset(EEGTMP,'savemode','resave');
+                EEG = eeg_store(EEG, EEGTMP, s);
             catch pipe_error
                 error_report{s} = pipe_error.message; %#ok<AGROW>
             end
@@ -617,6 +622,8 @@ if strcmpi(AnalysisLevel,'2')
             indir      = fullfile(InputDataset,TaskLabel{t});
         elseif contains(InputDataset,TaskLabel{t})
             indir     = InputDataset;
+        else
+            error('Enter the name of a folder containing the task name(s)')
         end
 
         if isfile(fullfile(indir,'AvgChanlocs.mat'))
