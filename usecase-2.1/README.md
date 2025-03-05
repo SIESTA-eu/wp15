@@ -135,7 +135,7 @@ The code that is specific to the analysis pipeline is shared under the CC0 licen
 
 The platform operator should be assumed to have no domain specific knowledge about the data, about the software, about the analysis pipeline, or about the results that it generates. The platform operator just executes the required containers following the [computational workflow](docs/workflow.md).
 
-The documention provided here is for Apptainer imagines, which allows wp15 members to develop and test. Once the use case is past the prototype stage, Docker images might be used instead.
+The documentation provided here is for Apptainer imagines, which allows wp15 members to develop and test. Once the use case is past the prototype stage, Docker images might be used instead.
 
 The documentation provided here is also just for a minimal test that does not consider differential privacy yet.
 
