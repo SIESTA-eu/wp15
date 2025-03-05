@@ -1,8 +1,63 @@
 # SIESTA - work package 15 - use case 2.4
 
-This implements the [Event-Related Potential](https://en.wikipedia.org/wiki/Event-related_potential) (ERP) analysis of 'classical' [ElectroEncephalography](https://en.wikipedia.org/wiki/Electroencephalography) research paradigms. This represents a very common type of biomedical data. The data are simple enough, allow automated data processing, and follows the BIDS standard.
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short it consists of these steps:
 
-The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
+2. the _data user_ implementing and testing the pipeline on the scrambled version
+3. the _platform operator_ running the differential private computation on the resampled version of the original data
+
+In the absence of a complete implementation of the SIESTA platform, this prototype use case requires that we bootstrap the whole process. The data transfer, the pipeline development, and the pipeline execution are all performed by wp15 members.
+
+In the following it is assumed that the wp15 repository with the code for all use cases is as `wp15` and that the data for all use cases is stored in a directory called `data` with subdirectories for each use case. Depending on where you store the code and the data on your computer, you may have to change some paths in the instructions below.
+
+## Data rights holder
+
+### Summary of the input data
+
+The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN).
+
+The input data consists of about 2000 files with a combined size of 24.1GB.
+
+Included in this dataset are:
+
+1. Raw data files for all 7 ERP components from 40 participants
+2. The event code schemes for all experiment paradigms
+3. The task stimuli used for eliciting N170, MMN, and N400, located in the stimuli folder
+4. Demographic information for all 40 participants ("participants.tsv & participants.json")
+
+### Data transfer
+
+The data can be downloaded from [ERPCore BIDS dataset](https://osf.io/9f5w7/files/osfstorage) or by installing and running the [osfclient](https://github.com/osfclient/osfclient). The osfclient downloads the data an order of magnitude faster, is more stable for long downloads, and ensures that the directory structure is preserved.
+
+```console
+python -m venv venv
+source venv/bin/activate
+pip install osfclient
+
+mkdir data/usecase-2.4
+cd data/usecase-2.4
+
+osf -p 9f5w7 clone download                                 # this writes to a subdirectory contained in the directory "download" 
+mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input      # move and rename the subdirectory to "input"
+rm -rf download                                             # this is now empty
+```
+
+### Constructing the scrambled data
+
+As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly.
+
+ A scrambled version of the data can be generated using [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble).
+
+```console
+cd data/usecase-2.4
+scramble input scrambled stub
+scramble input scrambled json -p '.*'
+scramble input scrambled brainvision
+```
+
+### Privacy assessment on the scrambled data
+
+To be discussed and documented here.
 
 ### Data citation
 
@@ -12,19 +67,22 @@ Emily S. Kappenman, Jaclyn L. Farrens, Wendy Zhang, Andrew X. Stewart, Steven J.
 
 The input dataset has been released under the [CC-BY-4.0](https://spdx.org/licenses/CC-BY-4.0.html) license.
 
-## Analysis pipeline
+## Data user
 
-### Legal aspects of the software
+The data user's pipeline implements the [Event-Related Potential](https://en.wikipedia.org/wiki/Event-related_potential) (ERP) analysis of 'classical' [ElectroEncephalography](https://en.wikipedia.org/wiki/Electroencephalography) research paradigms. This represents a very common type of biomedical data. The data are simple enough, allow automated data processing, and follows the BIDS standard.
 
-MATLAB is commercial software.
+The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
-EEGLAB is open source and released under the 2-clause BSD license.
+### Output data
 
-LIMO MEEG is open-source software released under the MIT License.
+The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
 
-FieldTrip is open source software and released under the GPLv3 license.
+The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
 
-The code that is specific to the analysis pipeline is shared under the CC0 license.
+```console
+cd wp15/usecase-2.4
+mkdir output
+```
 
 ### Software installation
 
@@ -34,7 +92,7 @@ There are also a number of additional EEGLAB plugins/dependencies (bids-matlab-t
 
 ```console
 git clone https://github.com/SIESTA-eu/wp15.git
-cd wp15/usecase-2.4
+cd wp15/usecase2.4
 
 wget https://github.com/sccn/eeglab/archive/refs/tags/2024.2.1.zip
 unzip 2024.2.1.zip
@@ -74,45 +132,6 @@ mv picard-matlab        eeglab/plugins/PICARD1.0
 mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 ```
 
-
-### Input data
-
-The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN).
-
-The input data consists of about 2000 files with a combined size of 24.1GB.
-
-Included in this dataset are:
-
-1. Raw data files for all 7 ERP components from 40 participants
-2. The event code schemes for all experiment paradigms
-3. The task stimuli used for eliciting N170, MMN, and N400, located in the stimuli folder
-4. Demographic information for all 40 participants ("participants.tsv & participants.json")
-
-The data can be downloaded from [ERPCore BIDS dataset](https://osf.io/9f5w7/files/osfstorage) or by installing and running the [osfclient](https://github.com/osfclient/osfclient). The osfclient downloads the data an order of magnitude faster, is more stable for long downloads, and ensures that the directory structure is preserved.
-
-```console
-cd wp15/usecase-2.4
-python -m venv venv
-source venv/bin/activate
-pip install osfclient
-osf -p 9f5w7 clone download
-mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input
-rm -rf download
-```
-
-### Output data
-
-The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
-
-The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
-
-```console
-cd wp15/usecase-2.4
-mkdir output
-```
-
-### Checking the installation
-
 Once all is installed, it should look like this
 
 ```console
@@ -149,15 +168,7 @@ Once all is installed, it should look like this
 └── output
 ```
 
-Alternatively, you can install the software in an Apptainer container image.
-
-```console
-cd wp15/usecase-2.4
-apptainer build pipeline.sif pipeline.def
-cd ../..
-```
-
-### Executing the pipeline
+### Testing the pipeline
 
 Executing the pipeline from the MATLAB command window is done like this:
 
@@ -179,6 +190,39 @@ matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab source; b
 matlab -batch "cd wp15/usecase-2.4; restoredefaultpath; addpath eeglab source; bidsapp input output group"
 ```
 
+You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written. For the prototype you can test the pipeline both on the original input data and on the scrambled data in the `scrambled` directory.
+
+### Legal aspects of the software
+
+MATLAB is commercial software.
+
+EEGLAB is open source and released under the 2-clause BSD license.
+
+LIMO MEEG is open-source software released under the MIT License.
+
+FieldTrip is open source software and released under the GPLv3 license.
+
+The code that is specific to the analysis pipeline is shared under the CC0 license.
+
+## Platform operator
+
+The platform operator should be assumed to have no domain specific knowledge about the data, about the software, about the analysis pipeline, or about the results that it generates. The platform operator just executes the required containers following the [computational workflow](docs/workflow.md).
+
+The documention provided here is for Apptainer imagines, which allows wp15 members to develop and test. Once the use case is past the prototype stage, Docker images might be used instead.
+
+The documentation provided here is also just for a minimal test that does not consider differential privacy yet.
+
+### Containerizing the pipeline
+
+You can install the software in an Apptainer container image like this:
+
+```console
+cd wp15/usecase-2.4
+apptainer build pipeline.sif pipeline.def
+```
+
+### Executing the pipeline as container
+
 Executing the pipeline from the Apptainer image is done like this:
 
 ```console
@@ -187,25 +231,4 @@ apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output parti
 apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output group
 ```
 
-It may be neccessay to use the `--bind` option to map the external and internal directories with input and output data.
-
-### Cleaning up
-
-Cleaning up the input and output data is done using:
-
-```console
-cd wp15/usecase-2.4
-rm -rf input output
-```
-
-### Scrambled data
-
-As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly. 
-
- A scrambled version of the data can be generated using [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble).
-
-```console
-scramble input output stub
-scramble input output json -p '.*'
-scramble input output brainvision
-```
+You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written.

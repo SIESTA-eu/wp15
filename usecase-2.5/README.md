@@ -1,17 +1,31 @@
 # SIESTA - work package 15 - use case 2.5
 
-This implements an SPM analysis on fMRI data that was recorded from participans engaged in a visual task.
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short it consists of these steps:
 
-The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
+1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
+2. the _data user_ implementing and testing the pipeline on the scrambled version
+3. the _platform operator_ running the differential private computation on the resampled version of the original data
 
-## Input data
+In the absence of a complete implementation of the SIESTA platform, this prototype use case requires that we bootstrap the whole process. The data transfer, the pipeline development, and the pipeline execution are all performed by wp15 members.
+
+In the following it is assumed that the wp15 repository with the code for all use cases is as `wp15` and that the data for all use cases is stored in a directory called `data` with subdirectories for each use case. Depending on where you store the code and the data on your computer, you may have to change some paths in the instructions below.
+
+## Data rights holder
+
+### Summary of the input data
 
 The input data is freely available from "OpenNeuro" with the Accession Number [ds004934](https://doi.org/10.18112/openneuro.ds004934.v1.0.0). The dataset includes 44 subjects who are divided into two experiments: 17 subjects undergo fMRIs dedicated to experiment 1, whereas 29 subjects undergo fMRIs dedicated to experiment 2.
 
-The input data consists of about 1548 files with a combined size of 18.63G. The data can be downloaded using the Amazon [AWS command-line interface](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) or using [datalad](https://www.datalad.org/).
+The input data consists of about 1548 files with a combined size of 18.63G.
+
+### Data transfer
+
+The data can be downloaded using the Amazon [AWS command-line interface](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) or using [datalad](https://www.datalad.org/).
 
 ```console
-mkdir input
+mkdir data/usecase-2.5
+cd data/usecase-2.5
+
 aws s3 cp --recursive --no-sign-request s3://openneuro.org/ds004934/ input
 ```
 
@@ -33,11 +47,31 @@ If your node installation is up-to-date and working then make sure you have an o
 ```console
 npm install -g @openneuro/cli
 
+mkdir data/usecase-2.5
+cd data/usecase-2.5
+
 openneuro login
 openneuro download ds004934 -s 1.0.0 input
 ```
 
 Tip: Use e.g. Node.js version 21.7.3 if you get errors from the openneuro client
+
+### Constructing the scrambled data
+
+As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly.
+
+ A scrambled version of the data can be generated using [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble).
+
+```console
+cd data/usecase-2.5
+scramble input scrambled stub
+scramble input scrambled json -p '(?!AcquisitionTime).*'
+scramble input scrambled nii permute y -i
+```
+
+### Privacy assessment on the scrambled data
+
+To be discussed and documented here.
 
 ### Data citation
 
@@ -53,7 +87,13 @@ The publication that describes the study in more detail is
 
 The input dataset has been released under the [CC0](https://spdx.org/licenses/CC0-1.0.html) license.
 
-## Output data
+## Data user
+
+The data user's pipeline implements an SPM analysis on fMRI data that was recorded from participans engaged in a visual task.
+
+The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
+
+### Output data
 
 The to-be-shared data in the output folder has the following directory structure:
 
@@ -76,16 +116,6 @@ cd wp15/usecase-2.5
 mkdir output
 ```
 
-## Analysis pipeline
-
-### Legal aspects of the software
-
-MATLAB is commercial software.
-
-SPM is open source software that is released under the GPLv2 license.
-
-The code that is specific to the analysis pipeline is shared under the CC0 license.
-
 ### Software installation
 
 This requires the Github source repository, SPM and MATLAB software.
@@ -100,24 +130,17 @@ mv spm12-r7771 spm12
 rm r7771.zip 
 ```
 
-Alternatively, you can install the software in an Apptainer container image.
-
-```console
-cd wp15/usecase-2.5
-apptainer build pipeline.sif pipeline.def
-```
-
-### Executing the pipeline
+### Testing the pipeline
 
 Executing the pipeline from the MATLAB command window is done like this:
 
 ```matlab
 cd wp15/usecase-2.5
 restoredefaultpath
+addpath work
 addpath spm12
 addpath spm12/config
 addpath spm12/matlabbatch
-addpath work
 
 bidsapp input output participant
 bidsapp input output group
@@ -131,6 +154,35 @@ matlab -batch "cd wp15/usecase-2.5; restoredefaultpath; addpath work spm12 spm12
 matlab -batch "cd wp15/usecase-2.5; restoredefaultpath; addpath work spm12 spm12/config spm12/matlabbatch; bidsapp input output group"
 ```
 
+You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written. For the prototype you can test the pipeline both on the original input data and on the scrambled data in the `scrambled` directory.
+
+### Legal aspects of the software
+
+MATLAB is commercial software.
+
+SPM is open source software that is released under the GPLv2 license.
+
+The code that is specific to the analysis pipeline is shared under the CC0 license.
+
+## Platform operator
+
+The platform operator should be assumed to have no domain specific knowledge about the data, about the software, about the analysis pipeline, or about the results that it generates. The platform operator just executes the required containers following the [computational workflow](docs/workflow.md).
+
+The documention provided here is for Apptainer imagines, which allows wp15 members to develop and test. Once the use case is past the prototype stage, Docker images might be used instead.
+
+The documentation provided here is also just for a minimal test that does not consider differential privacy yet.
+
+### Containerizing the pipeline
+
+You can install the software in an Apptainer container image like this:
+
+```console
+cd wp15/usecase-2.5
+apptainer build pipeline.sif pipeline.def
+```
+
+### Executing the pipeline as container
+
 Executing the pipeline from the Apptainer image is done like this:
 
 ```console
@@ -139,23 +191,4 @@ apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output parti
 apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output group
 ```
 
-## Cleaning up
-
-Cleaning up the input and output data is done using:
-
-```console
-cd wp15/usecase-2.5
-rm -rf input output
-```
-
-## Scrambled data
-
-As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly.
-
- A scrambled version of the data can be generated using [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble).
-
-```console
-scramble input output stub
-scramble input output json -p '(?!AcquisitionTime).*'
-scramble input output nii permute y -i
-```
+You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written.
