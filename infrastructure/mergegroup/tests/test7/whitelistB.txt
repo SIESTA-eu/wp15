@@ -1,0 +1,2 @@
+# this line is to be ignored
+results.nii
