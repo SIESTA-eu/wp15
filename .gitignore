@@ -4,6 +4,7 @@
 *.asv
 *.sif
 **/__pycache__/**
+.DS_Store
 
 BIDScramble/venv/*
 BIDScramble/build/*
