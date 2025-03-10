@@ -23,9 +23,9 @@ Stage: final
     apt update && apt -y install git
 
     # Install BIDScramble (update the repo source later)
-    # pip install bidscramble
+    # pip install bidscramble[mne]
     git clone https://github.com/SIESTA-eu/wp15.git
-    pip install wp15/BIDScramble
+    pip install wp15/BIDScramble[mne]
 
 %runscript
     exec scramble $@
