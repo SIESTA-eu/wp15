@@ -8,7 +8,7 @@ The use cases serve to get a broad and representative sample of neuroimaging dat
 
 | use case | data | software | responsible partner |
 |----------|------|----------|---------------------|
-| 2.1 | tabular, OpenNeuro, wget | R, windows/linux/macos | Nijmegen |
+| 2.1 | tabular, OpenNeuro, wget | R/Python/Julia/MATLAB, windows/linux/macos | Nijmegen |
 | 2.2 | anatomical MRI, OpenNeuro, openneuro/cli | container, linux | Nijmegen |
 | 2.3 | MEG, OpenNeuro, datalad | MATLAB, windows/linux/macos | Nijmegen |
 | 2.4 | EEG, OSF, osfclient | MATLAB, windows/linux/macos | Kopenhagen |
