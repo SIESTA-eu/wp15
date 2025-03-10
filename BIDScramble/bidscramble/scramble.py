@@ -96,15 +96,15 @@ def addparser_nii(parsers, _help: str):
     parser.set_defaults(func=scramble_nii)
 
     subparsers = parser.add_subparsers(dest='method', help='Scrambling method (default: null). Add -h, --help for more information')
-    subparser = subparsers.add_parser('null', parents=[parent_nii], description=description, help='Replaces all values with zeros')
-    subparser = subparsers.add_parser('blur', parents=[parent_nii], description=description, help='Apply a 3D Gaussian smoothing filter')
+    subparser  = subparsers.add_parser('null', parents=[parent_nii], description=description, help='Replaces all values with zeros')
+    subparser  = subparsers.add_parser('blur', parents=[parent_nii], description=description, help='Apply a 3D Gaussian smoothing filter')
     subparser.add_argument('fwhm', help='The FWHM (in mm) of the isotropic 3D Gaussian smoothing kernel', type=float)
-    subparser = subparsers.add_parser('permute', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more image dimensions')
-    subparser.add_argument('dims', help='The dimensions along which the images will be permuted', nargs='*', choices=['x','y','z','t','u','v','w'], default=['x','y'])
+    subparser  = subparsers.add_parser('permute', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more image dimensions')
+    subparser.add_argument('dims', help='The dimensions along which the images will be permuted', nargs='+', choices=['x','y','z','t','u','v','w'])
     subparser.add_argument('-i','--independent', help='Make all permutations along a dimension independent (instead of permuting slices as a whole)', action='store_true')
-    subparser = subparsers.add_parser('diffuse', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations using a sliding 3D permutation kernel')
+    subparser  = subparsers.add_parser('diffuse', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations using a sliding 3D permutation kernel')
     subparser.add_argument('radius', help='The radius (in mm) of the 3D/cubic permutation kernel', type=float, nargs='?', default=3)
-    subparser = subparsers.add_parser('wobble', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Deform the images using 3D random waveforms')
+    subparser  = subparsers.add_parser('wobble', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Deform the images using 3D random waveforms')
     subparser.add_argument('-a','--amplitude', metavar='GAIN', help='The amplitude of the random waveform', type=float, default=2)
     subparser.add_argument('-f','--freqrange', metavar='FREQ', help='The lowest and highest spatial frequency (in mm) of the random waveform', nargs=2, type=float, default=[1, 5])
 
@@ -124,8 +124,8 @@ def addparser_fif(parsers, _help: str):
 
     subparsers = parser.add_subparsers(dest='method', help='Scrambling method (default: null). Add -h, --help for more information')
     subparser  = subparsers.add_parser('null', parents=[parent], description=description, help='Replaces all values with zeros')
-    subparser = subparsers.add_parser('permute', parents=[parent], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more MEG data dimensions')
-    subparser.add_argument('dims', help='The dimensions along which the data will be permuted', nargs='*', choices=['channel', 'time'], type=list, default='time')
+    subparser  = subparsers.add_parser('permute', parents=[parent], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more MEG data dimensions')
+    subparser.add_argument('dims', help='The dimensions along which the data will be permuted', nargs='+', choices=['channel', 'time'], type=list)
 
 
 def addparser_brainvision(parsers, _help: str):
