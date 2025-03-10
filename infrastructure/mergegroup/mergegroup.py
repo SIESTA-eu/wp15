@@ -1,16 +1,14 @@
-import os, csv, re, sys
+import os, csv, re, sys, json, h5py, scipy.io  
 import numpy as np
 import nibabel as nib
 
 def filetype(filename):
-    if filename.endswith(".csv"):
-        return "csv"
-    elif filename.endswith(".tsv"):
-        return "tsv"
-    elif filename.endswith(".nii") or filename.endswith(".nii.gz"):
-        return "nii"
-    else:
-        return "unknown"
+    filename = filename.strip()  
+    extensions = {".txt": "txt", ".csv": "csv", ".tsv": "tsv", ".nii": "nii", ".nii.gz": "nii", ".mat": "mat"}
+    for ext, file_type in extensions.items():
+        if filename.lower().endswith(ext): 
+            return file_type
+    return "unknown"
 
 def parse_ctsv(filepath, delimiter):
     data = []
@@ -27,13 +25,25 @@ def parse_ctsv(filepath, delimiter):
     return header, data
 
 def parse_nii(filepath):
-
     return nib.load(filepath).get_fdata()
 
-def save_nii(outp, nii_data, affine):
+def parse_mat(filepath):    
+    try:
+        return scipy.io.loadmat(filepath)
+    except NotImplementedError:
+        with h5py.File(filepath, 'r') as file:
+            return {key: (dataset[()] if isinstance(dataset, h5py.Dataset) else {subkey: dataset[subkey][()] for subkey in dataset.keys()})
+                    for key, dataset in file.items() if key != "#refs#"}
 
-    nii_data = np.stack(nii_list, axis=-1)  
-    nib.save(nib.Nifti1Image(nii_data, affine), outp)
+def save_mat(data, filepath):
+    with open(filepath, 'w') as f:
+        for entry in data:
+            json.dump(entry, f, default=lambda o: o.tolist() if isinstance(o, np.ndarray) else o)
+            f.write('\n')
+
+def save_txt(output_path, data):
+    with open(output_path, "w") as file:
+        file.writelines("\t".join(map(str, row)) + "\n" for row in data)
 
 def save_ctsv(output_path, data_dict, headers, delimiter):
     with open(output_path, "w", newline='') as file:
@@ -56,55 +66,64 @@ def save_ctsv(output_path, data_dict, headers, delimiter):
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: apptainer run mergegroup.sif <input dir 1> <input dir 2> <input dir 3> ... <output dir> <whitelist.txt>")
+        print("Usage: apptainer run mergegroup.sif <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>")
         sys.exit(1)
-    
+
     try:
         with open(sys.argv[-1], "r") as file:
             whitelist = [line.strip() for line in file if line.strip() and not line.startswith("#")]
     except FileNotFoundError:
         print("Please provide a valid path to whitelist.txt")
         sys.exit(1)
-    
+
     output_dir = sys.argv[-2]
     os.makedirs(output_dir, exist_ok=True)
-    
     data_dict = {key: list() for key in whitelist}
     headers = {key: None for key in whitelist}
     file_types = {key: filetype(key) for key in whitelist}
-    nii_values = list()
+    txt_values, mat_values, nii_values = list(), list(), list()
+
     for key in whitelist:
-        input_dirs = sorted([f"{item}/{key}" for item in sys.argv[1:-2]],
-                             key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
-        
+        input_dirs = sorted([f"{item}/{key}" for item in sys.argv[1:-2]], key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
+
         for input_dir in input_dirs:
             if os.path.exists(input_dir):
                 try:
-                    if file_types[key] in ["csv", "tsv"]:
+                    if file_types[key] == "txt":
+                        with open(input_dir, "r") as file:
+                            txt_values.append(file.readline().strip())
+                        print(f"Merging: {input_dir} -> {output_dir}/group-merged.{file_types[key]}")
+                    elif file_types[key] in ["csv", "tsv"]:
                         delimiter = "," if file_types[key] == "csv" else "\t"
                         header, data = parse_ctsv(input_dir, delimiter)
-                        print(f"Merging: {input_dir} -> {output_dir}/group-merged.{file_types[key]}")
                         if headers[key] is None:
                             headers[key] = header
                         data_dict[key].extend(data)
+                        print(f"Merging: {input_dir} -> {output_dir}/group-merged.{file_types[key]}")
                     elif file_types[key] == "nii":
-                        nii_data = parse_nii(input_dir)
-                        nii_values.append(nii_data.flatten())
+                        nii_values.append(parse_nii(input_dir).flatten())
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.npy")
+                    elif file_types[key] == "mat":
+                        mat_values.append(parse_mat(input_dir))
+                        print(f"Merging: {input_dir} -> {output_dir}/group-merged.jsonl")
                     else:
                         print(f"Unsupported file type: {key}")
                 except Exception as e:
                     print(f"Error processing {input_dir}: {e}")
-    
-    if nii_values:
-        np.savetxt(output_dir+"/group-merged.txt", np.array(nii_values), fmt="%.15f") 
-        np.save(output_dir+"/group-merged.npy", np.array(nii_values))
+            else:
+                print(f"Expected file '{input_dir.split('/')[-1]}' does not exist in directory {'/'.join(input_dir.split('/')[:-1])}")        
 
-    if data_dict:
-    	output_file = f"{output_dir}/group-merged.csv" if any(ft == "csv" for ft in file_types.values()) else f"{output_dir}/group-merged.tsv"
-    	delimiter = "," if output_file.endswith(".csv") else "\t"
-    	save_ctsv(output_file, data_dict, headers, delimiter)
-    else: print("No valid data found.")
-    
+    if file_types[key] == "txt":
+        save_txt(f"{output_dir}/group-merged.txt", txt_values)
+    elif file_types[key] in ["csv", "tsv"]:
+        save_ctsv(f"{output_dir}/group-merged.{file_types[key]}", data_dict, headers, "," if file_types[key] == "csv" else "\t")
+    elif file_types[key] == "nii":
+        np.savetxt(f"{output_dir}/group-merged.txt", np.array(nii_values), fmt="%.15f") 
+        np.save(f"{output_dir}/group-merged.npy", np.array(nii_values))
+    elif file_types[key] == "mat":
+        save_mat(mat_values, f"{output_dir}/group-merged.jsonl")
+    else:
+        print("No valid data found.")
+
 if __name__ == "__main__":
     main()
