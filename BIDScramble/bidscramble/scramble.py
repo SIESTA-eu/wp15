@@ -117,7 +117,7 @@ def addparser_fif(parsers, _help: str):
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir fif\n'
-              '  scramble inputdir outputdir fif permute\n')
+              '  scramble inputdir outputdir fif permute time\n')
 
     parser = parsers.add_parser('fif', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.set_defaults(func=scramble_fif)
@@ -125,7 +125,7 @@ def addparser_fif(parsers, _help: str):
     subparsers = parser.add_subparsers(dest='method', help='Scrambling method (default: null). Add -h, --help for more information')
     subparser  = subparsers.add_parser('null', parents=[parent], description=description, help='Replaces all values with zeros')
     subparser  = subparsers.add_parser('permute', parents=[parent], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more MEG data dimensions')
-    subparser.add_argument('dims', help='The dimensions along which the data will be permuted', nargs='+', choices=['channel', 'time'], type=list)
+    subparser.add_argument('dims', help='The dimensions along which the data will be permuted', nargs='+', choices=['channel', 'time'])
 
 
 def addparser_brainvision(parsers, _help: str):
