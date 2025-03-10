@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import re
-import mne
 from tqdm import tqdm
 from pathlib import Path
 from typing import List
@@ -10,6 +8,8 @@ from . import get_inputfiles
 
 
 def scramble_fif(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str='null', dims: List[str]=(), dryrun: bool=False, **_):
+
+    import mne          # MNE is not imported in the root as it is only installed as `extras`
 
     # Defaults
     inputdir  = Path(inputdir).resolve()
