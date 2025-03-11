@@ -8,6 +8,7 @@ From: python:3-slim
 %files
 
 %post
+  sudo apt update && sudo apt install git
   python3 -m venv /venv
   . /venv/bin/activate
   python -m pip install datalad
@@ -34,4 +35,3 @@ From: python:3-slim
 
   echo Downloading the anatomical MRI data for all subjects ...
   datalad get sub-*/ses-mri/anat/*mprage_T1w.nii.gz
-

@@ -28,11 +28,11 @@ jobs:
 
       - name: Build containers
         run: |
-          cd ${GITHUB_WORKSPACE}/usecase-2.1 && apptainer build download.sif download.def
-          cd ${GITHUB_WORKSPACE}/usecase-2.2 && apptainer build download.sif download.def
-          cd ${GITHUB_WORKSPACE}/usecase-2.3 && apptainer build download.sif download.def
-          cd ${GITHUB_WORKSPACE}/usecase-2.4 && apptainer build download.sif download.def
-          cd ${GITHUB_WORKSPACE}/usecase-2.5 && apptainer build download.sif download.def
+          echo Building usecase 2.1; cd ${GITHUB_WORKSPACE}/usecase-2.1 && apptainer build download.sif download.def
+          echo Building usecase 2.2; cd ${GITHUB_WORKSPACE}/usecase-2.2 && apptainer build download.sif download.def
+          echo Building usecase 2.3; cd ${GITHUB_WORKSPACE}/usecase-2.3 && apptainer build download.sif download.def
+          echo Building usecase 2.4; cd ${GITHUB_WORKSPACE}/usecase-2.4 && apptainer build download.sif download.def
+          echo Building usecase 2.5; cd ${GITHUB_WORKSPACE}/usecase-2.5 && apptainer build download.sif download.def
 
       - name: Login and push containers
         run: |
