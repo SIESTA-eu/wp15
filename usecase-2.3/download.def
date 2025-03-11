@@ -8,7 +8,7 @@ From: python:3-slim
 %files
 
 %post
-  sudo apt update && sudo apt install git
+  apt update && apt install git
   python3 -m venv /venv
   . /venv/bin/activate
   python -m pip install datalad
