@@ -2,6 +2,7 @@ import os, csv, re, sys, json, h5py, scipy.io
 import numpy as np
 import nibabel as nib
 from more_itertools import collapse
+from itertools import zip_longest
 
 def filetype(filename):
     filename = filename.strip()  
@@ -72,7 +73,7 @@ def main():
     data_dict = {key: list() for key in whitelist}
     headers = {key: None for key in whitelist}
     file_types = {key: filetype(key) for key in whitelist}
-    txt_values, mat_values, nii_values = list(), list(), list()
+    txt_values, ctsv_values ,mat_values, nii_values = list(), list(), list(), list()
     for key in whitelist:
         input_dirs = sorted([f"{item}/{key}" for item in sys.argv[1:-2]], key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
         
@@ -88,7 +89,8 @@ def main():
                         header, data = parse_ctsv(input_dir, delimiter)
                         if headers[key] is None:
                             headers[key] = header
-                        data_dict[key].extend(data)
+                        #data_dict[key].extend(list(collapse(data)))
+                        ctsv_values.append(list(collapse(data)))
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     if file_types[key] == "nii":
                         nii_values.append(parse_nii(input_dir).flatten())
@@ -105,23 +107,16 @@ def main():
                 print(f"Expected file '{input_dir.split('/')[-1]}' does not exist in directory {'/'.join(input_dir.split('/')[:-1])}")        
 
 
+    merged_lists = [list(filter(lambda x: x is not None, sublist)) for sublist in zip_longest(
+    [i for i in txt_values], 
+    [i for i in ctsv_values], 
+    [i for i in nii_values], 
+    [prep_(i) for i in mat_values], fillvalue=None)]
+
     if os.path.exists(f"{output_dir}/group-merged.tsv"):
         os.remove(f"{output_dir}/group-merged.tsv")
-    if txt_values:
-        for i in txt_values:
-            save_(f"{output_dir}/group-merged.tsv", i)
-    if data_dict:
-        for i in list(data_dict.values())[0]:
-            save_(f"{output_dir}/group-merged.tsv",list(collapse(i)))
-    if nii_values:
-        for i in nii_values:
-            save_(f"{output_dir}/group-merged.tsv",list(collapse(i))) 
-    if mat_values:
-        for i in mat_values:
-            save_(f"{output_dir}/group-merged.tsv",prep_(i))  
-    else:
-        pass
-        #print("No valid data found.")
+    for i in merged_lists:
+         save_(f"{output_dir}/group-merged.tsv", list(collapse(i)))
 
 if __name__ == "__main__":
     main()
