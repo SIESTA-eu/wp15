@@ -12,19 +12,33 @@ def filetype(filename):
             return file_type
     return "unknown"
 
+
 def parse_ctsv(filepath, delimiter):
     data = []
-    header = None
     with open(filepath, 'r') as f:
         reader = csv.reader(f, delimiter=delimiter)
         l = next(reader, None)
         if any(not c.isdigit() for c in l):
-            header = l
+            pass
         else:
             data.append([float(x) for x in l])
         for row in reader:
             data.append([float(x) for x in row])
-    return header, data
+    return data
+    
+"""
+
+def parse_ctsv(filepath, delimiter):
+    data = []
+    with open(filepath, 'r') as f:
+        reader = csv.reader(f, delimiter=delimiter)
+        for l in list(collapse(reader)):
+            if not l.isalpha() or not l.isalnum():
+                data.append(float(l))
+            else: pass
+    return data
+"""
+
 
 def parse_nii(filepath):
     return nib.load(filepath).get_fdata()
@@ -36,7 +50,6 @@ def parse_mat(filepath):
         with h5py.File(filepath, 'r') as file:
             return {key: (dataset[()] if isinstance(dataset, h5py.Dataset) else {subkey: dataset[subkey][()] for subkey in dataset.keys()})
                     for key, dataset in file.items() if key != "#refs#"}
-
 
 def prep_(dict_):
     def flatten(lst):
@@ -71,32 +84,29 @@ def main():
     output_dir = sys.argv[-2]
     os.makedirs(output_dir, exist_ok=True)
     data_dict = {key: list() for key in whitelist}
-    headers = {key: None for key in whitelist}
     file_types = {key: filetype(key) for key in whitelist}
     txt_values, ctsv_values ,mat_values, nii_values = list(), list(), list(), list()
+    
     for key in whitelist:
         input_dirs = sorted([f"{item}/{key}" for item in sys.argv[1:-2]], key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
-        
-        for input_dir in input_dirs:
+        txt_aux, ctsv_aux,mat_aux, nii_aux = list(), list(), list(), list()
+        for input_dir in input_dirs:  
             if os.path.exists(input_dir):
                 try:
                     if file_types[key] == "txt":
                         with open(input_dir, "r") as file:
-                            txt_values.append(file.readline().strip())
+                            txt_aux.append(file.readline().strip())
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     if file_types[key] in ["csv", "tsv"]:
                         delimiter = "," if file_types[key] == "csv" else "\t"
-                        header, data = parse_ctsv(input_dir, delimiter)
-                        if headers[key] is None:
-                            headers[key] = header
-                        #data_dict[key].extend(list(collapse(data)))
-                        ctsv_values.append(list(collapse(data)))
+                        data = parse_ctsv(input_dir, delimiter)
+                        ctsv_aux.append(list(collapse(data)))              
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     if file_types[key] == "nii":
-                        nii_values.append(parse_nii(input_dir).flatten())
+                        nii_aux.append(parse_nii(input_dir).flatten())
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     if file_types[key] == "mat":
-                        mat_values.append(parse_mat(input_dir))
+                        mat_aux.append(parse_mat(input_dir))
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     else: 
                         pass
@@ -105,18 +115,31 @@ def main():
                     print(f"Error processing {input_dir}: {e}")
             else:
                 print(f"Expected file '{input_dir.split('/')[-1]}' does not exist in directory {'/'.join(input_dir.split('/')[:-1])}")        
-
-
+        if txt_aux:
+            txt_values.append(txt_aux)
+        if ctsv_aux:
+            ctsv_values.append(ctsv_aux)
+        if nii_aux:
+            nii_values.append(nii_aux)
+        if mat_aux:
+            mat_values.append([prep_(i) for i in mat_aux])
+    
+    #txt_values = list(np.array(txt_values).T)
+    ctsv_values= list(np.array(ctsv_values).T)    
+    #nii_values= list(np.array(nii_values).T)
+    mat_values= list(np.array(mat_values).T)
+ 
     merged_lists = [list(filter(lambda x: x is not None, sublist)) for sublist in zip_longest(
-    [i for i in txt_values], 
-    [i for i in ctsv_values], 
-    [i for i in nii_values], 
-    [prep_(i) for i in mat_values], fillvalue=None)]
-
+    [[list(pair)] for pair in zip(*[sublist for sublist in txt_values])],#[i for i in txt_values], 
+    [[list(pair)] for pair in zip(*[sublist for sublist in ctsv_values])],#[list(i) for i in ctsv_values], 
+    [[list(pair)] for pair in zip(*[sublist for sublist in nii_values])],#[i for i in nii_values], 
+    [[list(pair)] for pair in zip(*[sublist for sublist in mat_values])],#[prep_(i) for i in mat_values]
+    fillvalue=None)]
+    
     if os.path.exists(f"{output_dir}/group-merged.tsv"):
         os.remove(f"{output_dir}/group-merged.tsv")
     for i in merged_lists:
          save_(f"{output_dir}/group-merged.tsv", list(collapse(i)))
-
+    
 if __name__ == "__main__":
     main()
