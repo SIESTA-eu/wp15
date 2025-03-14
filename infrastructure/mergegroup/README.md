@@ -11,7 +11,7 @@ mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>
 ```
 
 In this directory there exists number of tests, representing possible usecases with possible results.[extension] and different dimensionality. Usecase shows
-$\text{<input dir 1> <input dir 2> ...}$, the directory for each individuals, $\text{<output dir>}$ for output directory, and $\text{whitelist.txt}$ which is a list of filenames of all results. 
+$\text{<input dir 1> <input dir 2> ...}$, the directory for each individuals, $\text{\<output dir\>}$ for output directory, and $\text{whitelist.txt}$ which is a list of filenames of all results. 
 Python script is practically run as below:
 
 ```python
