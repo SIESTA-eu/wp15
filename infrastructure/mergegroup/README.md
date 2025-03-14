@@ -2,7 +2,7 @@ The result of the [Jacknife resampling](https://en.wikipedia.org/wiki/Jackknife_
 
 **mergegroup.sif** container is built by infrastructure/mergegroup.def which runs infrastructure/mergegroup/mergegroup.py, responsible to collect the mentioned result of each individual $n$ and store it in usecase2.x/group-merge/group-merged.tsv, for further analysis in the pipeline. 
 
-The indiv results can be saved in different extensions such as $[.txt, .tsv, .csv, .mat, .nii, .nii.gz, ...]$ as well as different dimensions, $[i \doc j]$ where $i$ indicates result, and $j$ is different attributs.
+The indiv results can be saved in different extensions such as $[.txt, .tsv, .csv, .mat, .nii, .nii.gz, ...]$ as well as different dimensions, $[i \cdot j]$ where $i$ indicates result, and $j$ is different attributs.
 
 ### mergegroup.py usecase:
 
@@ -55,7 +55,7 @@ test10/
 └── whitelist.txt
 ```
 ### Output
-The output is stored in usecase2.x/group-merge/group-merged.tsv, which each line is a collection of all possible attribute, in all possible different file type of each individual, resulting in a tsv file of $[n \dot m]$, where $n$ is individuals and $m$ is attributes. 
+The output is stored in usecase2.x/group-merge/group-merged.tsv, which each line is a collection of all possible attribute, in all possible different file type of each individual, resulting in a tsv file of $[n \cdot m]$, where $n$ is individuals and $m$ is attributes. 
 ### Practical usecase
 ```bash
 python3 mergegroup.py group-1 group-2 group-3 group-merge whitelist.txt
