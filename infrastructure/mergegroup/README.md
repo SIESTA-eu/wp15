@@ -1,8 +1,8 @@
 The result of the [Jacknife resampling](https://en.wikipedia.org/wiki/Jackknife_resampling) is stored in usecase2.x/group-n/group/ where $x$ indicates different usecases, and $n$ is each individual.
 
-**mergegroup.sif** container is built by infrastructure/mergegroup.def which runs infrastructure/mergegroup/mergegroup.py, responsible to collect the mentioned result of each individual $n$ and store it in usecase2.x/group-merge/group-merged.tsv, for further analysis in the pipeline. 
+**mergegroup.sif** container is built by $\text{infrastructure/mergegroup.def]}$ which runs $\text{infrastructure/mergegroup/mergegroup.py]}$, responsible to collect the mentioned result of each individual $n$ and store it in $\text{[usecase2.x/group-merge/group-merged.tsv]}$, for further analysis in the pipeline. 
 
-The indiv results can be saved in different extensions such as $[.txt, .tsv, .csv, .mat, .nii, .nii.gz, ...]$ as well as different dimensions, $[i \cdot j]$ where $i$ indicates result, and $j$ is different attributes.
+The indiv results can be saved in different extensions such as $\text{[.txt, .tsv, .csv, .mat, .nii, .nii.gz, ...]}$ as well as different dimensions, $[i \cdot j]$ where $i$ indicates result, and $j$ is different attributes.
 
 ### mergegroup.py usecase:
 
@@ -11,7 +11,7 @@ mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>
 ```
 
 In this directory there exists number of tests, representing possible usecases with possible results.[extension] and different dimensionality. Usecase shows
-$<input dir 1> <input dir 2> ...$, the directory for each individuals, $ <output dir> $ for output directory, and $whitelist.txt$ which is a list of filenames of all results. 
+$\text{<input dir 1> <input dir 2> ...}$, the directory for each individuals, $\text{<output dir>}$ for output directory, and $\text{whitelist.txt}$ which is a list of filenames of all results. 
 Python script is practically run as below:
 
 ```python
