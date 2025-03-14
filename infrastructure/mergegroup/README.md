@@ -13,6 +13,7 @@ In this directory there exists number of tests, representing possible usecases w
 ```python
 python3 mergegroup.py group-1 group-2 group-3 group-merge whitelist.txt
 ```
+```
 test0/
 ├── group-1 
 │   ├── results.txt
@@ -50,6 +51,7 @@ test10/
 │   ├── results.nii
 │   └── results.tsv
 └── whitelist.txt
+```
 
 ### Practical usecase
 ```bash
