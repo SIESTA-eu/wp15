@@ -12,8 +12,9 @@ mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>
 
 In this directory there exists number of tests, representing possible usecases with possible results.[extension] and different dimensionality. Usecase shows
 $\text{<input dir 1> <input dir 2> ...}$, the directory for each individuals, $\text{\<output dir\>}$ for output directory, and $\text{whitelist.txt}$ which is a list of filenames of all results. 
-Python script is practically run as below:
 
+### Practical usecase
+Python script is practically run as below:
 ```python
 python3 mergegroup.py group-1 group-2 group-3 group-merge whitelist.txt
 ```
@@ -59,16 +60,13 @@ test10/
 ```
 ### Output
 The output is stored in usecase2.x/group-merge/group-merged.tsv, which each line is a collection of all possible attribute, in all possible different file type of each individual, resulting in a tsv file of $[n \cdot m]$, where $n$ is individuals and $m$ is attributes. 
-### Practical usecase
-```bash
-python3 mergegroup.py group-1 group-2 group-3 group-merge whitelist.txt
-```
+
 # Test
 Since each test has group-[1:3], the output file will have 3 lines. This can be tested by 
 ```bash
 for file in whitelist*.txt; do python3 mergegroup.py group-1 group-2 group-3 group-merge "$file"; wc -l group-merge/group-merged.tsv; done
 ```
-where the result for test0 will be 
+where the output will be similar for each whitelist.txt, for test0 will be 
 ```bash
 Merging: group-1/results.txt -> group-merge/group-merged.tsv
 Merging: group-2/results.txt -> group-merge/group-merged.tsv
