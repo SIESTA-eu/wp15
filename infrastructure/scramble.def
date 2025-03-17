@@ -25,7 +25,7 @@ Stage: final
     # Install BIDScramble (update the repo source later)
     # pip install bidscramble[fif]
     git clone https://github.com/SIESTA-eu/wp15.git
-    pip install wp15/BIDScramble[mne]
+    pip install wp15/BIDScramble[fif]
 
 %runscript
     exec scramble $@
