@@ -19,15 +19,17 @@ The platform operator should get information from the data rights holder on:
 - a manifest file to check completeness and integrity after data transfer
 - the retention period of the data on the SIESTA storage system
 
-## Uploading or downloading
+## Data transfer into the system
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to _downloading_ if the data rights holder creates an account on their system for the platform operator, and if the latter initiates and controls the transfer.
 
-## Uploading the data by the data rights holder
+Besides storing the original dataset, disk space should be made available to allow for intermediate and final results.
+
+### Uploading the data by the data rights holder
 
 Assuming that the SIESTA platform implements a secure file transfer protocol that is accessible to the data rights holder, then the data rights holder can initiate the data transfer. The platform operator should provide upload instructions to the data rights holder.
 
-## Downloading the data by the platform operator
+### Downloading the data by the platform operator
 
 Assuming that the SIESTA platform does _not_ (yet) implement a secure file transfer protocol accessible to the data rights holder, the data rights holder needs to give the platform operator access to the dataset and the platform operator initiates the transfer.
 
@@ -47,8 +49,9 @@ In the different use cases under wp15 we have identified different transfer mech
 
 Some of these allow for recursively downloading a directory containing files and subdirectories. Others are more suited for the download of a single file. In case the dataset being transferred is contained in a (potentially compressed) archive, such as a zip, tar, tgz, or rar file, the platform operator must "unzip" the dataset.  
 
-Besides storing the dataset, disk space should be made available to allow for intermediate and final results.
+### Data transfer out from the system 
 
+The data user might want to download the scrambled data for pipeline development. The data user will also want to download the results of the application of the pipeline on the sensitive input data.
 
 ## Computational requirements
 
