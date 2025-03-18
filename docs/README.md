@@ -17,15 +17,11 @@ In this work package we distinguish four types of data:
 
 Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles:
 
-1. Data rights holder
-2. Data user
-3. Platform operator
+1. [Data rights holder](data_rights_holder.md)
+2. [Data user](data_user.md)
+3. [Platform operator](platform_operator.md)
 
-Each of these roles has its own section in the documentation:
-
-- documentation for the [data rights holder](data_rights_holder.md)
-- documentation for the [data user](data_user.md)
-- documentation for the [platform operator](platform_operator.md)
+Each of these roles has its own section in the documentation, please click on the respective links.
 
 ## Data flow
 
