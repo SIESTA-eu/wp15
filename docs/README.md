@@ -21,7 +21,11 @@ Permission for accessing data is defined by the role of the user. In this work p
 2. Data user
 3. Platform operator
 
-Each of these roles has its own section in the documentation.
+Each of these roles has its own section in the documentation:
+
+- documentation for the [data rights holder](data_rights_holder.md)
+- documentation for the [data user](data_user.md)
+- documentation for the [platform operator](platform_operator.md)
 
 ## Data flow
 
@@ -40,3 +44,5 @@ This can be conceived to be graphically depicted in a flowchart.
 The review by the data rights holder prior to data disclosure in step 4 and 9 are optional, depending on the trust that the data rights holder puts in the process for generating the scrambled and the oputput data. There might be different levels of randomness implemented in the BIDScramble tool (and requested by the data rights holder), resulting in the scrambled data being somewhere along the scale of "anonymous" to "personal".
 
 The implementation of the analysis pipeline on the scrambled data (step 5) could be done on the platform, but could also be done by the data user on their own computer after downloading the scrambled data. After implementing it locally, the pipeline is to be uploaded. The result of step 5 is that the pipeline is available on the platform as a container.
+
+The data flow is further detailled in the [computational workflow](workflow.md) documentation. 
