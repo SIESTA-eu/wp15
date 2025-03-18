@@ -44,7 +44,7 @@ If the data user want to make use of MATLAB in the analysis, they should give th
 
 If the data user want to make use other non-free software in the analysis, they should provide the platform operator with that software and with the license to use that software on their behalf.
 
-## Data transfer
+## Data transfer out from the system (export)
 
 The data user may want to download the scrambled version of the data for local development and testing of the analysis pipeline.
 

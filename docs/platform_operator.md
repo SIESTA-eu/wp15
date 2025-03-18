@@ -21,7 +21,7 @@ The platform operator should get information from the data rights holder on:
 
 Besides storing the dataset, disk space should be made available to allow for intermediate and final results. The data user should specify the expected storage requirements of the analysis pipeline.
 
-## Data transfer into the system
+## Data transfer into the system (import)
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account for the data rights holder on the SIESTA platform and if the data rights holder initiates and controls the transfer. We refer to _downloading_ if the data rights holder creates an account on their system for the platform operator, and if the latter initiates and controls the transfer.
 
@@ -49,7 +49,7 @@ In the different use cases under wp15 we have identified different transfer mech
 
 Some of these allow for recursively downloading a directory containing files and subdirectories. Others are more suited for the download of a single file. In case the dataset being transferred is contained in a (potentially compressed) archive, such as a zip, tar, tgz, or rar file, the platform operator must "unzip" the dataset.  
 
-## Data transfer out from the system
+## Data transfer out from the system (export)
 
 The data user might want to download the scrambled data for pipeline development on their local computer.
 

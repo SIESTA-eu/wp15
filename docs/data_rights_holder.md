@@ -4,7 +4,7 @@ The data rights holder is the person or organization responsible for the dataset
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to _downloading_ if the data rights holder creates an account on their system for the platform operator, and if the latter initiates and controls the transfer. In neither case is the data user involved in the data transfer.
 
-## Data transfer
+## Data transfer into the system (import)
 
 ### Uploading the data by the data rights holder
 
