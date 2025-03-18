@@ -11,6 +11,8 @@ The containers, including the infrastructure, download and pipeline ones, are au
 
 Since building all containers takes a lot of time, you can also build containers locally. The instructions for that are specified in the README files for the specific use cases. You can also use the `Makefile` that is provided in the infrastructure directory. It allows building one container, or all of them.
 
+    cd infrastructure
+    
     make download-2.1.sif # only make this specific download container
     make pipeline-2.1.sif # only make this specific pipeline container
     make scramble.sif     # only make this specific container
