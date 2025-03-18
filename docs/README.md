@@ -41,4 +41,4 @@ The review by the data rights holder prior to data disclosure in step 4 and 9 ar
 
 The implementation of the analysis pipeline on the scrambled data (step 5) could be done on the platform, but could also be done by the data user on their own computer after downloading the scrambled data. After implementing it locally, the pipeline is to be uploaded. The result of step 5 is that the pipeline is available on the platform as a container.
 
-The data flow is further detailled in the [computational workflow](workflow.md) documentation. 
+The data flow is further detailled in the [computational workflow](workflow.md) documentation.

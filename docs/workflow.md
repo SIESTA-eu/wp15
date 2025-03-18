@@ -1,6 +1,10 @@
-# SIESTA computational workflow
+# Computational workflow
 
-Note that whenever `filename.sif` is mentioned below, it is assumed that this might be either an Apptainer or Singularity container (for wp15 development and testing), or a Docker container (for execution in Kubernetes). Arguments that are specified to the containers correspond to the input and the output directories (for wp15 development and testing) or the encrypted volumes that are to be mounted. The Apptainer or Docker containers do not take additional command-line options that are to be specified by the data rights holder or by the data user. The interaction of the data rights holder or data user with tools and data happens _inside_ the container. For this purpose, some of the containers will need to provide an interactive graphical desktop with VNC or ThinLinc.
+This document outlines the computational workflow and the handling of input data, intermedate or work-in-progress data, and output data.
+
+Whenever `filename.sif` is mentioned below, it is assumed that this might be either an Apptainer or Singularity container (for wp15 development and testing), or a Docker container (for execution in Kubernetes). Arguments that are specified to the containers correspond to the input and the output directories (for wp15 development and testing) or the encrypted volumes that are to be mounted. The Apptainer or Docker containers do not take additional command-line options that are to be specified by the data rights holder or by the data user. The interaction of the data rights holder or data user with tools and data happens _inside_ the container. For this purpose, some of the containers will need to provide an interactive graphical desktop with VNC or ThinLinc.
+
+Whenever a directory for input or output data is mentioned below, it is assumed that this corresponds to a secure and encrypted volume that is mounted into the container being executed. We anticipate that many volumes will be created, most of them only to hold the single-subject or leave-one-out datasets and the work-in-progress results of the pipelines on these subsets. These volumes can be short-lived and removed after their content has been merged for the next step in the workflow.
 
 ## Data rights holder
 

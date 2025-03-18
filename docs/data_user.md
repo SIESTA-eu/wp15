@@ -43,3 +43,9 @@ The analysis must be implemented as a containerized [BIDS application](https://d
 If the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable.
 
 If the data user want to make use other non-free software in the analysis, they should provide the platform operator with that software and with the license to use that software on their behalf.
+
+## Data transfer
+
+The data user may want to download the scrambled version of the data for local development and testing of the analysis pipeline.
+
+The data user will also want to download the results of the application of their pipeline to the original sensitive data.
