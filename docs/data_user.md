@@ -1,6 +1,8 @@
 # Data user
 
-The data user is the researcher that aims to answer a specific research question using the data that is made available for analysis through the SIESTA platform. As the data is considered to be sensitive, the data itself is not directly available for download. The SIESTA platform allows the data user to interactively implement an analysis, which eventually is converted to a container and executed by the platforn operator on the data of behalf of the data user.
+The data user is the researcher that aims to answer a specific research question using the data that is made available for analysis through the SIESTA platform. We assume here that the SIESTA data user is working in a different institute than the data rights holder; if they were working in the same institution they could share directly and the SIESTA platform would not be needed.
+
+As the data on SIESTA is considered to be sensitive, it is not directly available for download by the data user. The SIESTA platform allows the data user to interactively implement an analysis, which eventually is converted to a container and executed by the platform operator on the data of behalf of the data user.
 
 ## Developing and testing the analysis
 
