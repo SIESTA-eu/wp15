@@ -7,7 +7,7 @@ computational [workflow](../docs/workflow.md).
 
 ## Building containers
 
-The containers, including the infrastructure, download and pipeline ones, are automatically built by a GitHub action whenever a new tag is pushed to the repository. These containers are made available in the GitHub image registry and on the "packages" tab of the wp15 repository.
+The containers, including the infrastructure, download and pipeline ones, are automatically built by a GitHub action whenever a new tag is pushed to the repository. These containers are made available on the GitHub container registry and on the [packages](https://github.com/orgs/SIESTA-eu/packages?repo_name=wp15) page of the wp15 repository.
 
 Since building all containers takes a lot of time, you can also build containers locally. The instructions for that are specified in the README files for the specific use cases. You can also use the `Makefile` that is provided in the infrastructure directory. It allows building one container, or all of them.
 
