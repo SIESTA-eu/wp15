@@ -44,7 +44,7 @@ If the data user want to make use other non-free software in the analysis, they 
 
 The participant-level analysis can be done one subject at the time, but can also be executed in parallel. The analysis of one participant's data does not require access to the data of any other participant.
 
-To ensure that no targetted attachs are possible by singling out the data of any given subject, the participant leven alaysis is implemented on single-subject representations of the input dataset.
+To ensure that no targeted attacks are possible by singling out any given subject, the participant-level analysis is implemented on single-subject versions of the input dataset.
 
 ### Group level
 
