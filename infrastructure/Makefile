@@ -58,7 +58,7 @@ pipeline-2.5.sif: ../usecase-2.5/pipeline.def
 
 # Clean up generated container files
 clean:
-	rm -f $(CONTAINERS)
+	rm -f $(INFRASTRUCTURE) $(DOWNLOAD) $(PIPELINE)
 
 # Phony targets (targets that are not files)
 .PHONY: all clean
