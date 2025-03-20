@@ -19,10 +19,12 @@ From: ubuntu:24.04
   export LC_ALL=C
 
 %runscript
-  if [ ! -d "$1" ]; then
+  if [ ! -d "$1" ]; then 
     echo Error: the directory "$1" does not exist
     exit 1
   fi
-  echo Creating output directory "$2"
-  mkdir -p "$2"
-  echo The noise calibration is not yet implemented ...
+  if [ ! -d "$2" ]; then 
+    echo Error: the directory "$2" does not exist
+    exit 1
+  fi
+  echo The privacy review is not yet implemented ...
