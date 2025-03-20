@@ -32,7 +32,7 @@ The original dataset is not directly accessible to the data user and should rema
 
 The data user must specify to the platform operator what the computational requirements for the analysis are. Preferably, the data user would specify the computational requirements for the participant-level and the group-level separately, as that allows the platform operator to decide whether the participant-level analysis can be executed in parallel.
 
-The analysis must be implemented as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209) with a participant- and a group-level step. For development and testing we recommend to use a Linux-based environment where the data user has full administrative rights to install software and dependencies. The steps for software and dependency installation must be transferred to a container definition file.
+For development and testing we recommend to use a Linux-based environment where the data user has full administrative rights to install software and dependencies. The steps for software and dependency installation must be transferred to a container definition file.
 
 If the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable.
 
@@ -52,7 +52,9 @@ During the group-level analysis, the data from multiple participants is combined
 
 ### Computational efficiency
 
-The participant- and group-level analysis can in principle be computed sequentially in a single step or container, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these as separate steps so that the participant-level analyses don't have to be repeated for each leave-one-out sample.
+The participant- and group-level analysis can in principle be computed sequentially in a single step, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these explicitly as separate steps, so that the participant-level analyses don't have to be repeated for each leave-one-out sample. 
+
+Since the participant-level analysis is done separately for each subject, it can be executed in parallel by the platform operator. The data user does not have to implement anything special for parallel execution.
 
 ## Data transfer out from the system (export)
 
