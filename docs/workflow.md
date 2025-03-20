@@ -6,7 +6,7 @@ Whenever `filename.sif` is mentioned below, it is assumed that this might be eit
 
 Whenever a directory for input or output data is mentioned below, it is assumed that this corresponds to a secure and encrypted volume that is mounted into the container being executed. We anticipate that many volumes will be created, most of them only to hold the single-subject or leave-one-out datasets and the work-in-progress results of the pipelines on these subsets. These volumes can be short-lived and removed after their content has been merged for the next step in the workflow.
 
-In the following workflow there are a number of steps that are only done to check the consistency of the implementation. These increases the computational time and are not needed for the final output, but during platform development will help with testing.
+The following workflow includes a number of steps that are not needed for the final output. These have been added to validate the consistency of the implementation and to help with testing during platform development. They can be removed at a later stage.
 
 ## Data rights holder
 
