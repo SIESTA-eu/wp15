@@ -13,32 +13,43 @@ def filetype(filename):
     return "unknown"
 
 
+
 def parse_ctsv(filepath, delimiter):
-    data = []
-    with open(filepath, 'r') as f:
-        reader = csv.reader(f, delimiter=delimiter)
-        l = next(reader, None)
-        if any(not c.isdigit() for c in l):
-            pass
-        else:
-            data.append([float(x) for x in l])
+    data = list()
+    with open(filepath, 'r') as file:
+        reader = csv.reader(file, delimiter=delimiter)
         for row in reader:
-            data.append([float(x) for x in row])
+            line = list()
+            for item in row:
+                try:
+                    val = float(item)
+                    if val.is_integer():
+                        val = int(val)
+                    line.append(val)
+                except ValueError:
+                    continue
+            if line:
+                data.append(line)
+                
     return data
-    
-"""
 
-def parse_ctsv(filepath, delimiter):
-    data = []
-    with open(filepath, 'r') as f:
-        reader = csv.reader(f, delimiter=delimiter)
-        for l in list(collapse(reader)):
-            if not l.isalpha() or not l.isalnum():
-                data.append(float(l))
-            else: pass
+def parse_txt(filepath, delimiter=' '):
+    data = list()
+    with open(filepath, 'r') as file:
+        for line in file:
+            row = line.strip().split(delimiter)
+            line = list()
+            for item in row:
+                try:
+                    val = float(item)
+                    if val.is_integer():
+                        val = int(val)
+                    line.append(val)
+                except ValueError:
+                    continue
+            if line:
+                data.append(line)
     return data
-"""
-
 
 def parse_nii(filepath):
     return nib.load(filepath).get_fdata()
@@ -94,8 +105,8 @@ def main():
             if os.path.exists(input_dir):
                 try:
                     if file_types[key] == "txt":
-                        with open(input_dir, "r") as file:
-                            txt_aux.append(file.readline().strip())
+                        data = parse_txt(input_dir)
+                        txt_aux.append(list(collapse(data)))
                         print(f"Merging: {input_dir} -> {output_dir}/group-merged.tsv")
                     if file_types[key] in ["csv", "tsv"]:
                         delimiter = "," if file_types[key] == "csv" else "\t"
