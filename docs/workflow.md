@@ -6,87 +6,93 @@ Whenever `filename.sif` is mentioned below, it is assumed that this might be eit
 
 Whenever a directory for input or output data is mentioned below, it is assumed that this corresponds to a secure and encrypted volume that is mounted into the container being executed. We anticipate that many volumes will be created, most of them only to hold the single-subject or leave-one-out datasets and the work-in-progress results of the pipelines on these subsets. These volumes can be short-lived and removed after their content has been merged for the next step in the workflow.
 
+In the following workflow there are a number of steps that are only done to check the consistency of the implementation. These increases the computational time and are not needed for the final output, but during platform development will help with testing.
+
 ## Data rights holder
 
-Transfer the data to the platform and provide a scrambled version.
+Transfer the data to the platform, provide a scrambled version, and do a privacy review.
 
-    ./download.sif input
-    ./privacy.sif input scrambled  # this includes the interactive scrambling process and the privacy review
+    ./download.sif  input
+    ./scramble      input scrambled-input
+    ./privacy.sif   input scrambled-input
 
 ## Data user
 
 Develop the pipeline and test it on the scrambled data.
 
-    ./pipeline.sif scrambled output participant
-    ./pipeline.sif scrambled output group
+    ./pipeline.sif scrambled-input scrambled-output participant
+    ./pipeline.sif scrambled-input scrambled-output group
     
 ## Platform operator
+
+Run the particpant- and group-level analysis on the original input data.
+
+    ./pipeline.sif input output participant
+    ./pipeline.sif input output group
 
 Run the particpant-level analysis on the single subjects.
 
     for SUBJ in `seq $NSUBJ`; do
-        ./singlesubject.sif input singlesubject-$SUBJ $SUBJ
+        ./singlesubject.sif input singlesubject-$SUBJ-input $SUBJ
+        ./pipeline.sif singlesubject-$SUBJ-input singlesubject-$SUBJ-output participant
     done
 
-    for SUBJ in `seq $NSUBJ`; do
-        ./pipeline.sif singlesubject-$SUBJ singlesubject-$SUBJ/derivatives/output participant
-    done
+Combine the single subject input and results into merged datasets.
 
-_The call above assumes that the `singlesubject-$SUBJ` directory is writable and that the pipeline writes results in a subdirectory `singlesubject-$SUBJ/derivatives/output`. This is probably not realistic in a Docker scenario that accesses only volumes, not directories. In that case a separate `mergederivatives.sif` step might be needed to merge the singlesubject input data with the singlesubject derivative data. The resulting volumes for all participants are then merged in the next step. See [issue #61](https://github.com/SIESTA-eu/wp15/issues/61)._
-
-    ./mergesubjects.sif subjects-merged $(eval echo singlesubject-{1..$NSUBJ})
+    ./mergesubjects.sif singlesubject-merged-input  $(eval echo singlesubject-{1..$NSUBJ}-input)  # this should result in the same as "input"
+    ./mergesubjects.sif singlesubject-merged-output $(eval echo singlesubject-{1..$NSUBJ}-output)
 
 Run the group-level analysis on the leave-one-out resampled datasets.
 
     for SUBJ in `seq $NSUBJ`; do
-        ./leaveoneout.sif subjects-merged leaveoneout-$SUBJ $SUBJ
+        ./leaveoneout.sif input                       leaveoneout-$SUBJ-input  $SUBJ
+        ./leaveoneout.sif singlesubject-merged-output leaveoneout-$SUBJ-output $SUBJ
+        ./pipeline.sif    leaveoneout-$SUBJ-input     leaveoneout-$SUBJ-output group
     done
 
-    for SUBJ in `seq $NSUBJ`; do
-        ./pipeline.sif leaveoneout-$SUBJ group-$SUBJ group
-    done
+Merge the leave-one-out results and calibrate the noise.
 
-    ./mergegroup.sif $(eval echo group-{1..$NSUBJ}) group-merged
-    ./calibratenoise.sif group-merged noise
+    ./mergegroup.sif $(eval echo leaveoneout-{1..$NSUBJ}-output) leaveoneout-merged-output ./whitelist.txt
+    ./calibratenoise.sif leaveoneout-merged-output noise
 
 Run the group-level analysis on all subjects together and add the calibrated noise.
 
-    ./pipeline.sif subjects-merged group-all group
-    ./addnoise.sif group-all noise group-with-noise
+    ./pipeline.sif singlesubject-merged-input singlesubject-merged-output group  # this should result in the same as "output"
+    ./addnoise.sif singlesubject-merged-output noise singlesubject-merged-output-noise
+    ./addnoise.sif output noise output-noise    # this should result in the same "singlesubject-merged-output-noise"
 
 ## Data rights holder
 
 Review the group-level results with the calibrated noise and release them to the data user.
 
-    ./privacy.sif input group-with-noise
+    ./privacy.sif input output-noise
 
 # Required applications or containers
 
 - download.sif
-- privacy.sif (for the interactive scrambling process and the privacy review)
+- scramble.sif
+- privacy.sif
+- pipeline.sif
 - singlesubject.sif
-- pipeline.sif (participant-level, on single-subject data)
-- mergederivatives.sif
-- mergesubjects.sif
 - leaveoneout.sif
-- pipeline.sif (group-level, on resampled data)
+- mergesubjects.sif
 - mergegroup.sif
-- pipeline.sif (group-level, on all data, not resampled)
-- compare.sif
 - calibratenoise.sif
 - addnoise.sif
-- privacy.sif (for the privacy review on the output data)
 
 # Required data directories or volumes
 
 - input
-- scrambled
 - output
-- singlesubject-xxx
-- subjects-merged
-- leaveoneout-xxx
-- group-xxx
-- group-merged
+- scrambled-input
+- scrambled-output
+- singlesubject-xxx-input
+- singlesubject-xxx-output
+- singlesubject-merged-input
+- singlesubject-merged-output
+- leaveoneout-xxx-input
+- leaveoneout-xxx-output
+- leaveoneout-merged-output
 - noise
-- group-all
-- group-with-noise
+- singlesubject-merged-output-noise
+- output-noise
