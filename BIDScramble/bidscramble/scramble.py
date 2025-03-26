@@ -34,9 +34,9 @@ def addparser_stub(parsers, _help: str):
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir stub\n'
-              "  scramble inputdir outputdir stub -s '.*\.(nii|json|tsv)'\n"
-              "  scramble inputdir outputdir stub -s '(?!derivatives(/|$)).*'\n"
-              "  scramble inputdir outputdir stub -s '(?!sub.*scans.tsv|/func/).*'\n ")
+              r"  scramble inputdir outputdir stub -s '.*\.(nii|json|tsv)'\n"
+              r"  scramble inputdir outputdir stub -s '(?!derivatives(/|$)).*'\n"
+              r"  scramble inputdir outputdir stub -s '(?!sub.*scans.tsv|/func/).*'\n ")
 
     parser = parsers.add_parser('stub', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.set_defaults(func=scramble_stub)
@@ -152,11 +152,11 @@ def addparser_swap(parsers, _help: str):
     Randomly swaps the content of data files between a group of similar files in the input
     directory and save them as output.""")
 
-    epilog = ('examples:\n'
-              '  scramble inputdir outputdir swap\n'
-              "  scramble inputdir outputdir swap -s '.*\.(nii|json|tsv)'\n"
-              "  scramble inputdir outputdir swap -s '(?!derivatives(/|$)).*' -b\n"
-              "  scramble inputdir outputdir swap -g subject session run\n ")
+    epilog = (r'examples:\n'
+              r'  scramble inputdir outputdir swap\n'
+              r"  scramble inputdir outputdir swap -s '.*\.(nii|json|tsv)'\n"
+              r"  scramble inputdir outputdir swap -s '(?!derivatives(/|$)).*' -b\n"
+              r"  scramble inputdir outputdir swap -g subject session run\n ")
 
     parser = parsers.add_parser('swap', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.add_argument('-g','--grouping', metavar='ENTITY', help='A list of (full-name) BIDS entities that make up a group between which file contents are swapped. See: https://bids-specification.readthedocs.io/en/stable/appendices/entities.html', nargs='+', default=['subject'], type=str)
@@ -170,10 +170,10 @@ def addparser_pseudo(parsers, _help: str):
     subject label is replaced by a pseudonym anywhere in the filepath as well as inside all
     text files (such as json and tsv-files).""")
 
-    epilog = ('examples:\n'
-              '  scramble inputdir outputdir pseudo\n'
-              "  scramble inputdir outputdir_remove1 pseudo random  -s '(?!sub-003(/|$)).*' \n"
-              "  scramble inputdir outputdir_keep1 pseudo original -s 'sub-003(/|$).*'\n ")
+    epilog = (r'examples:\n'
+              r'  scramble inputdir outputdir pseudo\n'
+              r"  scramble inputdir outputdir_remove1 pseudo random  -s '(?!sub-003(/|$)).*' \n"
+              r"  scramble inputdir outputdir_keep1 pseudo original -s 'sub-003(/|$).*'\n ")
 
     parser = parsers.add_parser('pseudo', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.add_argument('method', help='The method to generate the pseudonyms', choices=['random','permute','original'], default='permute')
