@@ -19,4 +19,14 @@ From: ubuntu:24.04
   export LC_ALL=C
 
 %runscript
-  echo Nothing to see here, please come back later...
+  if [ ! -d "$1" ]; then
+    echo Error: the directory "$1" does not exist
+    exit 1
+  fi  
+  if [ ! -d "$2" ]; then
+    echo Error: the directory "$2" does not exist
+    exit 1
+  fi
+  echo Creating output directory "$3"
+  mkdir -p "$3"
+  echo Adding noise is not yet implemented ...
