@@ -6,12 +6,12 @@ This repository contains the work that is done in the context of work package 15
 
 The use cases serve to get a broad and representative sample of neuroimaging datasets and analysis pipelines.
 
-| use case | data | software | responsible partner |
-|----------|------|----------|---------------------|
-| 2.1 | tabular, OpenNeuro, wget | R/Python/Julia/MATLAB, windows/linux/macos | Nijmegen |
-| 2.2 | anatomical MRI, OpenNeuro, openneuro/cli | container, linux | Nijmegen |
-| 2.3 | MEG, OpenNeuro, datalad | MATLAB, windows/linux/macos | Nijmegen |
-| 2.4 | EEG, OSF, osfclient | MATLAB, windows/linux/macos | Kopenhagen |
-| 2.5 | functional MRI, OpenNeuro, AWS S3 | MATLAB, windows/linux/macos | Toulouse |
+| Use case | Data type and source      | Transfer method | Analysis software     | Responsible Partner |
+|----------|---------------------------|-----------------|-----------------------|---------------------|
+| 2.1      | Tabular (OpenNeuro)       | wget            | R/Python/Julia/MATLAB | Nijmegen            |
+| 2.2      | Anatomical MRI (OpenNeuro)| openneuro/cli   | Container             | Nijmegen            |
+| 2.3      | MEG (OpenNeuro)           | datalad         | MATLAB                | Nijmegen            |
+| 2.4      | EEG (OSF)                 | osfclient       | MATLAB                | Copenhagen          |
+| 2.5      | Functional MRI (OpenNeuro)| AWS S3          | MATLAB                | Toulouse            |
 
 More detailed documentation is provided in the respective use cases and in the [docs](docs) directory.
