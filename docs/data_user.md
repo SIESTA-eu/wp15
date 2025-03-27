@@ -50,6 +50,10 @@ To ensure that no targeted attacks are possible by singling out any given subjec
 
 During the group-level analysis, the data from multiple participants is combined into an aggregate group-level output that provides the answer to the data user's research question. The group level analysis might require access to the original input data, and might also require access to intermediate results that are computed during the participant-level analysis.
 
+### Software licenses
+
+The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used. This may mean that you have to apply for a license key (for example for [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/License)) or that you have to provide network access to a license server (for example [MATLAB](https://nl.mathworks.com/help/install/ug/use-existing-on-premises-license-manager-with-matlab-running-on-the-cloud.html)).
+
 ### Computational efficiency
 
 The participant- and group-level analysis can in principle be computed sequentially in a single step, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these explicitly as separate steps, so that the participant-level analyses don't have to be repeated for each leave-one-out sample. 
