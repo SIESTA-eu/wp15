@@ -6,7 +6,7 @@ This repository contains the work that is done in the context of work package 15
 
 The use cases serve to get a broad and representative sample of neuroimaging datasets and analysis pipelines.
 
-| Use case | Data type and source      | Transfer method | Analysis software     | Responsible Partner |
+| Use case | Data type and source      | Transfer method | Analysis software     | Responsible partner |
 |----------|---------------------------|-----------------|-----------------------|---------------------|
 | 2.1      | Tabular (OpenNeuro)       | wget            | R/Python/Julia/MATLAB | Nijmegen            |
 | 2.2      | Anatomical MRI (OpenNeuro)| openneuro/cli   | Container             | Nijmegen            |
