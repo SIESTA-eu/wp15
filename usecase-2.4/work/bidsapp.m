@@ -15,6 +15,7 @@ function bidsapp(varargin)
 %
 % -h,--help       shows this help and exit
 % -v,--version    shows the eeglab and limo versions and exit
+%
 % The InputDataset must be a directory containing a BIDS dataset.
 % The OutputLocation must be a directory that will contain the result.
 % The AnalysisLevel must be 'participant' or 'group'.
