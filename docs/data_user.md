@@ -22,6 +22,53 @@ During development and testing, the data user has access to an anonymous scrambl
 
 To facilitate debugging, the data user's analysis scripts should give explicit error messages. Rather than a try-except statement that print that "something went wrong", the analysis script should show _where_ in the analysis it went wrong (i.e., in which step, and on which subject) and _what_ went wrong. When possible, show a full stack trace of the error.
 
+### Input data handling
+
+Input data to the analysis pipeline must be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
+
+The input is for example formatted as 
+
+```
+input 
+├── dataset_description.json
+├── participants.tsv
+├── participants.json
+├── README.md
+├── sub-01
+|   | ses-01/...
+|   └ ses-02/...
+├── sub-02
+|   | ses-01/...
+|   └ ses-02/...
+...
+└── sub-NN
+    | ses-01/...
+    └ ses-02/...
+```
+
+The input directory can optionally also include derivatives that are provided by the data rights holder, such as MaxFiltered data, or FreeSurfer cortical sheets. These would be in the `input/derivative/pipelinename` directory, where the pipeline name is for example `maxfilter` or `freesurfer`. 
+
+### Output data handling
+
+Output data to the analysis pipeline must be formatted according to [BIDS](https://bids.neuroimaging.io) derivatives. The participant-level phase of the analysis should result in directories `sub-xxx` directly under the output directory. The group-level step has access to the same input data and output data directories as the participant-level step. The output data for the group-level step can be written at the top level of the output directory, but we recommend to write it in a dedicated `group` directory.
+
+You should _not_ make a directory named `derivatives` inside the output directory. You should also _not_ make multiple side-by-side derivatives in the output directory.
+
+The output is for example formatted as 
+
+```
+output 
+├── sub-01
+|   └ ...
+├── sub-02
+|   └ ...
+├── sub-03
+|   └ ...
+...
+└── group
+    └ result.tsv
+```
+
 ## Storage requirements
 
 The data user must specify to the platform operator what the storage requirements are for the participant- and group-level analyses. How many file are created, how much storage does that require, what is the retention period of the intermediate data, and what data files comprise the final results for the data user.
