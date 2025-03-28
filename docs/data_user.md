@@ -28,7 +28,7 @@ Input data to the analysis pipeline must be formatted as a raw dataset according
 
 The input is for example formatted as 
 
-```
+```console
 input 
 ├── dataset_description.json
 ├── participants.tsv
@@ -46,17 +46,19 @@ input
     └ ses-02/...
 ```
 
-The input directory can optionally also include derivatives that are provided by the data rights holder, such as MaxFiltered data, or FreeSurfer cortical sheets. These would be in the `input/derivative/pipelinename` directory, where the pipeline name is for example `maxfilter` or `freesurfer`. 
+The input directory can optionally also include derivatives that are provided by the data rights holder, such as MaxFiltered data, or FreeSurfer cortical sheets. These would be in the `input/derivative/pipelinename` directory, where the pipeline name is for example `maxfilter` or `freesurfer`.
 
 ### Output data handling
 
-Output data to the analysis pipeline must be formatted according to [BIDS](https://bids.neuroimaging.io) derivatives. The participant-level phase of the analysis should result in directories `sub-xxx` directly under the output directory. The group-level step has access to the same input data and output data directories as the participant-level step. The output data for the group-level step can be written at the top level of the output directory, but we recommend to write it in a dedicated `group` directory.
+Output data from the analysis pipeline must be formatted according to [BIDS](https://bids.neuroimaging.io) derivatives. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
+
+The participant-level analysis should write its results in `sub-xxx` directories that arew placed directly underneath the output directory. The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis can be written at the top level of the output directory, or in a dedicated `group` directory.
 
 You should _not_ make a directory named `derivatives` inside the output directory. You should also _not_ make multiple side-by-side derivatives in the output directory.
 
-The output is for example formatted as 
+The output is for example formatted as
 
-```
+```console
 output 
 ├── sub-01
 |   └ ...
@@ -65,15 +67,16 @@ output
 ├── sub-03
 |   └ ...
 ...
+├── someresults.tsv
 └── group
-    └ result.tsv
+    └ otherresults.nii.gz
 ```
 
 ## Storage requirements
 
 The data user must specify to the platform operator what the storage requirements are for the participant- and group-level analyses. How many file are created, how much storage does that require, what is the retention period of the intermediate data, and what data files comprise the final results for the data user.
 
-The original dataset is not directly accessible to the data user and should remain read-only. The analysis pipeline should not write any results to the original dataset. There is a single "BIDS derivative" output directory to hold the intermediate results of the participant-level analysis _and_ the group-level results. It is up to the data user how to organize the data in this directory, but we recommend that the participant-level data is organized in subdirectories named `sub-<label>` and that the group results are stored in a subdirectory named `group`.
+The original dataset is not directly accessible to the data user and should remain read-only. The analysis pipeline should not write any results to the original input dataset. If temporary results are to be written to the input dataset, it is required to make a copy of the input dataset to the output directory and use that as the input.
 
 ## Computational requirements
 
