@@ -11,7 +11,6 @@ from pathlib import Path
 
 def gen_whitelist(targetdir: str, pattern: str, outputfile: str):
 
-    # Copy all root files except the participants tsv-file
     targetdir  = Path(targetdir)
     outputfile = Path(outputfile)
     inputitems = [item.relative_to(targetdir).as_posix() for item in targetdir.rglob('*') if re.fullmatch(pattern, str(item.relative_to(targetdir)))]
