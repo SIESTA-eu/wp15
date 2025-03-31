@@ -1,7 +1,7 @@
 import sys
-import pathlib
 import re
 import pandas as pd
+from pathlib import Path
 from importlib import metadata
 from typing import List, Tuple
 from bids_validator import BIDSValidator
@@ -11,7 +11,7 @@ __description__ = metadata.metadata('bidscramble')['Summary']
 __url__         = metadata.metadata('bidscramble')['Project-URL']
 
 
-def get_inputfiles(inputdir: pathlib.Path, select: str, pattern: str='*', bidsvalidate: bool=False) -> Tuple[List[pathlib.Path], List[pathlib.Path]]:
+def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: bool=False) -> Tuple[List[Path], List[Path]]:
     """
     :param inputdir:     The input directory from which files are retrieved using rglob
     :param select:       The fullmatch regular expression pattern to select the files of interest
@@ -35,7 +35,7 @@ def get_inputfiles(inputdir: pathlib.Path, select: str, pattern: str='*', bidsva
     return sorted(inputfiles), sorted(inputdirs)       # TODO: create a class and return input objects?
 
 
-def prune_participants_tsv(rootdir: pathlib.Path):
+def prune_participants_tsv(rootdir: Path):
     """
     Removes rows from the participants tsv file if their subject directories do not exist
 
