@@ -1,4 +1,6 @@
-import os, csv, re, sys, json, h5py, scipy.io  
+#!/usr/bin/env python3
+
+import os, csv, re, sys, json, h5py, scipy.io
 import numpy as np
 import nibabel as nib
 from more_itertools import collapse
