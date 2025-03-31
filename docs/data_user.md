@@ -84,7 +84,7 @@ The data user must specify to the platform operator what the computational requi
 
 For development and testing we recommend to use a Linux-based environment where the data user has full administrative rights to install software and dependencies. The steps for software and dependency installation must be transferred to a container definition file.
 
-If the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable.
+If the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
 
 If the data user want to make use other non-free software in the analysis, they should provide the platform operator with that software and with the license to use that software on their behalf.
 
