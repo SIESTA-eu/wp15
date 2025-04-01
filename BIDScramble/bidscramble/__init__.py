@@ -26,11 +26,7 @@ def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: 
 
     if bidsvalidate:
         inputfiles = [fpath for fpath in inputfiles if not BIDSValidator().is_bids(fpath.as_posix())]
-
-    if not inputfiles:
-        print(f"WARNING: No files found in {inputdir} using '{select}'")
-    else:
-        print(f"Found {len(inputfiles)} input files and {len(inputdirs)} directories using '{select}'")
+    print(f"Found {len(inputfiles)} input files and {len(inputdirs)} directories using '{select}'")
 
     return sorted(inputfiles), sorted(inputdirs)       # TODO: create a class and return input objects?
 

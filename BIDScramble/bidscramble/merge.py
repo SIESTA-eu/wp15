@@ -45,8 +45,9 @@ def merge(outputdir: str, inputdirs: List[str]):
                 raise Exception(f"ERROR: Got duplicate participant IDs {duplicates.tolist()} when merging: {inputdir}")
 
         for subdir in inputdir.glob('sub-*'):
-            print(f"Merging: {subdir.name} -> {outputdir}")
-            shutil.copytree(subdir, outputdir/subdir.name)
+            if subdir.is_dir():
+                print(f"Merging: {subdir.name} -> {outputdir}")
+                shutil.copytree(subdir, outputdir/subdir.name)
 
     # Save the merged participants table to disk
     if not table.empty:
