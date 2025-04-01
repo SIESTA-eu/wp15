@@ -42,10 +42,8 @@ def merge(outputdir: str, inputdirs: List[str]):
                     raise Exception(f"ERROR: Got duplicate participant IDs {duplicates.tolist()} when merging: {inputdir}")
 
             elif item.is_dir():
-                if (outputdir/item.name).exists():
-                    raise Exception(f"ERROR: Merge target folder already exists: {item}")
                 print(f"Merging: {item.name} -> {outputdir}")
-                shutil.copytree(item, outputdir/item.name)
+                shutil.copytree(item, outputdir/item.name, dirs_exist_ok=True)
 
             elif not (outputdir/item.name).exists():
                 print(f"Merging: {item.name} -> {outputdir/item.name}")
