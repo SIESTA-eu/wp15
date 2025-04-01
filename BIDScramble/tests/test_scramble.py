@@ -177,7 +177,7 @@ def test_scramble_nii(tmp_path):
 
     # Create diffused output data
     (tmp_path/'output'/niifile).unlink()
-    scramble_nii(tmp_path/'input', tmp_path/'output', 'sub.*\\.nii.gz', False, 'diffuse', radius=25)
+    scramble_nii(tmp_path/'input', tmp_path/'output', 'sub.*\\.nii.gz', False, 'scatter', radius=25)
     assert (tmp_path/'output'/niifile).is_file()
 
     # Check that the NIfTI data is properly diffused

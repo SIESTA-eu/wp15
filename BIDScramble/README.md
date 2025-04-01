@@ -146,18 +146,18 @@ examples:
 
 ```console
 usage: scramble inputdir outputdir nii [-h] [-d] [-b] [-s PATTERN] [-c [SPECS]]
-                                       {null,blur,permute,diffuse,wobble} ...
+                                       {null,blur,permute,scatter,wobble} ...
 
 Adds scrambled versions of the NIfTI files in the input directory to the output directory. If no
 scrambling method is specified, the default behavior is to null all image values.
 
 positional arguments:
-  {null,blur,permute,diffuse,wobble}
+  {null,blur,permute,scatter,wobble}
                         Scrambling method (default: null). Add -h, --help for more information
     null                Replaces all values with zeros
     blur                Apply a 3D Gaussian smoothing filter
     permute             Perform random permutations along one or more image dimensions
-    diffuse             Perform random permutations using a sliding 3D permutation kernel
+    scatter             Perform random permutations using a sliding 3D permutation kernel
     wobble              Deform the images using 3D random waveforms
 
 options:
@@ -176,8 +176,8 @@ options:
 
 examples:
   scramble inputdir outputdir nii
-  scramble inputdir outputdir nii diffuse -h
-  scramble inputdir outputdir nii diffuse 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'
+  scramble inputdir outputdir nii scatter -h
+  scramble inputdir outputdir nii scatter 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'
   scramble inputdir outputdir nii wobble -a 2 -f 1 8 -s 'sub-.*_T1w.nii'
 ```
 

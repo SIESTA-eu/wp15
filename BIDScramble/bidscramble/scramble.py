@@ -88,8 +88,8 @@ def addparser_nii(parsers, _help: str):
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir nii\n'
-              '  scramble inputdir outputdir nii diffuse -h\n'
-              "  scramble inputdir outputdir nii diffuse 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'\n"
+              '  scramble inputdir outputdir nii scatter -h\n'
+              "  scramble inputdir outputdir nii scatter 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'\n"
               "  scramble inputdir outputdir nii wobble -a 2 -f 1 8 -s 'sub-.*_T1w.nii'\n ")
 
     parser = parsers.add_parser('nii', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
@@ -102,7 +102,7 @@ def addparser_nii(parsers, _help: str):
     subparser  = subparsers.add_parser('permute', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations along one or more image dimensions')
     subparser.add_argument('dims', help='The dimensions along which the images will be permuted', nargs='+', choices=['x','y','z','t','u','v','w'])
     subparser.add_argument('-i','--independent', help='Make all permutations along a dimension independent (instead of permuting slices as a whole)', action='store_true')
-    subparser  = subparsers.add_parser('diffuse', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations using a sliding 3D permutation kernel')
+    subparser  = subparsers.add_parser('scatter', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Perform random permutations using a sliding 3D permutation kernel')
     subparser.add_argument('radius', help='The radius (in mm) of the 3D/cubic permutation kernel', type=float, nargs='?', default=3)
     subparser  = subparsers.add_parser('wobble', parents=[parent_nii], formatter_class=DefaultsFormatter, description=description, help='Deform the images using 3D random waveforms')
     subparser.add_argument('-a','--amplitude', metavar='GAIN', help='The amplitude of the random waveform', type=float, default=2)
