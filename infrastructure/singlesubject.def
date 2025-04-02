@@ -28,9 +28,9 @@ Stage: final
     pip install wp15/BIDScramble
 
 %runscript
-    PID=$(ls -d $1/sub-* | sed -n "${3}p" | xargs basename)
+    PID=$(ls -d $1/sub-*/ | sed -n "${3}p" | xargs basename)
     if [ -z "$PID" ]; then
         echo "Error: No data found for participant_nr $3" >&2
         exit 1
     fi
-    exec scramble $1 $2 pseudo original -s ".*\b$PID((\.|_)\w+)*\b(/|$).*"
+    exec scramble $1 $2 pseudo original -s "(.*/)*$PID([\._-].+)*(/|$).*" -r no
