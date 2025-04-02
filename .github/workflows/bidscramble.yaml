@@ -5,6 +5,8 @@ on:
       - 'BIDScramble/**'
       - '!**.md'
       - '!**.rst'
+    tags-ignore:      # Explicitly ignore tags to avoid running twice
+      - '*'
   pull_request:
     paths:
       - 'BIDScramble/**'

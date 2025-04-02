@@ -2,6 +2,8 @@ name: Codespell
 
 on:
   push:
+    tags-ignore:      # Explicitly ignore tags to avoid running twice
+      - '*'
   pull_request:
 
 permissions:
