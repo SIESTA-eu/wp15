@@ -33,6 +33,4 @@ Stage: final
         echo "Error: No data found for participant_nr $3" >&2
         exit 1
     fi
-    NOPID="(?!($PID|$PID(\.|_).*|derivatives)(/|$))"
-    scramble $1 $2 pseudo original -s "${NOPID}.*"
-    exec scramble $1 $2 pseudo original -s "derivatives/.*/${NOPID}.*"
+    exec scramble $1 $2 pseudo original -s "(?!.*\b$PID((\.|_)\w+)?\b(/|$)).*"

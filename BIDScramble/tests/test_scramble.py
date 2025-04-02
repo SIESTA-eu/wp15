@@ -39,7 +39,7 @@ def test_scramble_stub(tmp_path):
     # Check that all output data - `derivatives` + `LICENSE` is there
     assert (tmp_path/'output'/'LICENSE').is_file()
     assert (tmp_path/'output'/'code').is_dir()
-    assert not (tmp_path/'output'/'derivatives').is_dir()
+    assert not (tmp_path/'output'/'derivatives').exists()
     assert len(list((tmp_path/'input').rglob('*'))) == len(list((tmp_path/'output').rglob('*')))
 
     # Check that the 'GeneratedBy' and 'DatasetType' have been written
@@ -68,7 +68,7 @@ def test_scramble_tsv(tmp_path):
     # Create nulled output data
     scramble_tsv(tmp_path/'input', tmp_path/'output', 'partici.*\\.tsv', False, 'null', '')
     assert (tmp_path/'output'/'partici_test.tsv').is_file()
-    assert not (tmp_path/'output'/'test.tsv').is_file()
+    assert not (tmp_path/'output'/'test.tsv').exists()
 
     # Check that the participants.tsv data is properly nulled
     inputdata  = pd.read_csv(tmp_path/'input'/'participants.tsv', sep='\t')
@@ -107,7 +107,7 @@ def test_scramble_json(tmp_path):
     # Create the output data
     scramble_json(tmp_path/'input', tmp_path/'output', r'.*/sub-.*\.json', False, '(?!RecordingDuration|Channel).*')
     assert (tmp_path/'output'/eegjson).is_file()
-    assert not (tmp_path/'output'/'participants.json').is_file()
+    assert not (tmp_path/'output'/'participants.json').exists()
 
     # Check that the participants.json data is properly preserved/emptied
     with (tmp_path/'input'/eegjson).open('r') as fid:
@@ -131,7 +131,7 @@ def test_scramble_nii(tmp_path):
     # Create nulled output data
     scramble_nii(tmp_path/'input', tmp_path/'output', 'sub.*\\.nii.gz', False, 'null')
     assert (tmp_path/'output'/niifile).is_file()
-    assert not (tmp_path/'output'/'participants.tsv').is_file()
+    assert not (tmp_path/'output'/'participants.tsv').exists()
 
     # Check that the NIfTI data is properly nulled
     outdata = nib.load(tmp_path/'output'/niifile).get_fdata()
@@ -215,7 +215,7 @@ def test_scramble_fif(tmp_path):
     # Create nulled output data
     scramble_fif(tmp_path/'input', tmp_path/'output', r'sub.*\.fif', False, 'null')
     assert (tmp_path/'output'/megfile).is_file()
-    assert not (tmp_path/'output'/'participants.tsv').is_file()
+    assert not (tmp_path/'output'/'participants.tsv').exists()
 
     # fif files come in 3 flavours that use different reader functions
     isevoked  = False
@@ -256,7 +256,7 @@ def test_scramble_brainvision(tmp_path):
     # Create nulled output data
     scramble_brainvision(tmp_path/'input', tmp_path/'output', r'sub.*\.vhdr', False, 'null')
     assert (tmp_path/'output'/eegfile).is_file()
-    assert not (tmp_path/'output'/'participants.tsv').is_file()
+    assert not (tmp_path/'output'/'participants.tsv').exists()
 
     # Check that the output data is properly nulled
     (vhdr, vmrk, data) = brainvision.read(tmp_path/'output'/eegfile)
@@ -338,7 +338,7 @@ def test_scramble_pseudo(tmp_path):
     assert (tmp_path/'output'/'participants.json').is_file()
     assert (tmp_path/'output'/edfpath).is_file()
     assert (tmp_path/'output'/'.bidsignore').is_file()
-    assert not (tmp_path/'output'/'.git').is_dir()
+    assert not (tmp_path/'output'/'.git').exists()
 
     # Check the participants.tsv file
     inputdata  = pd.read_csv(tmp_path/'input'/'participants.tsv', sep='\t', index_col='participant_id')
@@ -354,7 +354,7 @@ def test_scramble_pseudo(tmp_path):
     shutil.rmtree(tmp_path/'output')
     scramble_pseudo(tmp_path/'input', tmp_path/'output', r'sub-03(/|$).*', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
     assert (tmp_path/'output'/'participants.json').is_file()
-    assert not (tmp_path/'output'/edfpath).is_file()
+    assert not (tmp_path/'output'/edfpath).exists()
 
     # Check the participants.tsv file
     outputdata = pd.read_csv(tmp_path/'output'/'participants.tsv', sep='\t', index_col='participant_id')
@@ -369,7 +369,7 @@ def test_scramble_pseudo(tmp_path):
     shutil.rmtree(tmp_path/'output')
     scramble_pseudo(tmp_path/'input', tmp_path/'output', r'(?!sub-03(/|$)).*', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
     assert (tmp_path/'output'/'participants.json').is_file()
-    assert not (tmp_path/'output'/edfpath).is_file()
+    assert not (tmp_path/'output'/edfpath).exists()
 
     # Check the participants.tsv file
     outputdata = pd.read_csv(tmp_path/'output'/'participants.tsv', sep='\t', index_col='participant_id')
@@ -379,3 +379,37 @@ def test_scramble_pseudo(tmp_path):
     assert not inputdata.index.equals(outputdata.index)
     for index in inputdata.index:
         assert index not in outputdata.index
+
+    # Create inputdir + derivatives with 3 subjects
+    table = pd.DataFrame().rename_axis('participant_id')
+    input = tmp_path/'input'
+    for label in range(3):
+        subdir = input/f"sub-{label}"
+        (subdir/'anat').mkdir(parents=True)
+        (subdir/'anat'/f"sub-{label}_T1w.nii").touch()
+        (subdir/'anat'/f"sub-{label}_T1w.json").touch()
+        table.loc[f"sub-{label}", 'inputdir'] = label
+    table.to_csv(input/'participants.tsv', sep='\t')
+    (input/'README').touch()
+    derivative = input/'derivatives'/'deriv-1'
+    derivative.parent.mkdir()
+    shutil.copytree(input, derivative, ignore=shutil.ignore_patterns('derivatives'))
+    (derivative/'sub-0.html').touch()                   # This is what MRIQC does
+    (derivative/'sub-1.html').touch()
+    derivative = input/'derivatives'/'deriv-2'
+    shutil.copytree(input, derivative, ignore=shutil.ignore_patterns('derivatives'))
+
+    # Test leave-one-out
+    exclude = r'(?!.*\bsub-1((\.|_)\w+)?\b(/|$))'                   # = NO: PID folder, files starting with PID_ or PID-, derivatives folder, hidden files or folders
+    scramble_pseudo(tmp_path/'input', tmp_path/'output', f"{exclude}.*", False, 'original','^sub-(.*?)(?:/|$).*', 'yes')
+    assert     (tmp_path/'output'/'sub-0').is_dir()
+    assert     (tmp_path/'output'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()
+    assert not (tmp_path/'output'/'sub-1').exists()
+    assert not (tmp_path/'output'/'sub-1'/'anat'/'sub-1_T1w.nii').exists()
+    assert     (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-0').is_dir()
+    assert     (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()
+    assert not (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-1').exists()
+    assert not (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-1'/'anat'/'sub-1_T1w.nii').exists()
+    assert     (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-0.html').exists()
+    assert not (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-1.html').exists()
+    assert     (tmp_path/'output'/'derivatives'/'deriv-2'/'sub-2'/'anat'/'sub-2_T1w.nii').is_file()

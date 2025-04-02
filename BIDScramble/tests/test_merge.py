@@ -4,7 +4,7 @@ from bidscramble.merge import merge
 
 def test_merge(tmp_path):
 
-    # Create 3 inputdirs with 1, 2 and 3 subjects, respectively
+    # Create 3 inputdirs + derivatives with 1, 2 and 3 subjects, respectively
     for idx in range(1, 4):
         table = pd.DataFrame().rename_axis('participant_id')
         inputdir = tmp_path/f"input-{idx}"
