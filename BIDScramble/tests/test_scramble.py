@@ -394,18 +394,22 @@ def test_scramble_pseudo(tmp_path):
     derivative = input/'derivatives'/'deriv-1'
     derivative.parent.mkdir()
     shutil.copytree(input, derivative, ignore=shutil.ignore_patterns('derivatives'))
+    (input/'sub-0_T1w.html').touch()
+    (input/'sub-1_T1w.html').touch()
     (derivative/'sub-0_T1w.html').touch()                   # This is what MRIQC does
     (derivative/'sub-1_T1w.html').touch()
     derivative = input/'derivatives'/'deriv-2'
     shutil.copytree(input, derivative, ignore=shutil.ignore_patterns('derivatives'))
 
     # Test leave-one-out
-    exclude = r'(?!.*\bsub-1((\.|_)\w+)*\b(/|$))'           # = NO: PID folder, files starting with PID_ or PID-
-    scramble_pseudo(tmp_path/'input', tmp_path/'output', f"{exclude}.*", False, 'original','^sub-(.*?)(?:/|$).*', 'yes')
+    exclude = r'(?!(.*/)*sub-1([\._-].+)*(/|$)).*'           # = NO: PID folder, files starting with PID_ or PID-
+    scramble_pseudo(tmp_path/'input', tmp_path/'output', exclude, False, 'original','^sub-(.*?)(?:/|$).*', 'no')
     assert     (tmp_path/'output'/'sub-0').is_dir()
     assert     (tmp_path/'output'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()
+    assert     (tmp_path/'output'/'sub-0_T1w.html').exists()
     assert not (tmp_path/'output'/'sub-1').exists()
     assert not (tmp_path/'output'/'sub-1'/'anat'/'sub-1_T1w.nii').exists()
+    assert not (tmp_path/'output'/'sub-1_T1w.html').exists()
     assert     (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-0').is_dir()
     assert     (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()
     assert not (tmp_path/'output'/'derivatives'/'deriv-1'/'sub-1').exists()
