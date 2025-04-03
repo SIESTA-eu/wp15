@@ -47,7 +47,7 @@ In the different use cases under wp15 we have identified different transfer mech
 - wget
 - curl
 
-Some of these allow for recursively downloading a directory containing files and subdirectories. Others are more suited for the download of a single file. In case the dataset being transferred is contained in a (potentially compressed) archive, such as a zip, tar, tgz, or rar file, the platform operator must "unzip" the dataset.  
+Some of these allow for recursively downloading a directory containing files and subdirectories. Others are more suited for the download of a single file. In case the dataset being transferred is contained in a (potentially compressed) archive, such as a zip, tar, tgz, or rar file, the platform operator must "unzip" the dataset.
 
 ## Data transfer out from the system (export)
 

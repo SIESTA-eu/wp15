@@ -60,7 +60,7 @@ git clone https://github.com/SIESTA-eu/DatLeak.git
 DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer.
 
 ```console
-python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999 
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999
 ```
 
 This will print a report on screen with the percentage of rows with partial leakage, the percentage of rows with full leakage, the average matching cells per row, and the standard deviation of the matching cells per row.
@@ -86,7 +86,7 @@ The data user's pipeline implements a very simple analysis of the tabular data t
 
 This specific use case implements the same pipeline based on R, MATLAB, Python and Julia. In the subsequent documentation we only describe the version based on R.
 
-The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows. 
+The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
 ### Output data
 
@@ -101,7 +101,7 @@ mkdir output
 
 ### Software installation
 
-The R-software can be installed on a Linux, MacOS or Windows computer, specifically including the `Rscript` binary. The `optparse` and `dplyr` packages are ideally installed and on the path. If these packages are not available, they will be downloaded and installed in a temporary directory. 
+The R-software can be installed on a Linux, MacOS or Windows computer, specifically including the `Rscript` binary. The `optparse` and `dplyr` packages are ideally installed and on the path. If these packages are not available, they will be downloaded and installed in a temporary directory.
 
 ### Testing the pipeline
 

@@ -294,7 +294,7 @@ options:
 
 examples:
   scramble inputdir outputdir         pseudo
-  scramble inputdir outputdir_remove1 pseudo random   -s '(?!sub-003(/|$)).*' 
+  scramble inputdir outputdir_remove1 pseudo random   -s '(?!sub-003(/|$)).*'
   scramble inputdir outputdir_keep1   pseudo original -s 'sub-003/.*'
 ```
 

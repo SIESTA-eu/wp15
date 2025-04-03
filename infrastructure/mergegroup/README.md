@@ -18,7 +18,7 @@ There are a number of tests that are organized like this:
 
 ```console
 test0/
-├── group-1 
+├── group-1
 │   └── results.txt
 ├── group-2
 │   └── results.txt
@@ -27,7 +27,7 @@ test0/
 └── whitelist.txt
 
 test1/
-├── group-1 
+├── group-1
 │   └── results.tsv
 ├── group-2
 │   └── results.tsv
@@ -43,7 +43,7 @@ test1/
 ...
 
 test10/
-├── group-1 
+├── group-1
 │   ├── results.mat
 │   ├── results.nii
 │   └── results.tsv

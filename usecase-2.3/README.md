@@ -83,7 +83,7 @@ The pipeline is expected to be executed on a Linux computer, although it might a
 
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
 
-The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
+The `whitelist.txt` file contains a complete list of the output data that is to be shared.
 
 ```console
 cd wp15/usecase-2.3

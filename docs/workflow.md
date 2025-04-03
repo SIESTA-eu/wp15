@@ -10,7 +10,7 @@ The following workflow includes a number of steps that are not needed for the fi
 
 ## Data rights holder
 
-Transfer the data to the platform, provide a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user. 
+Transfer the data to the platform, provide a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user.
 
     ./download.sif  input
     ./scramble      input scrambled-input
@@ -22,7 +22,7 @@ Develop the pipeline and test it on the scrambled data.
 
     ./pipeline.sif scrambled-input scrambled-output participant
     ./pipeline.sif scrambled-input scrambled-output group
-    
+  
 ## Platform operator
 
 Run the particpant- and group-level analysis on the original input data.
