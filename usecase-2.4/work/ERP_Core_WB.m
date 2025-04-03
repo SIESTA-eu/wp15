@@ -129,7 +129,8 @@ end
 sublist = find(ismember({all_sub.name}', SubjectLabel))'; % labels to num
 
 if ~exist('TaskLabel','var')
-        TaskLabel = {'ERN','MMN','N170','N2pc','N400','P3'};
+        TaskLabel = {'ERN' 'MMN'}; %JM CHANGED: let's do 2 task only by default
+        %TaskLabel = {'ERN','MMN','N170','N2pc','N400','P3'};
 end
 
 if any(cellfun(@(x) contains(x,'high_pass'),options))
@@ -415,6 +416,7 @@ if strcmpi(AnalysisLevel,'1')
         end
 
         % 1st AnalysisLevel analysis
+        STUDY.filepath = ''; % JM ADDED THIS, BECAUSE OTHERWISE LIMO GETS LOST IN RELATIVE PATHS ETC, I don't understand the logic of all those paths specs in the STUDY object, but this seems to work for correct downstream singlesubject processing
         [STUDY, files] = std_limo(STUDY, EEG, 'method',estimation,...
             'measure','daterp', 'chanloc',AvgChanlocs,...
             'timelim',analysis_window(t,:),'erase','on',...
