@@ -34,9 +34,12 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     outputdir_ = outputdir/'tmpdir_swap' if method != 'original' else outputdir
 
     # Create pseudonyms for all selected subject identifiers
-    rootfiles             = [rootfile for rootfile in inputdir.iterdir() if rootfiles=='yes' and rootfile.is_file() and not (outputdir/rootfile.name).is_file()]
+    bidsfiles             = [bidsfile for bidsfile in inputdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/bidsfile.name).is_file()]
+    if (inputdir/'derivatives').is_dir():
+        for derivdir in (inputdir/'derivatives').iterdir():
+            bidsfiles    += [bidsfile for bidsfile in derivdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/'derivatives'/derivdir.name/bidsfile.name).is_file() and derivdir.is_dir()]
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
-    inputfiles           += [rootfile for rootfile in rootfiles if rootfile not in inputfiles]
+    inputfiles           += [bidsfile for bidsfile in bidsfiles if bidsfile not in inputfiles]
     subjectids            = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
         pseudonyms = [next(tempfile._get_candidate_names()).replace('_','x') for _ in subjectids]
@@ -82,7 +85,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
             for subjectid, pseudonym in zip(subjectids, pseudonyms):
 
                 # Pseudonymize the filepath
-                if (subjectid in inputid or inputitem in rootfiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
+                if (subjectid in inputid or inputitem in bidsfiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
                     pseudoitem = outputdir/str(inputitem.relative_to(inputdir)).replace(f"sub-{subjectid}", f"sub-{pseudonym}")
                     print(f"\t{'Renaming' if outputitem.is_file() else 'Making'} sub-{subjectid} -> {pseudoitem}")
                     if not dryrun:
