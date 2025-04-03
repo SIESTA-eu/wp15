@@ -349,7 +349,7 @@ if strcmpi(AnalysisLevel,'1')
         if exist('error_report','var')
             mask = cellfun(@(x) ~isempty(x), error_report); % which subject/session
             if all(mask)
-                save(fullfile(OutputLocation,'error_report_preprocessing'),error_report);
+                save(fullfile(OutputLocation,'error_report_preprocessing'),'error_report');
                 error('there has been a preprocessing issue with all included datasets, cannot proceed');
             else
                 STUDY = std_rmdat(STUDY, EEG, 'datinds', find(mask));
