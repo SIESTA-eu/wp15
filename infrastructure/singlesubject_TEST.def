@@ -3,7 +3,7 @@ From: python:3-slim
 
 %help
 
-    The general form to run the mergesubjects command is:
+    The general form to run the singlesubject command is:
         apptainer run singlesubject.sif <inputdir> <outputdir> <participant_nr>
 
 %labels
