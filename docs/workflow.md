@@ -39,8 +39,8 @@ Run the particpant-level analysis on the single subjects.
 
 Combine the single subject input and results into merged datasets.
 
-    ./mergesubjects.sif singlesubject-merged-input  $(eval echo singlesubject-{1..$NSUBJ}-input)  # this should result in the same as "input"
-    ./mergesubjects.sif singlesubject-merged-output $(eval echo singlesubject-{1..$NSUBJ}-output)
+    ./mergesubjects.sif $(eval echo singlesubject-{1..$NSUBJ}-input)  singlesubject-merged-input    # this should result in the same as "input"
+    ./mergesubjects.sif $(eval echo singlesubject-{1..$NSUBJ}-output) singlesubject-merged-output
 
 Run the group-level analysis on the leave-one-out resampled datasets.
 
