@@ -16,4 +16,4 @@ The use cases serve to get a broad and representative sample of neuroimaging dat
 
 Detailed documentation for each use case is provided in the corresponding directories.
 
-General documentation aimed at SIESTA users and on the general computational workflowis provided in the [docs](docs) directory.
+General documentation aimed at SIESTA users and on the general computational workflow is provided in the [docs](docs) directory.
