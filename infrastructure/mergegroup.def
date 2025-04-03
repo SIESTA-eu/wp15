@@ -3,7 +3,7 @@ From: python:3-slim
 
 %help
 
-    The general form to run the mergesubjects command is:
+    The general form to run the mergegroup command is:
         apptainer run mergegroup.sif <input dir 1> <input dir 2> <input dir 3> ... <output dir> <whitelist.txt>"
 
 %labels

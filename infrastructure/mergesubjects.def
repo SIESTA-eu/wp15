@@ -10,7 +10,7 @@ Stage: final
 
     The general form to run the mergesubjects command is:
 
-        apptainer run mergesubjects.sif <output> <inputs>
+        apptainer run mergesubjects.sif <inputs> <output>
 
 %labels
   org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"

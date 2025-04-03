@@ -39,8 +39,8 @@ for SUBJ in input/sub-*/; do
 done
 
 # MERGE
-apptainer run ${URLORAS}/mergesubjects.sif:${VER} singlesubject-merged-input  $(eval echo singlesubject-{1..$count}-input)
-apptainer run ${URLORAS}/mergesubjects.sif:${VER} singlesubject-merged-output $(eval echo singlesubject-{1..$count}-output)
+apptainer run ${URLORAS}/mergesubjects.sif:${VER} $(eval echo singlesubject-{1..$count}-input)  singlesubject-merged-input
+apptainer run ${URLORAS}/mergesubjects.sif:${VER} $(eval echo singlesubject-{1..$count}-output) singlesubject-merged-output
 
 # CREATE LOO SAMPLES AND RUN THE GROUP PIPELINE ON THE INPUT AND ON THE LOO SAMPLES
 count=1

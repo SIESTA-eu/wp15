@@ -11,7 +11,7 @@ from typing import List
 from pathlib import Path
 
 
-def merge(outputdir: str, inputdirs: List[str]):
+def merge(inputdirs: List[str], outputdir: str):
 
     outputdir = Path(outputdir)
     inputdirs = [Path(inputdir) for inputdir in inputdirs]
@@ -32,7 +32,7 @@ def merge(outputdir: str, inputdirs: List[str]):
                         print(f"WARNING: merging unexpected file: {derivative}")
                         shutil.copy(derivative, outputdir/'derivatives')
                     else:
-                        merge(outputdir/'derivatives'/derivative.name, [derivative])
+                        merge([derivative], outputdir/'derivatives'/derivative.name)
 
             elif item.name == 'participants.tsv':
                 print(f"Merging: {item}")
@@ -60,9 +60,9 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      epilog='examples:\n'
-                                            '  merge outputdir singlesubject-1  singlesubject-2  singlesubject-3\n ')
-    parser.add_argument('outputdir', help='The output directory with the merged data')
+                                            '  merge singlesubject-1  singlesubject-2  singlesubject-3 outputdir\n ')
     parser.add_argument('inputdirs', help='The list of BIDS (or BIDS-like) input directories with the partial (e.g. single-subject) data', nargs='+')
+    parser.add_argument('outputdir', help='The output directory with the merged data')
 
     # Parse the input arguments
     args = parser.parse_args()
