@@ -26,10 +26,10 @@ To facilitate debugging, the data user's analysis scripts should give explicit e
 
 Input data to the analysis pipeline must be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
 
-The input is for example formatted as 
+The input is for example formatted as
 
 ```console
-input 
+input
 ├── dataset_description.json
 ├── participants.tsv
 ├── participants.json
@@ -59,7 +59,7 @@ You should _not_ make a directory named `derivatives` inside the output director
 The output is for example formatted as
 
 ```console
-output 
+output
 ├── sub-01
 |   └ ...
 ├── sub-02
@@ -106,7 +106,7 @@ The SIESTA platform or its platform operators does not provide the software and/
 
 ### Computational efficiency
 
-The participant- and group-level analysis can in principle be computed sequentially in a single step, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these explicitly as separate steps, so that the participant-level analyses don't have to be repeated for each leave-one-out sample. 
+The participant- and group-level analysis can in principle be computed sequentially in a single step, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these explicitly as separate steps, so that the participant-level analyses don't have to be repeated for each leave-one-out sample.
 
 Since the participant-level analysis is done separately for each subject, it can be executed in parallel by the platform operator. The data user does not have to implement anything special for parallel execution.
 

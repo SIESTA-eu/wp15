@@ -1,6 +1,6 @@
 # SIESTA - work package 15 - use case 2.4
 
-This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](../docs/README.md). In short, it consists of these steps:
 
 1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
 2. the _data user_ implementing and testing the pipeline on the scrambled version
@@ -37,7 +37,7 @@ pip install osfclient
 mkdir data/usecase-2.4
 cd data/usecase-2.4
 
-osf -p 9f5w7 clone download                                 # this writes to a subdirectory contained in the directory "download" 
+osf -p 9f5w7 clone download                                 # this writes to a subdirectory contained in the directory "download"
 mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input      # move and rename the subdirectory to "input"
 rm -rf download                                             # this is now empty
 ```
@@ -111,14 +111,14 @@ wget https://sccn.ucsd.edu/eeglab/plugins/zapline-plus1.2.1.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/picard-matlab.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/bids-matlab-tools8.0.zip
 
-unzip fieldtrip-lite-20240111.zip 
-unzip bva-io1.73.zip 
-unzip firfilt2.8.zip 
-unzip ICLabel1.6.zip 
-unzip clean_rawdata2.91.zip 
-unzip zapline-plus1.2.1.zip 
-unzip picard-matlab.zip 
-unzip bids-matlab-tools8.0.zip 
+unzip fieldtrip-lite-20240111.zip
+unzip bva-io1.73.zip
+unzip firfilt2.8.zip
+unzip ICLabel1.6.zip
+unzip clean_rawdata2.91.zip
+unzip zapline-plus1.2.1.zip
+unzip picard-matlab.zip
+unzip bids-matlab-tools8.0.zip
 
 rm *.zip
 

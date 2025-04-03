@@ -127,7 +127,7 @@ cd wp15/usecase-2.5
 wget https://github.com/spm/spm12/archive/refs/tags/r7771.zip
 unzip r7771.zip
 mv spm12-r7771 spm12
-rm r7771.zip 
+rm r7771.zip
 ```
 
 ### Testing the pipeline
