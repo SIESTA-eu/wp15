@@ -48,6 +48,7 @@ for SUBJ in input/sub-*/; do
     leaveout="$count: $SUBJ"
     apptainer run ${URLORAS}/leaveoneout.sif:${VER} singlesubject-merged-input  leaveoneout-$count-input  $count
     apptainer run ${URLORAS}/leaveoneout.sif:${VER} singlesubject-merged-output leaveoneout-$count-output $count
+    rm -rf leaveoneout-$count-output/.bids_db/      # Somehow this database makes the last subject iteration fail
     apptainer run $PIPELINE                         leaveoneout-$count-input    leaveoneout-$count-output group
     ((count++))
 done
