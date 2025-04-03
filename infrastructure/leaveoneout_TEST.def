@@ -1,0 +1,29 @@
+BootStrap: docker
+From: python:3-slim
+
+%help
+
+    The general form to run the leaveoneout command is:
+        apptainer run leaveoneout.sif <inputdir> <outputdir> <participant_nr>
+
+%labels
+    org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+    leaveoneout/leaveoneout.py /opt/leaveoneout.py
+
+%post
+    ################################################################################
+    # general updates to the base image
+    ################################################################################
+    apt update -y && apt-get install -y python3-pip
+    echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+    echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+    DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+    pip install pandas --quiet
+  
+%environment
+    export LC_ALL=C
+
+%runscript
+    python3 /opt/leaveoneout.py "$@"
