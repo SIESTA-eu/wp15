@@ -52,7 +52,7 @@ def leaveoneout_(input_dir, output_dir ,participant_nr):
                             except OSError as e:
                                 print("Error: to investigate")
                                 pass
-            print(f"{participant_nr} has been succesfully excluded.")        
+            print(f"{participant_nr} has been successfully excluded.")        
         return True
     except FileNotFoundError:
         print("Error: Input folder Not Found. Please make sure of input folder name.", file=sys.stderr)
