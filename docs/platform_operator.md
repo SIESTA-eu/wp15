@@ -61,7 +61,7 @@ A regular analysis on the dataset often involves two phases: computations at the
 
 It is quite common that the participant-level computations result in intermediate data that is of a similar size as the original data. The "participant" level computations can in principle be parallelized over subjects. The "group" level computations usually do not involve or allow for parallel computation.
 
-The data user decides on the analysis that is to be executed on the data. Hence the the data user must specify an estimate of the computational requirements. Some computations will scale linearly in time with the dataset size (for example 2x as many subjects in the dataset means 2x longer computations) but other computations will have a non-linear relationship to the dataset size.
+The data user decides on the analysis that is to be executed on the data. Hence, the data user must specify an estimate of the computational requirements. Some computations will scale linearly in time with the dataset size (for example 2x as many subjects in the dataset means 2x longer computations) but other computations will have a non-linear relationship to the dataset size.
 
 The platform operator should get information from the data user on:
 
@@ -75,4 +75,4 @@ The platform operator should get information from the data user on:
 
 SInce the data user cannot have direct access to the sensitive data, the computation is to be initiated by the platform operator. Following the computations, the results are used to calibrate nosie and to prepare diofferentially private results. These are optionally reviewd by the data rights holder and subsequently shared with the data user.
 
-The analysis is to be implemented by the data user as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209). To allow development, testing, and deployment on the compute environment of the data user, we have settled on [Apptainer](https://apptainer.org). If needed, the platform operator convert the Apptainer image into a Dßocker image.
+The analysis is to be implemented by the data user as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209). To allow development, testing, and deployment on the compute environment of the data user, we have settled on [Apptainer](https://apptainer.org). If needed, the platform operator convert the Apptainer image into a Docker image.
