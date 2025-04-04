@@ -59,7 +59,7 @@ def singlesubject_(input_dir, output_dir ,participant_nr):
                             except OSError as e:
                                 print("Error: {e}")
                                 pass
-            print(f"{participant_nr} has been succesfully splitted to {str(output_dir)}")        
+            print(f"{participant_nr} has been successfully splitted to {str(output_dir)}")        
         else:
             print(f"Error: participant_nr[{participant_nr}] does not exist in {input_dir}.")  
         return True
