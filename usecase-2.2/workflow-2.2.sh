@@ -9,8 +9,8 @@ VER=latest
 USECASE=2.2
 URLORAS=oras://ghcr.io/siesta-eu
 WHITELIST=./whitelist.txt
-PIPELINE=./pipeline-${USECASE}.sif
-# PIPELINE=${URLORAS}/pipeline-${USECASE}.sif:${VER}
+# PIPELINE=./pipeline-${USECASE}.sif
+PIPELINE=${URLORAS}/pipeline-${USECASE}.sif:${VER}
 
 # DOWNLOAD
 apptainer run ${URLORAS}/download-${USECASE}.sif:${VER} input
