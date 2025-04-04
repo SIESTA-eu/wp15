@@ -31,12 +31,13 @@ apptainer run $PIPELINE scrambled-input scrambled-output participant
 apptainer run $PIPELINE scrambled-input scrambled-output group
 
 # CREATE SINGLESUBJECT AND RUN THE PIPELINE ON SINGLESUBJECTS
-count=0
+count=1             # NB: ((count++)) evaluates to 0 if count==0, which is a falsey value in bash, causing set -e to exit
 for SUBJ in input/sub-*/; do
-   set +e; ((count++)); set -e    # ((count++)) evaluates to 0 if count==0, which is a falsey value in bash
    apptainer run ${URLORAS}/singlesubject.sif:${VER} input singlesubject-$count-input $count
    apptainer run $PIPELINE singlesubject-$count-input singlesubject-$count-output participant
+   ((count++))
 done
+((count--))
 
 # MERGE
 apptainer run ${URLORAS}/mergesubjects.sif:${VER} $(eval echo singlesubject-{1..$count}-input)  singlesubject-merged-input
@@ -52,6 +53,7 @@ for SUBJ in input/sub-*/; do
     apptainer run $PIPELINE                         leaveoneout-$count-input    leaveoneout-$count-output group
     ((count++))
 done
+((count--))
 
 # MERGE
 apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$count}-output) leaveoneout-merged-output $WHITELIST
