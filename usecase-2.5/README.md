@@ -93,6 +93,16 @@ The data user's pipeline implements an SPM analysis on fMRI data that was record
 
 The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
 
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes XX GB of RAM, XX seconds per subject, and results in XX GB of temporary data per subject.
+
+There are 44(?) subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The to-be-shared data in the output folder has the following directory structure:

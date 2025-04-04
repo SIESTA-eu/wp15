@@ -70,6 +70,16 @@ This implements the [MRIQC](https://mriqc.readthedocs.io/en/latest/) pipeline fo
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes XX GB of RAM, XX seconds per subject, and results in XX GB of temporary data per subject.
+
+There are 136 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The output data consists of MRI QC parameters of each participant
