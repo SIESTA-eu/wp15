@@ -6,7 +6,7 @@ As the data on SIESTA is considered to be sensitive, it is not directly availabl
 
 ## Developing and testing the analysis
 
-The data analysis can be implemented on basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
+The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
 
 The final implementation should be containerized and implemented as a [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) with a participant- and a group-level step (see below).
 
@@ -14,7 +14,7 @@ The final implementation should be containerized and implemented as a [BIDS app]
 
 Install all software and all dependencies from the command line, as that will facilitate the implementation of the container.
 
-Once the container is built, it will be read only. Installing additional software dependencies from within the analysis environment (for example downloading and installing "plug-ins" on the fly) will not work. If software dependencies need to be installed from within the analysis environment, this must be done in the container definition file, not in the analysis pipeline. See for an example the usecase-2.1 container with `r-base` and the the call to `install.packages` for the dependencies.
+Once the container is built, it will be read only and always run without internet connectivity. Installing additional software dependencies from within the analysis environment (for example downloading and installing "plug-ins" on the fly) will not work. If software dependencies need to be installed from within the analysis environment, this must be done in the container definition file, not in the analysis pipeline. See for an example the usecase-2.1 container with `r-base` and the call to `install.packages` for the dependencies.
 
 The only two directories that are shared with the analysis pipeline are directory with the input and the output data. The input directory is to be assumed to be read-only. The output directory can be used in any way you like, but only the files in the `whitelist.txt` with group-level aggregate data will be shared with the data user.
 
@@ -24,7 +24,7 @@ To facilitate debugging, the data user's analysis scripts should give explicit e
 
 ### Input data handling
 
-Input data to the analysis pipeline must be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
+Input data to the analysis pipeline will be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
 
 The input is for example formatted as
 
@@ -84,17 +84,11 @@ The data user must specify to the platform operator what the computational requi
 
 For development and testing we recommend to use a Linux-based environment where the data user has full administrative rights to install software and dependencies. The steps for software and dependency installation must be transferred to a container definition file.
 
-If the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
-
-If the data user want to make use other non-free software in the analysis, they should provide the platform operator with that software and with the license to use that software on their behalf.
-
 ### Participant level
 
 [BIDS apps](https://doi.org/10.1371/journal.pcbi.1005209) make the distinction between participant- and group-level analyses. The participant-level analysis can be considered as a sort of pre-processing step prior to the actual analysis. Examples include FreeSurfer reconstruction of the cortical sheet, or computing first-level statistical estimates.
 
-The participant-level analysis can be done one subject at the time, but can also be executed in parallel. The analysis of one participant's data does not require access to the data of any other participant.
-
-To ensure that no targeted attacks are possible by singling out any given subject, the participant-level analysis is implemented on single-subject versions of the input dataset.
+The participant-level analysis can be done one subject at the time, but can also be executed in parallel. As such, the analysis of one participant's data does not have access to the data of any other participant, i.e. the participant-level analysis is implemented on single-subject versions of the input dataset.
 
 ### Group level
 
@@ -102,13 +96,11 @@ During the group-level analysis, the data from multiple participants is combined
 
 ### Software licenses
 
-The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used. This may mean that you have to apply for a license key (for example for [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/License)) or that you have to provide network access to a license server (for example [MATLAB](https://nl.mathworks.com/help/install/ug/use-existing-on-premises-license-manager-with-matlab-running-on-the-cloud.html)).
+The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used.
 
-### Computational efficiency
+For instance, if the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
 
-The participant- and group-level analysis can in principle be computed sequentially in a single step, but for efficiency reasons with the leave-one-out resampling scheme, we have implemented these explicitly as separate steps, so that the participant-level analyses don't have to be repeated for each leave-one-out sample.
-
-Since the participant-level analysis is done separately for each subject, it can be executed in parallel by the platform operator. The data user does not have to implement anything special for parallel execution.
+If the data user want to make use other non-free software in the analysis (for example for [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/License)), they should provide the platform operator with that software and with the license to use that software on their behalf.
 
 ## Data transfer out from the system (export)
 

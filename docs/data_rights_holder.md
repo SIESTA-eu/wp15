@@ -1,6 +1,24 @@
 # Data rights holder
 
-The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer.
+The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) standard. The input is for example formatted as
+
+```
+input
+├── dataset_description.json
+├── participants.tsv
+├── participants.json
+├── README.md
+├── sub-01
+|   | ses-01/...
+|   └ ses-02/...
+├── sub-02
+|   | ses-01/...
+|   └ ses-02/...
+..
+└── sub-NN
+    | ses-01/...
+    └ ses-02/...
+```
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to this as _downloading_ if the data rights holder creates an account for the platform operator on their institutional system, and if the latter initiates and controls the transfer. In neither case is the data user involved in the data transfer.
 
@@ -20,7 +38,7 @@ The data rights holder can provide the platform operator with instructions and a
 
 It is the responsibility of the data rights holder to employ data minimization and to ensure that the dataset does not contain information that is not needed for subsequent analyses.
 
-It is the responsibility of the platform owner to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
+It is the responsibility of the platform operator to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
 
 ### For the scrambled data
 
