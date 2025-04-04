@@ -54,7 +54,7 @@ for SUBJ in input/sub-*/; do
 done
 
 # MERGE
-apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$NSUBJ}-output) leaveoneout-merged-output $WHITELIST
+apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$count}-output) leaveoneout-merged-output $WHITELIST
 
 # apptainer run oras://ghcr.io/siesta-eu/calibratenoise.sif:${VER}      leaveoneout-merged-output noise
 # apptainer run oras://ghcr.io/siesta-eu/mergesubjects.sif:${VER}       singlesubject-merged $(eval echo singlesubject-{1..$NSUBJ})  # this should result in the same as "input"
