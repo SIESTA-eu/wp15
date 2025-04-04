@@ -35,12 +35,7 @@ def singlesubject_(input_dir, output_dir ,participant_nr):
                             shutil.copy2(os.path.join(root, file), output_path)
                         except FileExistsError:
                             pass
-                    #elif any(str(participant_nr) in file for file in files):
-                    #    try:
-                    #        shutil.copy2(os.path.join(root, file), output_path)
-                    #    except FileExistsError:
-                    #        pass
-        	    
+
                 for dir in dirs:
                     if dir == participant_nr:
                         src_dir = os.path.join(root, dir)
