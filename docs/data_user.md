@@ -4,6 +4,8 @@ The data user is the researcher that aims to answer a specific research question
 
 As the data on SIESTA is considered to be sensitive, it is not directly available for download by the data user. The SIESTA platform allows the data user to interactively implement an analysis, which eventually is converted to a container and executed by the platform operator on the data of behalf of the data user.
 
+SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
+
 ## Developing and testing the analysis
 
 The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.

@@ -1,8 +1,10 @@
 # Data rights holder
 
-The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) standard. The input is for example formatted as
+The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
-```
+The BIDS-formatted input data is for example structured as
+
+```console
 input
 ├── dataset_description.json
 ├── participants.tsv
