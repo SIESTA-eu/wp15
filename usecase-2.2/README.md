@@ -72,7 +72,7 @@ The pipeline is expected to be executed on a Linux computer, although it might a
 
 ### Computational requirements for the participant level
 
-The execution of the pipeline for each participant takes about 8 GB of RAM, 15 minutes per subject, and results in XX GB of temporary data per subject.
+The execution of the pipeline for each participant takes about 8 GB of RAM, 15 minutes per subject, and results in 250 MB of temporary data per subject.
 
 There are 136 subjects.
 
