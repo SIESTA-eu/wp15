@@ -52,7 +52,7 @@ It is the responsibility of the data rights holder to ensure that data following
 
 The scrambled data is anonymous, hence the pipeline applied to the scrambled data is also anonymous and its result can be shared without restrictions.
 
-The direct output of the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to make the direct output differentially private.
+The direct output of the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to make the direct output differentially private as, for example, explained on [Wikipedia](https://en.wikipedia.org/wiki/Differential_privacy).
 
 ## Differentially private output data
 
