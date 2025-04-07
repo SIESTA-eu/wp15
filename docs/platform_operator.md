@@ -1,6 +1,8 @@
 # Platform operator
 
-The platform operator is the person or organization responsible for the SIESTA infrastructure. They take care of the secure storage and compute environment and allow "data rights holders" to upload data to the platform and "data users" to perform analyses on that data.
+The platform operator is the person or organization responsible for the SIESTA infrastructure. They take care of the secure storage and compute environment and allow "data rights holders" to upload data to the platform and "data users" to perform analyses on that data and to download the results.
+
+Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data".
 
 SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
