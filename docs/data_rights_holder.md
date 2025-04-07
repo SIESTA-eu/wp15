@@ -24,9 +24,11 @@ input
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some decentral research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform.
 
-Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the decentral institutional storage. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
+Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for data ingestion into SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the decentral institutional storage or repository. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
 
 So for the data transfer into SIESTA we refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to this as _downloading_ if the data rights holder creates an account for the platform operator on their institutional system, and if the latter initiates and controls the transfer. In neither case is the data user involved in the data transfer.
+
+Note that there is also _downloading_ by the data user of the results of the analysis pipeline, but that is discussed elsewhere in the [corresponding documentation](./data_user.md).
 
 ## Data transfer into the system (import)
 

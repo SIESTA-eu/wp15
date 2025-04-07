@@ -108,4 +108,4 @@ If the data user want to make use other non-free software in the analysis (for e
 
 The data user may want to download the scrambled version of the data for local development and testing of the analysis pipeline.
 
-The data user will also want to download the results of the application of their pipeline to the original sensitive data.
+The data user will also want to download the differentially private results of the application of their pipeline to the original sensitive data.
