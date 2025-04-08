@@ -7,9 +7,9 @@ import singlesubject
 test_path = Path('tests')
 
 def test1(tmp_path):
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject3', 'sub-03'])
+    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject1', '1'])
+    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject2', '2'])
+    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject3', '3'])
 
     # FIXME determine the correct counts and then enable these tests
     #assert len(list(tmp_path.iterdir()))                               == 9       # 6 subjects + derivatives + README + participants.tsv
@@ -20,19 +20,23 @@ def test1(tmp_path):
     #assert len(list((tmp_path/'derivatives'/'deriv-1').glob('sub-*'))) == 6       # 6 subjects
 
 def test2(tmp_path):
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject3', 'sub-03'])
+    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject1', '1'])
+    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject2', '2'])
+    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject3', '3'])
 
     # FIXME add some tests that are not yet in test1, no reason to repeat the same tests
 
 def test3(tmp_path):
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject3', 'sub-03'])
+    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject1', '1'])
+    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject2', '2'])
+    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject3', '3'])
 
     # FIXME add some tests that are not yet in test1 and test2, no reason to repeat the same tests
 
+def test4(tmp_path):
+    singlesubject.main(['exe', test_path / 'test4', tmp_path / 'test4/singlesubject1', '1']) # this is 4
+    singlesubject.main(['exe', test_path / 'test4', tmp_path / 'test4/singlesubject2', '2']) # this is 5
+    singlesubject.main(['exe', test_path / 'test4', tmp_path / 'test4/singlesubject3', '3']) # this is 6
 
 if __name__ == "__main__":
     # This would run it with pytest, similar to running pytest from a GitHub action
@@ -46,3 +50,4 @@ if __name__ == "__main__":
     test1(Path(sys.argv[1]))
     test2(Path(sys.argv[1]))
     test3(Path(sys.argv[1]))
+    test4(Path(sys.argv[1]))
