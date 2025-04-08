@@ -1,15 +1,15 @@
 import sys
 # import pytest
 from pathlib import Path
-import singlesubject
+import leaveoneout
 
-# it is assumed to run within the infrastructure/singlesubject folder
+# it is assumed to run within the infrastructure/leaveoneout folder
 test_path = Path('tests')
 
 def test1(tmp_path):
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test1', tmp_path / 'test1/singlesubject3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout1', 'sub-01'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout2', 'sub-02'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout3', 'sub-03'])
 
     # FIXME determine the correct counts and then enable these tests
     #assert len(list(tmp_path.iterdir()))                               == 9       # 6 subjects + derivatives + README + participants.tsv
@@ -20,16 +20,16 @@ def test1(tmp_path):
     #assert len(list((tmp_path/'derivatives'/'deriv-1').glob('sub-*'))) == 6       # 6 subjects
 
 def test2(tmp_path):
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test2', tmp_path / 'test2/singlesubject3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout1', 'sub-01'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout2', 'sub-02'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout3', 'sub-03'])
 
     # FIXME add some tests that are not yet in test1, no reason to repeat the same tests
 
 def test3(tmp_path):
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject1', 'sub-01'])
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject2', 'sub-02'])
-    singlesubject.main(['exe', test_path / 'test3', tmp_path / 'test3/singlesubject3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout1', 'sub-01'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout2', 'sub-02'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout3', 'sub-03'])
 
     # FIXME add some tests that are not yet in test1 and test2, no reason to repeat the same tests
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     # This allows running the script directly from the console, but you need to pass the output directory as an argument.
     # The advantage of this is that you can inspect the output more easily.
     if len(sys.argv) < 2:
-        print("Usage: test_singlesubject.py <outputdir>")
+        print("Usage: test_leaveoneout.py <outputdir>")
         sys.exit(1)
     test1(Path(sys.argv[1]))
     test2(Path(sys.argv[1]))

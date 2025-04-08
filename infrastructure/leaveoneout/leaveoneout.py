@@ -61,13 +61,15 @@ def leaveoneout_(input_dir, output_dir ,participant_nr):
         print("Error: Input folder Not Found. Please make sure of input folder name.", file=sys.stderr)
         return False
 
-def main():
-    if len(sys.argv) < 4:
-        print("Usage: apptainer run leaveoneout.sif <inputdir> <outputdir> <participant_nr>")
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    if len(args) < 4:
+        print("Usage: leaveoneout.py <inputdir> <outputdir> <participant_nr>")
         sys.exit(1)
-    input_dir = sys.argv[1]
-    output_dir = sys.argv[2]
-    participant_nr = sys.argv[3]
+    input_dir = args[1]
+    output_dir = args[2]
+    participant_nr = args[3]
     pid = leaveoneout_(input_dir, output_dir,participant_nr)
     if not pid:
         print("Nothing to return!")
