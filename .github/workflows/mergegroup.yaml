@@ -1,5 +1,6 @@
 name: mergegroup tests
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'infrastructure/mergegroup/**'

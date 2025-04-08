@@ -1,5 +1,6 @@
 name: leaveoneout tests
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'infrastructure/leaveoneout/**'

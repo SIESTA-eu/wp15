@@ -1,5 +1,6 @@
 name: mergesubjects tests
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'infrastructure/mergesubjects/**'

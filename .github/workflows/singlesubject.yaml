@@ -1,5 +1,6 @@
 name: singlesubject tests
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'infrastructure/singlesubject/**'
