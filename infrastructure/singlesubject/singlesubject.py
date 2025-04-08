@@ -22,9 +22,9 @@ def singlesubject_(input_dir, output_dir ,participant_nr):
                         try:
                             df = pd.read_csv(os.path.join(root, file), sep='\t')
                             try:
-        	                    if participant_nr in df[list(df.columns)[0]].values:
-        	                        row = df[df[list(df.columns)[0]] == participant_nr]
-        	                        row.to_csv(os.path.join(output_path, file), sep='\t', index=False)
+                                if participant_nr in df[list(df.columns)[0]].values:
+                                    row = df[df[list(df.columns)[0]] == participant_nr]
+                                    row.to_csv(os.path.join(output_path, file), sep='\t', index=False)
                             except Exception as e:
                                 print(e)
                                 pass
