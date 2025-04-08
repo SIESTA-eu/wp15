@@ -23,5 +23,5 @@ jobs:
       - name: Tests with pytest
         run: |
           pip install --upgrade pip
-          pip install pytest pandas h5py scipy 
+          pip install pytest pandas h5py scipy nibabel numpy more_itertools
           pytest .
