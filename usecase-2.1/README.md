@@ -88,6 +88,16 @@ This specific use case implements the same pipeline based on R, MATLAB, Python a
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
+### Computational requirements for the participant level
+
+There is no real computation done at the participant level, so this takes barely any time (except for data handling). The execution of the pipeline for each participant takes XX GB of RAM and XX seconds per subject.
+
+There are 60 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The output data consist of a `results.tsv` file that contains the averaged age, height and weight of the participants.

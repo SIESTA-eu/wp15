@@ -9,8 +9,8 @@ VER=latest
 USECASE=2.2
 URLORAS=oras://ghcr.io/siesta-eu
 WHITELIST=./whitelist.txt
-PIPELINE=./pipeline-${USECASE}.sif
-# PIPELINE=${URLORAS}/pipeline-${USECASE}.sif:${VER}
+# PIPELINE=./pipeline-${USECASE}.sif
+PIPELINE=${URLORAS}/pipeline-${USECASE}.sif:${VER}
 
 # DOWNLOAD
 apptainer run ${URLORAS}/download-${USECASE}.sif:${VER} input
@@ -31,12 +31,13 @@ apptainer run $PIPELINE scrambled-input scrambled-output participant
 apptainer run $PIPELINE scrambled-input scrambled-output group
 
 # CREATE SINGLESUBJECT AND RUN THE PIPELINE ON SINGLESUBJECTS
-count=0
+count=1             # NB: ((count++)) evaluates to 0 if count==0, which is a falsey value in bash, causing set -e to exit
 for SUBJ in input/sub-*/; do
-   set +e; ((count++)); set -e    # ((count++)) evaluates to 0 if count==0, which is a falsey value in bash
    apptainer run ${URLORAS}/singlesubject.sif:${VER} input singlesubject-$count-input $count
    apptainer run $PIPELINE singlesubject-$count-input singlesubject-$count-output participant
+   ((count++))
 done
+((count--))
 
 # MERGE
 apptainer run ${URLORAS}/mergesubjects.sif:${VER} $(eval echo singlesubject-{1..$count}-input)  singlesubject-merged-input
@@ -52,12 +53,13 @@ for SUBJ in input/sub-*/; do
     apptainer run $PIPELINE                         leaveoneout-$count-input    leaveoneout-$count-output group
     ((count++))
 done
+((count--))
 
 # MERGE
-apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$NSUBJ}-output) leaveoneout-merged-output $WHITELIST
+apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$count}-output) leaveoneout-merged-output $WHITELIST
 
 # apptainer run oras://ghcr.io/siesta-eu/calibratenoise.sif:${VER}      leaveoneout-merged-output noise
-# apptainer run oras://ghcr.io/siesta-eu/mergesubjects.sif:${VER}       singlesubject-merged $(eval echo singlesubject-{1..$NSUBJ})  # this should result in the same as "input"
-# apptainer run oras://ghcr.io/siesta-eu/pipeline-${USECASE}.sif:${VER} singlesubject-merged singlesubject-merged-output group       # this should result in the same as "input-output"
+# apptainer run oras://ghcr.io/siesta-eu/mergesubjects.sif:${VER}       singlesubject-merged $(eval echo singlesubject-{1..$NSUBJ})  # This should result in the same as "input"
+# apptainer run oras://ghcr.io/siesta-eu/pipeline-${USECASE}.sif:${VER} singlesubject-merged singlesubject-merged-output group       # This should result in the same as "input-output"
 # apptainer run oras://ghcr.io/siesta-eu/addnoise.sif:${VER}            singlesubject-merged-output noise result-with-noise
 # apptainer run oras://ghcr.io/siesta-eu/privacy.sif:${VER}             result-with-noise

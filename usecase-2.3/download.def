@@ -28,10 +28,12 @@ From: python:3-slim
   cd ${1}
 
   echo Downloading the MEG data for all subjects ...
-  datalad get sub-*/ses-meg/meg/*
+  datalad get sub-*/ses-meg/meg/*run-01*
+  datalad get sub-*/ses-meg/meg/*run-02*
 
   echo Downloading the MaxFiltered MEG data for all subjects ...
-  datalad get derivatives/meg_derivatives/sub-*/ses-meg/meg/*
+  datalad get derivatives/meg_derivatives/sub-*/ses-meg/meg/*run-01*
+  datalad get derivatives/meg_derivatives/sub-*/ses-meg/meg/*run-02*
 
   echo Downloading the anatomical MRI data for all subjects ...
   datalad get sub-*/ses-mri/anat/*mprage_T1w.nii.gz

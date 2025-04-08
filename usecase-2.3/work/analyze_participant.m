@@ -17,7 +17,7 @@ function analyze_participant(inputprefix, outputprefix)
     nsubj = size(participants,1);
     nruns = 2; % do the computations for the first few runs only
 
-    for subject=1:nsubj
+    for subject = 1:nsubj
 
       close all
 

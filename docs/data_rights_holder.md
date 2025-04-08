@@ -1,8 +1,34 @@
 # Data rights holder
 
-The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer.
+The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
-The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to this as _downloading_ if the data rights holder creates an account for the platform operator on their institutional system, and if the latter initiates and controls the transfer. In neither case is the data user involved in the data transfer.
+The BIDS-formatted input data is for example structured as
+
+```console
+input
+├── dataset_description.json
+├── participants.tsv
+├── participants.json
+├── README.md
+├── sub-01
+|   | ses-01/...
+|   └ ses-02/...
+├── sub-02
+|   | ses-01/...
+|   └ ses-02/...
+..
+└── sub-NN
+    | ses-01/...
+    └ ses-02/...
+```
+
+The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some decentral research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform.
+
+Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for data ingestion into SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the decentral institutional storage or repository. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
+
+So for the data transfer into SIESTA we refer to this as _uploading_ in case the platform operator creates an account on the SIESTA platform for the data rights holder and if the latter initiates and controls the transfer. We refer to this as _downloading_ if the data rights holder creates an account for the platform operator on their institutional system, and if the latter initiates and controls the transfer. In neither case is the data user involved in the data transfer.
+
+Note that there is also _downloading_ by the data user of the results of the analysis pipeline, but that is discussed elsewhere in the [corresponding documentation](./data_user.md).
 
 ## Data transfer into the system (import)
 
@@ -20,7 +46,7 @@ The data rights holder can provide the platform operator with instructions and a
 
 It is the responsibility of the data rights holder to employ data minimization and to ensure that the dataset does not contain information that is not needed for subsequent analyses.
 
-It is the responsibility of the platform owner to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
+It is the responsibility of the platform operator to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
 
 ### For the scrambled data
 
@@ -32,7 +58,7 @@ It is the responsibility of the data rights holder to ensure that data following
 
 The scrambled data is anonymous, hence the pipeline applied to the scrambled data is also anonymous and its result can be shared without restrictions.
 
-The direct output of the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to make the direct output differentially private.
+The direct output of the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to make the direct output differentially private as, for example, explained on [Wikipedia](https://en.wikipedia.org/wiki/Differential_privacy).
 
 ## Differentially private output data
 

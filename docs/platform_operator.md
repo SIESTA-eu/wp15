@@ -1,6 +1,10 @@
 # Platform operator
 
-The platform operator is the person or organization responsible for the SIESTA infrastructure. They take care of the secure storage and compute environment and allow "data rights holders" to upload data to the platform and "data users" to perform analyses on that data.
+The platform operator is the person or organization responsible for the SIESTA infrastructure. They take care of the secure storage and compute environment and allow "data rights holders" to upload data to the platform and "data users" to perform analyses on that data and to download the results.
+
+Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data".
+
+SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
 The neuroimaging use cases in wp15 require the input data to be organized according to the [BIDS format](http://bids-standard.org/), and the analysis to be implemented as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209). It is possible to verify the validity of the input data with the [BIDS validator](https://bids-standard.github.io/bids-validator/).
 
@@ -61,7 +65,7 @@ A regular analysis on the dataset often involves two phases: computations at the
 
 It is quite common that the participant-level computations result in intermediate data that is of a similar size as the original data. The "participant" level computations can in principle be parallelized over subjects. The "group" level computations usually do not involve or allow for parallel computation.
 
-The data user decides on the analysis that is to be executed on the data. Hence the the data user must specify an estimate of the computational requirements. Some computations will scale linearly in time with the dataset size (for example 2x as many subjects in the dataset means 2x longer computations) but other computations will have a non-linear relationship to the dataset size.
+The data user decides on the analysis that is to be executed on the data. Hence, the data user must specify an estimate of the computational requirements. Some computations will scale linearly in time with the dataset size (for example 2x as many subjects in the dataset means 2x longer computations) but other computations will have a non-linear relationship to the dataset size.
 
 The platform operator should get information from the data user on:
 
@@ -75,4 +79,4 @@ The platform operator should get information from the data user on:
 
 SInce the data user cannot have direct access to the sensitive data, the computation is to be initiated by the platform operator. Following the computations, the results are used to calibrate nosie and to prepare diofferentially private results. These are optionally reviewd by the data rights holder and subsequently shared with the data user.
 
-The analysis is to be implemented by the data user as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209). To allow development, testing, and deployment on the compute environment of the data user, we have settled on [Apptainer](https://apptainer.org). If needed, the platform operator convert the Apptainer image into a Dßocker image.
+The analysis is to be implemented by the data user as a containerized [BIDS application](https://doi.org/10.1371/journal.pcbi.1005209). To allow development, testing, and deployment on the compute environment of the data user, we have settled on [Apptainer](https://apptainer.org). If needed, the platform operator convert the Apptainer image into a Docker image.

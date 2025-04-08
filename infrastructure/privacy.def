@@ -15,6 +15,9 @@ From: ubuntu:24.04
   echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
   DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
 %environment
   export LC_ALL=C
 

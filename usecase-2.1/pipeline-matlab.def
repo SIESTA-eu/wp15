@@ -32,6 +32,9 @@ From: ubuntu:24.04
   /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB
   ln -s /opt/matlab/bin/matlab /usr/local/bin
 
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
 %environment
   export LC_ALL=C
 
