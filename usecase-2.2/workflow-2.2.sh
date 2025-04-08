@@ -59,7 +59,7 @@ done
 apptainer run ${URLORAS}/mergegroup.sif:${VER} $(eval echo leaveoneout-{1..$count}-output) leaveoneout-merged-output $WHITELIST
 
 # apptainer run oras://ghcr.io/siesta-eu/calibratenoise.sif:${VER}      leaveoneout-merged-output noise
-# apptainer run oras://ghcr.io/siesta-eu/mergesubjects.sif:${VER}       singlesubject-merged $(eval echo singlesubject-{1..$NSUBJ})  # this should result in the same as "input"
-# apptainer run oras://ghcr.io/siesta-eu/pipeline-${USECASE}.sif:${VER} singlesubject-merged singlesubject-merged-output group       # this should result in the same as "input-output"
+# apptainer run oras://ghcr.io/siesta-eu/mergesubjects.sif:${VER}       singlesubject-merged $(eval echo singlesubject-{1..$NSUBJ})  # This should result in the same as "input"
+# apptainer run oras://ghcr.io/siesta-eu/pipeline-${USECASE}.sif:${VER} singlesubject-merged singlesubject-merged-output group       # This should result in the same as "input-output"
 # apptainer run oras://ghcr.io/siesta-eu/addnoise.sif:${VER}            singlesubject-merged-output noise result-with-noise
 # apptainer run oras://ghcr.io/siesta-eu/privacy.sif:${VER}             result-with-noise
