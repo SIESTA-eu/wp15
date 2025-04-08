@@ -1,0 +1,24 @@
+name: mergesubjects tests
+on:
+  push:
+    paths:
+      - '!**.md'
+  pull_request:
+    paths:
+      - '!**.md'
+
+jobs:
+  tests:
+    name: Run pytests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure/mergesubjects
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Tests with pytest
+        run: |
+          pip install --upgrade pip
+          pip install pytest
+          pytest .
