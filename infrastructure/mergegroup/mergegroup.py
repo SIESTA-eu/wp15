@@ -82,26 +82,28 @@ def save_(filename, data):
     with open(filename, "a") as f:
         f.write("\t".join(map(str, data)) + "\n")
 
-def main():
-    if len(sys.argv) < 4:
-        print("Usage: apptainer run mergegroup.sif <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>")
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    if len(args) < 4:
+        print("Usage: mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>")
         sys.exit(1)
 
     try:
-        with open(sys.argv[-1], "r") as file:
+        with open(args[-1], "r") as file:
             whitelist = [line.strip() for line in file if line.strip() and not line.startswith("#")]
     except FileNotFoundError:
         print("Please provide a valid path to whitelist.txt")
         sys.exit(1)
 
-    output_dir = sys.argv[-2]
+    output_dir = args[-2]
     os.makedirs(output_dir, exist_ok=True)
     data_dict = {key: list() for key in whitelist}
     file_types = {key: filetype(key) for key in whitelist}
     txt_values, ctsv_values ,mat_values, nii_values = list(), list(), list(), list()
     
     for key in whitelist:
-        input_dirs = sorted([f"{item}/{key}" for item in sys.argv[1:-2]], key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
+        input_dirs = sorted([f"{item}/{key}" for item in args[1:-2]], key=lambda x: [int(text) if text.isdigit() else text for text in re.split(r'(\d+)', x)])
         txt_aux, ctsv_aux,mat_aux, nii_aux = list(), list(), list(), list()
         for input_dir in input_dirs:  
             if os.path.exists(input_dir):
