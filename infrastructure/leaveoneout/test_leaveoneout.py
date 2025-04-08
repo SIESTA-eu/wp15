@@ -7,9 +7,9 @@ import leaveoneout
 test_path = Path('tests')
 
 def test1(tmp_path):
-    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout1', 'sub-01'])
-    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout2', 'sub-02'])
-    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout1', '1'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout2', '2'])
+    leaveoneout.main(['exe', test_path / 'test1', tmp_path / 'test1/leaveoneout3', '3'])
 
     # FIXME determine the correct counts and then enable these tests
     #assert len(list(tmp_path.iterdir()))                               == 9       # 6 subjects + derivatives + README + participants.tsv
@@ -20,16 +20,16 @@ def test1(tmp_path):
     #assert len(list((tmp_path/'derivatives'/'deriv-1').glob('sub-*'))) == 6       # 6 subjects
 
 def test2(tmp_path):
-    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout1', 'sub-01'])
-    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout2', 'sub-02'])
-    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout1', '1'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout2', '2'])
+    leaveoneout.main(['exe', test_path / 'test2', tmp_path / 'test2/leaveoneout3', '3'])
 
     # FIXME add some tests that are not yet in test1, no reason to repeat the same tests
 
 def test3(tmp_path):
-    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout1', 'sub-01'])
-    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout2', 'sub-02'])
-    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout3', 'sub-03'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout1', '1'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout2', '2'])
+    leaveoneout.main(['exe', test_path / 'test3', tmp_path / 'test3/leaveoneout3', '3'])
 
     # FIXME add some tests that are not yet in test1 and test2, no reason to repeat the same tests
 
