@@ -2,9 +2,11 @@ name: mergegroup tests
 on:
   push:
     paths:
+      - 'infrastructure/mergegroup/**'
       - '!**.md'
   pull_request:
     paths:
+      - 'infrastructure/mergegroup/**'
       - '!**.md'
 
 jobs:

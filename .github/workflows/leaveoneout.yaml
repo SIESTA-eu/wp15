@@ -2,9 +2,11 @@ name: leaveoneout tests
 on:
   push:
     paths:
+      - 'infrastructure/leaveoneout/**'
       - '!**.md'
   pull_request:
     paths:
+      - 'infrastructure/leaveoneout/**'
       - '!**.md'
 
 jobs:
