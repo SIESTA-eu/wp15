@@ -56,7 +56,7 @@ def leaveoneout_(input_dir, output_dir ,participant_nr):
                                 pass
                                 
                
-            print(f"{participant_nr} has been succesfully excluded.")        
+            print(f"{participant_nr} has been successfully excluded.")        
         else:
             print(f"Error: participant_nr[{participant_nr}] does not exist in {input_dir}.")  
         return True
