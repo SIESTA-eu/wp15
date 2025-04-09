@@ -137,7 +137,7 @@ mv bva-io               eeglab/plugins/bva-io1.73
 mv firfilt              eeglab/plugins/firfilt2.8
 mv ICLabel              eeglab/plugins/ICLabel1.6
 mv clean_rawdata        eeglab/plugins/clean_rawdata2.91
-mv zapline-plus-1.2.1   eeglab/plugins/apline-plus1.2.1
+mv zapline-plus-1.2.1   eeglab/plugins/zapline-plus1.2.1
 mv picard-matlab        eeglab/plugins/PICARD1.0
 mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 ```
