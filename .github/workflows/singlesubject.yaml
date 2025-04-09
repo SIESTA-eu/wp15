@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infrastructure/singlesubjects
+        working-directory: ./infrastructure/singlesubject
 
     steps:
       - name: Checkout v4
