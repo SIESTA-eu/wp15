@@ -1,0 +1,24 @@
+dataset_description.json
+{
+    "Name": "Test Dataset",
+    "BIDSVersion": "1.0.0",
+    "License": "CC0",
+    "Authors": [
+        "Author 1",
+        "Author 2"
+    ],
+    "Acknowledgements": "Thanks to everyone who contributed.",
+    "HowToAcknowledge": "Please cite the dataset.",
+    "Funding": [
+        {
+            "AwardNumber": "123456",
+            "Agency": "National Science Foundation"
+        }
+    ],
+    "ReferencesAndLinks": [
+        {
+            "Title": "Example Reference",
+            "URL": "https://example.com"
+        }
+    ]
+}
