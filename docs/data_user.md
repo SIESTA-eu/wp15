@@ -111,6 +111,10 @@ The participant-level analysis can be done one subject at the time, but can also
 
 During the group-level analysis, the data from multiple participants is combined into an aggregate group-level output that provides the answer to the data user's research question. The group level analysis might require access to the original input data, and might also require access to intermediate results that are computed during the participant-level analysis.
 
+#### whitelisting
+
+The group level output is taken from a whitelist.txt file that must list all the desired outcomes.
+
 ### Software licenses
 
 The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used.
