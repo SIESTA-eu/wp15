@@ -26,9 +26,11 @@ To facilitate debugging, the data user's analysis scripts should give explicit e
 
 ### Input data handling
 
-Input data to the analysis pipeline will be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
+Input data to the analysis pipeline is formatted as a [BIDS](https://bids.neuroimaging.io) dataset. If the input data provided by the data rights holder is a "derivatives" dataset (as specified by `DatasetType` in the `dataset_description.json` file), it is expected to still follow the folder organization of a "raw" dataset, as that is required for the shuffling and resampling.
 
-The input is for example formatted as
+The input directory can optionally also include nested derivatives that are provided by the data rights holder, such as MaxFiltered data, or FreeSurfer cortical sheets. These would be in the `input/derivative/pipelinename` directory, where the pipeline name is for example `maxfilter` or `freesurfer`. Again, these derivatives should follow the folder organization of a "raw" dataset.
+
+The input is, for example, formatted as
 
 ```console
 input
@@ -43,12 +45,25 @@ input
 |   | ses-01/...
 |   └ ses-02/...
 ...
-└── sub-NN
-    | ses-01/...
-    └ ses-02/...
+├── sub-NN
+|   | ses-01/...
+|   └ ses-02/...
+└── derivatives
+    ├ maxfilter
+    | ├── dataset_description.json
+    | ├── README.md
+    | ├── sub-01
+    | ├── sub-02
+    | ...
+    | └── sub-NN
+    └ freesurfer
+      ├── dataset_description.json
+      ├── README.md
+      ├── sub-01
+      ├── sub-02
+      ...
+      └── sub-NN
 ```
-
-The input directory can optionally also include derivatives that are provided by the data rights holder, such as MaxFiltered data, or FreeSurfer cortical sheets. These would be in the `input/derivative/pipelinename` directory, where the pipeline name is for example `maxfilter` or `freesurfer`.
 
 ### Output data handling
 
