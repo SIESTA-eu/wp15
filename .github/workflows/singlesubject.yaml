@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infrastructure/mergesubjects
+        working-directory: ./infrastructure/singlesubjects
 
     steps:
       - name: Checkout v4
