@@ -28,4 +28,4 @@ jobs:
           pip install pytest pandas
           
       - name: Run tests
-        run: pytest test_mergesubjects.py -v -s
+        run: pytest infrastructure/mergesubjects/test_mergesubjects.py -v -s
