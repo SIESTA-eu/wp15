@@ -6,15 +6,15 @@ test_path = Path('tests')
 
 def test1(tmp_path):
     prefix = test_path / 'test1'
-    mergesubjects.main(['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test1-merged'])
+    mergesubjects.main(*['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test1-merged'])
 
 def test2(tmp_path):
     prefix = test_path / 'test2'
-    mergesubjects.main(['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test2-merged'])
+    mergesubjects.main(*['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test2-merged'])
 
 def test3(tmp_path):
     prefix = test_path / 'test3'
-    mergesubjects.main(['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test3-merged'])
+    mergesubjects.main(*['exe', prefix / 'singlesubject-1', prefix / 'singlesubject-2', prefix / 'singlesubject-3', tmp_path / 'test3-merged'])
 
     
 if __name__ == "__main__":
