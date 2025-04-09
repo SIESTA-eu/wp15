@@ -48,8 +48,7 @@ It is the responsibility of the data rights holder to employ data minimization a
 
 It is the responsibility of the platform operator to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
 
-In WP15, we have not considered the network and storage aspect on the SIESTA platform, where encryption in transit and at rest may or not apply.
-
+In WP15, we have not considered the network and storage aspect on the SIESTA platform, where encryption in transit and at rest may or may not apply.
 ### For the scrambled data
 
 The scrambled data is needed for the data user to implement and test their analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
