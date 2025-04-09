@@ -26,7 +26,7 @@ To facilitate debugging, the data user's analysis scripts should give explicit e
 
 ### Input data handling
 
-Input data to the analysis pipeline will be formatted as a raw dataset according to [BIDS](https://bids.neuroimaging.io), as that is required for the shuffling and resampling.
+Input data to the analysis pipeline will be formatted as [BIDS](https://bids.neuroimaging.io) dataset. If the "DatasetType" is derivatives, it is expected to still follow the folder organization of DatasetType: raw, as that is required for the shuffling and resampling.
 
 The input is for example formatted as
 
