@@ -88,11 +88,12 @@ def test10(tmp_path):
 
 if __name__ == "__main__":
     # This would run it with pytest, similar to running pytest from a GitHub action
-    # pytest.main([__file__, '-v', '-s'])
-
+    import pytest
+    pytest.main([__file__, '-v', '-s'])
+"""
     # This allows running the script directly from the console, but you need to pass the output directory as an argument.
     # The advantage of this is that you can inspect the output more easily.
-    if len(sys.argv) < 2:
+    #if len(sys.argv) < 2:
         print("Usage: test_mergegroup.py <outputdir>")
         sys.exit(1)
     test0(Path(sys.argv[1]))
@@ -106,3 +107,4 @@ if __name__ == "__main__":
     test8(Path(sys.argv[1]))
     test9(Path(sys.argv[1]))
     test10(Path(sys.argv[1]))
+"""
