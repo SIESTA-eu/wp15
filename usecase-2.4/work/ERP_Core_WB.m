@@ -300,14 +300,14 @@ if strcmpi(AnalysisLevel,'1')
 
         EEG = ALLEEG;
         for s=1:size(ALLEEG,2)
-            try
+            %try
                 % downsample
                 EEGTMP = eeg_checkset(EEG(s), 'loaddata');
                 if EEGTMP.srate ~= 250
                     EEGTMP = pop_resample(EEGTMP, 250);
                 end
                 % line freq removal
-                EEGTMP = pop_zapline_plus(EEGTMP,'noisefreqs','line',...
+                EEGTMP = pop_zapline_plus(EEGTMP,...
                     'coarseFreqDetectPowerDiff',4,'chunkLength',30,...
                     'adaptiveNremove',1,'fixedNremove',1,'plotResults',0);
                 % remove bad channels
@@ -341,9 +341,9 @@ if strcmpi(AnalysisLevel,'1')
                 EEGTMP = pop_reref(EEGTMP,[],'interpchan','off');
                 EEGTMP = pop_saveset(EEGTMP,'savemode','resave');
                 EEG = eeg_store(EEG, EEGTMP, s);
-            catch pipe_error
-                error_report{s} = pipe_error.message; %#ok<AGROW>
-            end
+            %catch pipe_error
+            %    error_report{s} = pipe_error.message; %#ok<AGROW>
+            %end
         end
 
         % Save study

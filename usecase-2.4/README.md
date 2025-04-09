@@ -112,12 +112,14 @@ rm 2024.2.1.zip
 git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
 mv limo_tools           eeglab/plugins/limo_tools
 
+git clone https://github.com/sccn/zapline-plus
+mv zapline-plus         eeglab/plugins/zapline-plus
+
 wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/bva-io1.73.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/firfilt2.8.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/ICLabel1.6.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/clean_rawdata2.91.zip
-wget https://sccn.ucsd.edu/eeglab/plugins/zapline-plus1.2.1.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/picard-matlab.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/bids-matlab-tools8.0.zip
 
@@ -126,7 +128,6 @@ unzip bva-io1.73.zip
 unzip firfilt2.8.zip
 unzip ICLabel1.6.zip
 unzip clean_rawdata2.91.zip
-unzip zapline-plus1.2.1.zip
 unzip picard-matlab.zip
 unzip bids-matlab-tools8.0.zip
 
@@ -137,7 +138,6 @@ mv bva-io               eeglab/plugins/bva-io1.73
 mv firfilt              eeglab/plugins/firfilt2.8
 mv ICLabel              eeglab/plugins/ICLabel1.6
 mv clean_rawdata        eeglab/plugins/clean_rawdata2.91
-mv zapline-plus-1.2.1   eeglab/plugins/zapline-plus1.2.1
 mv picard-matlab        eeglab/plugins/PICARD1.0
 mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 ```
@@ -165,7 +165,7 @@ Once all is installed, it should look like this
 │   |   └── ICLabel1.6
 │   |   └── limo_tools
 │   |   └── PICARD1.0
-│   |   └── zapline-plus1.2.1
+│   |   └── zapline-plus
 │   │   └── [..]
 ├── input
 │   ├── CHANGES
