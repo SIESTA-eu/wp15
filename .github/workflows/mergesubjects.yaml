@@ -19,9 +19,13 @@ jobs:
         working-directory: ./infrastructure/mergesubjects
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Tests with pytest
+      - name: Checkout v4
+        uses: actions/checkout@v4
+        
+      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install pytest pandas
-          pytest .
+          
+      - name: Run tests
+        run: pytest test_mergesubjects.py -v -s
