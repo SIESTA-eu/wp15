@@ -265,7 +265,7 @@ if strcmpi(AnalysisLevel,'1')
     for t = 1:length(TaskLabel)
 
         %% IMPORT
-        outdir = fullfile(OutputLocation,TaskLabel{t});
+        outdir = fullfile(OutputLocation);
         if ~exist(outdir,'dir')
             mkdir(outdir)
         end
