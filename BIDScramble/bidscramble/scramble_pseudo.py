@@ -36,8 +36,8 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     # Create pseudonyms for all selected subject identifiers
     bidsfiles             = [bidsfile for bidsfile in inputdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/bidsfile.name).is_file()]
     if (inputdir/'derivatives').is_dir():
-        for derivdir in (inputdir/'derivatives').iterdir():
-            bidsfiles    += [bidsfile for bidsfile in derivdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/'derivatives'/derivdir.name/bidsfile.name).is_file() and derivdir.is_dir()]
+        for derivdir in [item for item in (inputdir/'derivatives').iterdir() if item.is_dir()]:
+            bidsfiles    += [bidsfile for bidsfile in derivdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/'derivatives'/derivdir.name/bidsfile.name).is_file()]
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
     inputfiles           += [bidsfile for bidsfile in bidsfiles if bidsfile not in inputfiles]
     subjectids            = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
