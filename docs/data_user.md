@@ -89,6 +89,12 @@ output
     └ otherresults.nii.gz
 ```
 
+#### Whitelisting
+
+The participant and group-level analysis result in a number of files, some of which are only temporary work-in-progress, whereas others represent the primary research outcomes of the analysis pipeline. The data user has to provide a text file `whitelist.txt` that lists all the desired outcomes, i.e., all files resulting from the group-level analysis that are to be retained. Noise calibration will be done on the numerical data in these files, and a differentially private version of these files will be shared with the data user. 
+
+Files that are not in the `whitelist.txt` will never be shared with the data user.
+
 ## Storage requirements
 
 The data user must specify to the platform operator what the storage requirements are for the participant- and group-level analyses. How many file are created, how much storage does that require, what is the retention period of the intermediate data, and what data files comprise the final results for the data user.

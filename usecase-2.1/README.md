@@ -72,6 +72,8 @@ Average Matching Cells per Row: 254.03
 Standard Deviation of Matching Cells per Row: 10.15
 ```
 
+If full leakage is not at 0%, the scrambler should be re-run. Partial leakage is left at the appreciation of the data right holder.
+
 ### Data citation
 
 Yulin Wang and Wei Duan and Debo Dong and Lihong Ding and Xu Lei (2022). A test-retest resting and cognitive state EEG dataset. OpenNeuro. [Dataset] doi: doi:10.18112/openneuro.ds004148.v1.0.1
