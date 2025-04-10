@@ -21,9 +21,10 @@ def test_mergegroup(test_dir, whitelist_file, tmp_path):
         whitelist_file
     ]
     mergegroup.main(args)
-
-    merged_file = merged_dir / 'group-merged.tsv'
+    
+    merged_file = tmp_path / f'{test_dir.name}-{whitelist_file.stem}' / 'group-merged.tsv'
     assert merged_file.exists(), f"Merged file not found: {merged_file}"
+    
     num_lines = sum(1 for _ in merged_file.open('r', encoding='utf-8'))
     print(f"Line count for {merged_file}: {num_lines}")
 
