@@ -45,6 +45,9 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   
   # also use the github-repo for zapline, the v1.2.1 zip-file is buggy
   git clone https://github.com/sccn/zapline-plus.git
+  cd zapline-plus
+  git checkout 18d4eec
+  cd ../
   mv zapline-plus eeglab/plugins/zapline-plus
   
   wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
