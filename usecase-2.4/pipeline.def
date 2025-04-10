@@ -31,7 +31,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mkdir /opt/matlab
   wget https://www.mathworks.com/mpm/glnxa64/mpm -O /opt/matlab/mpm
   chmod +x /opt/matlab/mpm
-  /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB
+  /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB Signal_Processing_Toolbox Statistics_and_Machine_Learning_Toolbox
   ln -s /opt/matlab/bin/matlab /usr/local/bin
   cd /work
   wget https://github.com/sccn/eeglab/archive/refs/tags/2024.2.1.zip
@@ -42,12 +42,20 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
   mv limo_tools eeglab/plugins/limo_tools
 
+  
+  # also use the github-repo for zapline, the v1.2.1 zip-file is buggy
+  git clone https://github.com/sccn/zapline-plus.git
+  cd zapline-plus
+  git checkout 18d4eec
+  cd ../
+  mv zapline-plus eeglab/plugins/zapline-plus
+  
   wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/bva-io1.73.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/firfilt2.8.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/ICLabel1.6.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/clean_rawdata2.91.zip
-  wget https://sccn.ucsd.edu/eeglab/plugins/zapline-plus1.2.1.zip
+  #wget https://sccn.ucsd.edu/eeglab/plugins/zapline-plus1.2.1.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/picard-matlab.zip
   wget https://sccn.ucsd.edu/eeglab/plugins/bids-matlab-tools8.0.zip
 
@@ -56,7 +64,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   unzip firfilt2.8.zip
   unzip ICLabel1.6.zip
   unzip clean_rawdata2.91.zip
-  unzip zapline-plus1.2.1.zip
+  #unzip zapline-plus1.2.1.zip
   unzip picard-matlab.zip
   unzip bids-matlab-tools8.0.zip
 
@@ -67,7 +75,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv firfilt              eeglab/plugins/firfilt2.8
   mv ICLabel              eeglab/plugins/ICLabel1.6
   mv clean_rawdata        eeglab/plugins/clean_rawdata2.91
-  mv zapline-plus-1.2.1   eeglab/plugins/apline-plus1.2.1
+  #mv zapline-plus-1.2.1   eeglab/plugins/zapline-plus1.2.1
   mv picard-matlab        eeglab/plugins/PICARD1.0
   mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 

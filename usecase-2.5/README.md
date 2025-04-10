@@ -1,4 +1,4 @@
-# SIESTA - work package 15 - use case 2.5
+# SIESTA - work package 15 - use case 2.5 (4D imaging space * time)
 
 This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
 

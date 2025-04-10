@@ -265,7 +265,7 @@ if strcmpi(AnalysisLevel,'1')
     for t = 1:length(TaskLabel)
 
         %% IMPORT
-        outdir = fullfile(OutputLocation,TaskLabel{t});
+        outdir = fullfile(OutputLocation);
         if ~exist(outdir,'dir')
             mkdir(outdir)
         end
@@ -300,14 +300,14 @@ if strcmpi(AnalysisLevel,'1')
 
         EEG = ALLEEG;
         for s=1:size(ALLEEG,2)
-            try
+            %try
                 % downsample
                 EEGTMP = eeg_checkset(EEG(s), 'loaddata');
                 if EEGTMP.srate ~= 250
                     EEGTMP = pop_resample(EEGTMP, 250);
                 end
                 % line freq removal
-                EEGTMP = pop_zapline_plus(EEGTMP,'noisefreqs','line',...
+                EEGTMP = pop_zapline_plus(EEGTMP,...
                     'coarseFreqDetectPowerDiff',4,'chunkLength',30,...
                     'adaptiveNremove',1,'fixedNremove',1,'plotResults',0);
                 % remove bad channels
@@ -341,9 +341,9 @@ if strcmpi(AnalysisLevel,'1')
                 EEGTMP = pop_reref(EEGTMP,[],'interpchan','off');
                 EEGTMP = pop_saveset(EEGTMP,'savemode','resave');
                 EEG = eeg_store(EEG, EEGTMP, s);
-            catch pipe_error
-                error_report{s} = pipe_error.message; %#ok<AGROW>
-            end
+            %catch pipe_error
+            %    error_report{s} = pipe_error.message; %#ok<AGROW>
+            %end
         end
 
         % Save study
@@ -416,7 +416,6 @@ if strcmpi(AnalysisLevel,'1')
         end
 
         % 1st AnalysisLevel analysis
-        STUDY.filepath = ''; % JM ADDED THIS, BECAUSE OTHERWISE LIMO GETS LOST IN RELATIVE PATHS ETC, I don't understand the logic of all those paths specs in the STUDY object, but this seems to work for correct downstream singlesubject processing
         [STUDY, files] = std_limo(STUDY, EEG, 'method',estimation,...
             'measure','daterp', 'chanloc',AvgChanlocs,...
             'timelim',analysis_window(t,:),'erase','on',...
