@@ -39,19 +39,19 @@ def prune_participants_tsv(rootdir: Path):
     :return:
     """
 
-    participants_tsv = rootdir/'participants.tsv'
-    if participants_tsv.is_file():
+    for participants_tsv in [rootdir/'participants.tsv'] + list((rootdir/'phenotype').glob('*.tsv')) if (rootdir/'phenotype').is_dir() else []:
+        if participants_tsv.is_file():
 
-        print(f"--> {participants_tsv}")
-        table = pd.read_csv(participants_tsv, sep='\t', dtype=str, index_col='participant_id')
-        for subid in table.index:
-            if not isinstance(subid, str):  # Can happen with anonymized data
-                return
-            if not (rootdir/subid).is_dir():
-                print(f"Pruning {subid} record from {participants_tsv}")
-                table.drop(subid, inplace=True)
+            print(f"--> {participants_tsv}")
+            table = pd.read_csv(participants_tsv, sep='\t', dtype=str, index_col='participant_id')
+            for subid in table.index:
+                if not isinstance(subid, str):  # Can happen with anonymized data
+                    return
+                if not (rootdir/subid).is_dir():
+                    print(f"Pruning {subid} record from {participants_tsv}")
+                    table.drop(subid, inplace=True)
 
-        table.to_csv(participants_tsv, sep='\t', encoding='utf-8', na_rep='n/a')
+            table.to_csv(participants_tsv, sep='\t', encoding='utf-8', na_rep='n/a')
 
 
 def console_scripts(show: bool=False) -> list:
