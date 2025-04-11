@@ -39,7 +39,7 @@ def prune_participants_tsv(rootdir: Path):
     :return:
     """
 
-    for participants_tsv in [rootdir/'participants.tsv'] + list((rootdir/'phenotype').glob('*.tsv')) if (rootdir/'phenotype').is_dir() else []:
+    for participants_tsv in [rootdir/'participants.tsv'] + (list((rootdir/'phenotype').glob('*.tsv')) if (rootdir/'phenotype').is_dir() else []):
         if participants_tsv.is_file():
 
             print(f"--> {participants_tsv}")
