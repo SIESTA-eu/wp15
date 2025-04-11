@@ -67,7 +67,7 @@ input
 
 ### Output data handling
 
-Output data from the analysis pipeline must be formatted a typical [BIDS](https://bids.neuroimaging.io) being here `DatasetType: derivatives`. That is required for the shuffling and resampling. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
+Output data from the analysis pipeline must be formatted as a typical [BIDS](https://bids.neuroimaging.io) being here `DatasetType: derivatives`. That is required for the shuffling and resampling. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
 
 The participant-level analysis should write its results in `sub-xxx` directories that arew placed directly underneath the output directory. The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis can be written at the top level of the output directory, or in a dedicated `group` directory.
 
