@@ -7,9 +7,10 @@ test_dirs = [d for d in test_path.iterdir() if d.is_dir() and d.name.startswith(
 @pytest.mark.parametrize('test_dir', test_dirs)
 def test_singlesubject(test_dir, tmp_path):
     subject_numbers = ['1', '2', '3']
-
-    for subject in subject_numbers:
-        singlesubject.main(['exe', str(test_dir), str(tmp_path / f'{test_dir.name}/singlesubject{subject}'), subject])
+    # "Usage: singlesubject.py <inputdir> <outputdir> <participant_nr>"
+    for participant_nr in subject_numbers:
+        print()
+        singlesubject.main(['exe', str(test_dir), str(tmp_path / f'{test_dir.name}/singlesubject-output-{participant_nr}'), participant_nr])
 
 
 if __name__ == "__main__":
