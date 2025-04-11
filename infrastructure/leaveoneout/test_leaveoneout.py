@@ -9,7 +9,7 @@ def test_leaveoneout(test_dir, tmp_path):
     subject_numbers = ['1', '2', '3']
 
     for subject in subject_numbers:
-        singlesubject.main(['exe', str(test_dir), str(tmp_path / f'{test_dir.name}/leaveoneout{subject}'), subject])
+        singlesubject.main(['exe', str(test_dir), str(tmp_path / f'{test_dir.name}/singlesubject{subject}'), subject])
 
 
 if __name__ == "__main__":
