@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infrastructure/mergesubjects
+        working-directory: ./infprint("Usage: singlesubject.py <inputdir> <outputdir> <participant_nr>")rastructure/mergesubjects
 
     steps:
       - name: Checkout v4
@@ -28,4 +28,4 @@ jobs:
           pip install pytest pandas
           
       - name: Run tests
-        run: pytest test_mergesubjects_v01.py -v -s
+        run: pytest test_mergesubjects.py -v -s
