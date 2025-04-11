@@ -79,7 +79,7 @@ This will print a report on screen with the percentage of rows with partial leak
  - Standard Deviation of row/participants that are identical: 6.26
 ```
 
-If full leakage is not at 0%, the scrambler should be re-run. Partial leakage is left at the appreciation of the data right holder.
+Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and bellow as acceptable.
 
 ### Data citation
 
