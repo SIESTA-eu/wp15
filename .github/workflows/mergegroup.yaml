@@ -29,4 +29,4 @@ jobs:
           pip install pytest pandas h5py scipy nibabel more_itertools --quiet
       
       - name: Run tests
-        run: pytest test_mergegroup_v01.py -v -s
+        run: pytest test_mergegroup.py -v -s
