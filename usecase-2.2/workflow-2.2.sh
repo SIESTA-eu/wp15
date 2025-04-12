@@ -25,9 +25,9 @@ apptainer run ${URLORAS}/scramble.sif:${VER} input scrambled-input json -p '.*'
 # apptainer run ${URLORAS}/privacy.sif:${VER} input scrambled-input
 
 # RUN PIPELINE
-apptainer run $PIPELINE input           output           participant --mem_gb 30 --ants-nthreads 8 --nprocs 4
+apptainer run $PIPELINE input           output           participant --mem_gb 30
 apptainer run $PIPELINE input           output           group
-apptainer run $PIPELINE scrambled-input scrambled-output participant --mem_gb 30 --ants-nthreads 8 --nprocs 4
+apptainer run $PIPELINE scrambled-input scrambled-output participant --mem_gb 30
 apptainer run $PIPELINE scrambled-input scrambled-output group
 
 # CREATE SINGLESUBJECT AND RUN THE PIPELINE ON SINGLESUBJECTS
