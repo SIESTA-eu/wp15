@@ -22,28 +22,34 @@
 tdir <- tempdir()
 .libPaths(c(tdir, .libPaths()))
 
-hasoptparse  <- c("optparse") %in% rownames(installed.packages())
-hasdplyr     <- c("dplyr") %in% rownames(installed.packages())
-if (hasoptparse==FALSE)  {install.packages("optparse", lib=tdir, dependencies=TRUE, repos="https://cloud.r-project.org")}
-if (hasdplyr==FALSE)     {install.packages("dplyr", lib=tdir, dependencies=TRUE, repos="https://cloud.r-project.org")}
+hasoptparse <- c("optparse") %in% rownames(installed.packages())
+hasdplyr <- c("dplyr") %in% rownames(installed.packages())
+if (!hasoptparse) {
+  install.packages("optparse", lib = tdir, dependencies = TRUE, repos = "https://cloud.r-project.org")
+}
+if (!hasdplyr) {
+  install.packages("dplyr", lib = tdir, dependencies = TRUE, repos = "https://cloud.r-project.org")
+}
 
 # Load the required package for the option parsing
 library("optparse", warn.conflicts = FALSE)
 # Load the required package for column selection
 library("dplyr", warn.conflicts = FALSE)
+# Load the required package for JSON writing
+library("jsonlite", warn.conflicts = FALSE)
 
 # Define the option parser
 option_list <- list(
-  make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
-              help="Print extra output"),
-  make_option(c("--start-idx"), type="integer", default=0,
-              help="Start index for participant selection", metavar="INTEGER"),
-  make_option(c("--stop-idx"), type="integer", default=0,
-              help="Stop index for participant selection", metavar="INTEGER")
+  make_option(c("-v", "--verbose"), action = "store_true", default = FALSE,
+              help = "Print extra output"),
+  make_option(c("--start-idx"), type = "integer", default = 0,
+              help = "Start index for participant selection", metavar = "INTEGER"),
+  make_option(c("--stop-idx"), type = "integer", default = 0,
+              help = "Stop index for participant selection", metavar = "INTEGER")
 )
 
 # Parse the options
-parser <- OptionParser(option_list=option_list, 
+parser <- OptionParser(option_list = option_list,
                        usage = "usage: %prog [options] input output level",
                        description = "This pipeline computes averages from the participants.tsv file.")
 arguments <- parse_args(parser, positional_arguments = 3)
@@ -71,51 +77,88 @@ if (opts$verbose) {
   cat("Stopping index:", opts$'stop-idx', "\n")
 }
 
-#
-inputfile  <- file.path(inputdir, c("participants.tsv"))
+# Create the output directory and its parents if they don't exist
+dir.create(outputdir, recursive = TRUE, showWarnings = FALSE)
 
-# read table, deal with missing values
-participants <- read.csv(inputfile, sep="\t", na.strings=c("n/a"))
+# Write the metadata about the dataset to a JSON file in line with the BIDS standard
+# https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#dataset-description
+dataset_description <- list(
+  "Name" = "SIESTA Use Case 2.1",
+  "BIDSVersion" = "1.10.0",
+  "DatasetType" = "derivative",
+  "License" = "CC0", # same as input dataset
+  "Authors" = list("SIESTA workpackage 15 team"),
+  "Acknowledgements" = list("SIESTA workpackage 15 team"),
+  "HowToAcknowledge" = list("Please cite the SIESTA paper"),
+  "Funding" = list("Horizon Europe research and innovation programme grant agreement No. 101131957"),
+  "ReferencesAndLinks" = list("https://eosc-siesta.eu", "https://github.com/SIESTA-eu/wp15"),
+  "SourceDatasets" = list(
+    list(
+      "DOI" = "10.18112/openneuro.ds004148.v1.0.1",
+      "Version" = "1.0.1"
+    )
+  ),
+  "GeneratedBy" = list(
+    list(
+      "Name" = "R version of SIESTA use case 2.1",
+      "Description" = "This code computes averages from the participants.tsv file",
+      "Version" = "x.y.z", # FIXME, the tagged version number should be inserted here
+      "Container" = list(
+        "Type" = "apptainer",
+        "Tag" = "latest", # FIXME, the tagged version number should be inserted here
+        "URI" = "oras://ghcr.io/siesta-eu/pipeline-2.1.sif:latest"
+      )
+    )
+  )
+)
 
-# select the rows
-if (opts$'stop-idx'>0) {
+dataset_description_json <- file.path(outputdir, 'dataset_description.json')
+write(jsonlite::toJSON(dataset_description, auto_unbox = TRUE, pretty = TRUE), dataset_description_json)
+
+# Read the input file
+inputfile <- file.path(inputdir, "participants.tsv")
+
+# Read table, deal with missing values
+participants <- read.csv(inputfile, sep = "\t", na.strings = c("n/a"))
+
+# Select the rows
+if (opts$'stop-idx' > 0) {
   participants <- participants[1:opts$'stop-idx', ]
 }
-if (opts$'start-idx'>0) {
+if (opts$'start-idx' > 0) {
   participants <- participants[opts$'start-idx':nrow(participants), ]
 }
 
-# print some of the columns
+# Print some of the columns
 if (opts$verbose) {
   print(participants %>% select(1:5))
 }
 
-# create the output directory and its parents if they don't exist
+# Create the output directory and its parents if they don't exist
 dir.create(outputdir, recursive = TRUE, showWarnings = FALSE)
 
 if (level == "participant") {
-  print("nothing to do at the participant level, only creating participant-level output directories")
+  print("Nothing to do at the participant level, only creating participant-level output directories")
   for (i in 1:nrow(participants)) {
     dir.create(file.path(outputdir, participants$participant_id[i]), recursive = TRUE, showWarnings = FALSE)
   }
-
 } else if (level == "group") {
   outputfile <- file.path(outputdir, "group", "results.tsv")
   dir.create(file.path(outputdir, "group"), recursive = TRUE, showWarnings = FALSE)
 
-  # use the column names and capitalization from the original dataset
-  # ignore missing values
+  # Use the column names and capitalization from the original dataset
+  # Ignore missing values
   averagedage <- mean(participants$age, na.rm = TRUE)
   averagedHeight <- mean(participants$Height, na.rm = TRUE)
   averagedWeight <- mean(participants$Weight, na.rm = TRUE)
 
-  # construct table with results
+  # Construct table with results
   result <- data.frame(averagedage, averagedHeight, averagedWeight)
 
   if (opts$verbose) {
     print(result)
   }
 
-  # write the results to disk
-  write.table(result, file=outputfile, sep="\t", col.names=FALSE, row.names=FALSE)
+  # Write the results to disk
+  write.table(result, file = outputfile, sep = "\t", col.names = FALSE, row.names = FALSE)
 }

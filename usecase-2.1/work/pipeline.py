@@ -10,7 +10,7 @@ Copyright (C) 2024, SIESTA workpackage 15 team
 import pandas as pd
 import argparse
 from pathlib import Path
-
+import json
 
 ##########################################################################
 # Compute the averages of the age, height, and weight of the participants
@@ -36,8 +36,47 @@ def main(options: dict):
         print('options =')
         print(options)
 
+    # Create the output directory and its parents if they don't exist
+    Path(options['outputdir']).mkdir(parents=True, exist_ok=True)
+
+    # Write the metadata about the dataset to a JSON file in line with the BIDS standard
+    # https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#dataset-description
+    dataset_description = {
+        "Name": "SIESTA Use Case 2.1",
+        "BIDSVersion": "1.10.0",
+        "DatasetType": "derivative",
+        "License": "CC0", # same as input dataset
+        "Authors": ["SIESTA workpackage 15 team"],
+        "Acknowledgements": ["SIESTA workpackage 15 team"],
+        "HowToAcknowledge": ["Please cite the SIESTA paper"],
+        "Funding": ["Horizon Europe research and innovation programme grant agreement No. 101131957"],
+        "ReferencesAndLinks": ["https://eosc-siesta.eu", "https://github.com/SIESTA-eu/wp15"],
+        "SourceDatasets": [
+            {
+                "DOI": "10.18112/openneuro.ds004148.v1.0.1",
+                "Version": "1.0.1"
+            }    
+        ],
+        "GeneratedBy": [
+            {
+                "Name": "Python version of SIESTA use case 2.1",
+                "Description": "This code computes averages from the participants.tsv file",
+                "Version": "x.y.z",     # FIXME, the tagged version number should be inserted here 
+                "Container": {
+                    "Type": "apptainer",
+                    "Tag": "latest",    # FIXME, the tagged version number should be inserted here
+                    "URI": "oras://ghcr.io/siesta-eu/pipeline-2.1.sif:latest"
+                }
+            }
+        ],
+    }
+
+    dataset_description_json = Path(options['outputdir']) / 'dataset_description.json'
+    with open(dataset_description_json, 'w', encoding='utf-8') as f:
+        json.dump(dataset_description, f, ensure_ascii=False, indent=4)    
+    
     # Read the participants.tsv input file into a DataFrame
-    inputfile  = Path(options['inputdir'])/'participants.tsv'
+    inputfile  = Path(options['inputdir']) / 'participants.tsv'
     if not inputfile.is_file():
         print(f"WARNING: input file does not exist: {inputfile}")
         return
@@ -57,9 +96,6 @@ def main(options: dict):
     if options.get('verbose'):
         print(f"selected {len(participants)} participants")
 
-    # Create the output directory and its parents if they don't exist
-    Path(options['outputdir']).mkdir(parents=True, exist_ok=True)
-
     if options.get('level') == 'participant':
         print("nothing to do at the participant level, only creating participant-level output directories")
 
@@ -68,10 +104,10 @@ def main(options: dict):
             Path(outputdir).mkdir(parents=True, exist_ok=True)
 
     elif options.get('level') == 'group':
-        outputfile = Path(options['outputdir'])/'group'/'results.tsv'
+        outputfile = Path(options['outputdir']) / 'group' / 'results.tsv'
 
         # Create the group output directory and its parents if they don't exist
-        outputdir = Path(options['outputdir'])/'group'
+        outputdir = Path(options['outputdir']) / 'group'
         outputdir.mkdir(parents=True, exist_ok=True)
 
         # Compute averages
