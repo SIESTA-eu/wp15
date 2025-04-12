@@ -27,12 +27,16 @@ def merge(inputdirs: List[str], outputdir: str):
 
             if item.name == 'derivatives':
                 (outputdir/'derivatives').mkdir(exist_ok=True)
-                for derivative in (inputdir/'derivatives').iterdir():
+                for derivative in item.iterdir():
                     if derivative.is_file():
                         print(f"WARNING: merging unexpected file: {derivative}")
                         shutil.copy(derivative, outputdir/'derivatives')
                     else:
                         merge([derivative], outputdir/'derivatives'/derivative.name)
+
+            elif item.name == 'sourcedata':
+                (outputdir/'sourcedata').mkdir(exist_ok=True)
+                merge([item], outputdir/'sourcedata')
 
             elif item.name == 'participants.tsv':
                 print(f"Merging: {item}")

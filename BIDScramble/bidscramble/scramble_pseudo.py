@@ -4,7 +4,7 @@ import random
 import tempfile
 from tqdm import tqdm
 from pathlib import Path
-from . import get_inputfiles, prune_participants_tsv
+from . import get_inputfiles, prune_participants_tsv, is_bids
 
 
 def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str, participant: str, rootfiles: str, dryrun: bool=False, **_):
@@ -34,14 +34,15 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     outputdir_ = outputdir/'tmpdir_swap' if method != 'original' else outputdir
 
     # Create pseudonyms for all selected subject identifiers
-    bidsfiles             = [bidsfile for bidsfile in inputdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/bidsfile.name).is_file()]
-    if (inputdir/'derivatives').is_dir():
-        for derivdir in [item for item in (inputdir/'derivatives').iterdir() if item.is_dir()]:
-            bidsfiles    += [bidsfile for bidsfile in derivdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/'derivatives'/derivdir.name/bidsfile.name).is_file()]
-    if (inputdir/'phenotype').is_dir():
-        bidsfiles        += [bidsfile for bidsfile in (inputdir/'phenotype').iterdir() if rootfiles=='yes' and not (outputdir/'phenotype'/bidsfile.name).is_file()]
+    extrafiles            = [extrafile for extrafile in inputdir.iterdir() if rootfiles=='yes' and not (outputdir/extrafile.name).is_file()]
+    if (derivatives := inputdir/'derivatives').is_dir():
+        for derivdir in [item for item in derivatives.iterdir() if item.is_dir()]:
+            extrafiles   += [extrafile for extrafile in derivdir.iterdir() if rootfiles=='yes' and not (outputdir/'derivatives'/derivdir.name/extrafile.name).is_file()]
+    for extra in ('sourcedata', 'phenotype'):
+        if (extradir := inputdir/extra).is_dir():
+            extrafiles   += [extrafile for extrafile in extradir.iterdir() if rootfiles=='yes' and not (outputdir/extra/extrafile.name).is_file()]
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
-    inputfiles           += [bidsfile for bidsfile in bidsfiles if bidsfile not in inputfiles]
+    inputfiles           += [extrafile for extrafile in extrafiles if extrafile not in inputfiles and extrafile.is_file() and (not bidsvalidate or is_bids(extrafile.relative_to(inputdir)))]
     subjectids            = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
         pseudonyms = [next(tempfile._get_candidate_names()).replace('_','x') for _ in subjectids]
@@ -87,7 +88,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
             for subjectid, pseudonym in zip(subjectids, pseudonyms):
 
                 # Pseudonymize the filepath
-                if (subjectid in inputid or inputitem in bidsfiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
+                if (subjectid in inputid or inputitem in extrafiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
                     pseudoitem = outputdir/str(inputitem.relative_to(inputdir)).replace(f"sub-{subjectid}", f"sub-{pseudonym}")
                     print(f"\t{'Renaming' if outputitem.is_file() else 'Making'} sub-{subjectid} -> {pseudoitem}")
                     if not dryrun:

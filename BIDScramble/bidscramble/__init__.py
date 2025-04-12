@@ -9,6 +9,16 @@ from bids_validator import BIDSValidator
 __version__     = metadata.version('bidscramble')
 __description__ = metadata.metadata('bidscramble')['Summary']
 __url__         = metadata.metadata('bidscramble')['Project-URL']
+validator       = BIDSValidator()
+
+
+def is_bids(item: Path):
+
+    item = item.as_posix()
+    if not item.startswith('/'):
+        item = '/' + item
+
+    return validator.is_bids(item) or item == '/.bidsignore'
 
 
 def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: bool=False) -> Tuple[List[Path], List[Path]]:
@@ -21,11 +31,9 @@ def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: 
     """
 
     inputitems = [item for item in inputdir.rglob(pattern) if re.fullmatch(select, str(item.relative_to(inputdir)))]
-    inputfiles = [fpath  for fpath  in inputitems if fpath.is_file()]
-    inputdirs  = [folder for folder in inputitems if folder.is_dir() and folder.name not in ('.','..')]
+    inputfiles = [fpath  for fpath  in inputitems if fpath.is_file() and (not bidsvalidate or is_bids(fpath.relative_to(inputdir)))]
+    inputdirs  = [folder for folder in inputitems if folder.is_dir() and folder.name not in ('.', '..')]
 
-    if bidsvalidate:
-        inputfiles = [fpath for fpath in inputfiles if not BIDSValidator().is_bids(fpath.as_posix())]
     print(f"Found {len(inputfiles)} input files and {len(inputdirs)} directories using '{select}'")
 
     return sorted(inputfiles), sorted(inputdirs)       # TODO: create a class and return input objects?
