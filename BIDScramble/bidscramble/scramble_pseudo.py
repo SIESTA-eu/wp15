@@ -33,17 +33,24 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     outputdir  = Path(outputdir).resolve()
     outputdir_ = outputdir/'tmpdir_swap' if method != 'original' else outputdir
 
+    def get_extrafiles(inputdir: Path, outputdir: Path) -> list:
+        """Recursively get the modality agnostic from the root, sourcedata, phenotype and derivatives directories"""
+        extrafiles = [extrafile for extrafile in inputdir.iterdir() if not (outputdir/extrafile.name).is_file()]
+        for extra in ('sourcedata', 'phenotype'):
+            if (extradir := inputdir/extra).is_dir():
+                extrafiles += [extrafile for extrafile in extradir.iterdir() if not (outputdir/extra/extrafile.name).is_file()]
+        if (derivatives := inputdir/'derivatives').is_dir():
+            for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
+                extrafiles += get_extrafiles(derivativedir, outputdir/'derivatives'/derivativedir.name)
+        return extrafiles
+
     # Create pseudonyms for all selected subject identifiers
-    extrafiles            = [extrafile for extrafile in inputdir.iterdir() if rootfiles=='yes' and not (outputdir/extrafile.name).is_file()]
-    if (derivatives := inputdir/'derivatives').is_dir():
-        for derivdir in [item for item in derivatives.iterdir() if item.is_dir()]:
-            extrafiles   += [extrafile for extrafile in derivdir.iterdir() if rootfiles=='yes' and not (outputdir/'derivatives'/derivdir.name/extrafile.name).is_file()]
-    for extra in ('sourcedata', 'phenotype'):
-        if (extradir := inputdir/extra).is_dir():
-            extrafiles   += [extrafile for extrafile in extradir.iterdir() if rootfiles=='yes' and not (outputdir/extra/extrafile.name).is_file()]
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
-    inputfiles           += [extrafile for extrafile in extrafiles if extrafile not in inputfiles and extrafile.is_file() and (not bidsvalidate or is_bids(extrafile.relative_to(inputdir)))]
-    subjectids            = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
+    extrafiles            = []
+    if rootfiles == 'yes':
+        extrafiles += get_extrafiles(inputdir, outputdir)
+        inputfiles += [extrafile for extrafile in extrafiles if extrafile not in inputfiles and extrafile.is_file() and (not bidsvalidate or is_bids(extrafile.relative_to(inputdir)))]
+    subjectids = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
         pseudonyms = [next(tempfile._get_candidate_names()).replace('_','x') for _ in subjectids]
     elif method == 'permute':
@@ -89,7 +96,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
 
                 # Pseudonymize the filepath
                 if (subjectid in inputid or inputitem in extrafiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
-                    pseudoitem = outputdir/str(inputitem.relative_to(inputdir)).replace(f"sub-{subjectid}", f"sub-{pseudonym}")
+                    pseudoitem = outputdir/re.sub(f"sub-{re.escape(subjectid)}(?=[._/$])", f"sub-{pseudonym}", inputitem.relative_to(inputdir).as_posix())
                     print(f"\t{'Renaming' if outputitem.is_file() else 'Making'} sub-{subjectid} -> {pseudoitem}")
                     if not dryrun:
                         if outputitem.is_file():
@@ -99,7 +106,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
                             pseudoitem.mkdir(parents=True, exist_ok=True)
 
                 # Pseudonymize the file content (for **all** subject ids)
-                newtext = newtext.replace(f"sub-{subjectid}", f"sub-^#^{pseudonym}")    # Add temporary `^#^` characters to avoid recursive replacements
+                newtext = re.sub(f"sub-{re.escape(subjectid)}(?=[._/$\t\n])", f"sub-^#^{pseudonym}", newtext)    # Add temporary `^#^` characters to avoid recursive replacements
 
             # Write the non-binary pseudonymized file content
             if newtext:
