@@ -330,9 +330,9 @@ def test_scramble_pseudo(tmp_path):
 
     # Pseudonymize the data using permuted subject identifiers
     scramble_pseudo(tmp_path/'input', tmp_path/'output', r'(?!\.).*', True, 'permute', '^sub-(.*?)(?:/|$).*', 'yes')
-    assert (tmp_path/'output'/'participants.json').is_file()
-    assert (tmp_path/'output'/edfpath).is_file()
-    assert (tmp_path/'output'/'.bidsignore').is_file()
+    assert     (tmp_path/'output'/'participants.json').is_file()
+    assert     (tmp_path/'output'/edfpath).is_file()
+    assert not (tmp_path/'output'/'.bidsignore').is_file()
     assert not (tmp_path/'output'/'.git').exists()
 
     # Check the participants.tsv file
@@ -347,8 +347,8 @@ def test_scramble_pseudo(tmp_path):
 
     # Pseudonymize the n=1 data using random subject identifiers
     shutil.rmtree(tmp_path/'output')
-    scramble_pseudo(tmp_path/'input', tmp_path/'output', r'sub-03(/|$).*', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
-    assert (tmp_path/'output'/'participants.json').is_file()
+    scramble_pseudo(tmp_path/'input', tmp_path/'output', r'sub-03(/|$).*|p.*\.tsv', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
+    assert     (tmp_path/'output'/'participants.tsv').is_file()
     assert not (tmp_path/'output'/edfpath).exists()
 
     # Check the participants.tsv file
@@ -357,14 +357,14 @@ def test_scramble_pseudo(tmp_path):
     for column, values in outputdata.items():
         assert column in inputdata.columns
     assert not inputdata.index.equals(outputdata.index)
-    for index in inputdata.index:
-        assert index not in outputdata.index
+    assert 'sub-03' not in outputdata.index
 
     # Pseudonymize the n-1 data using random subject identifiers
     shutil.rmtree(tmp_path/'output')
-    scramble_pseudo(tmp_path/'input', tmp_path/'output', r'(?!sub-03(/|$)).*', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
-    assert (tmp_path/'output'/'participants.json').is_file()
+    scramble_pseudo(tmp_path/'input', tmp_path/'output', r'(?!sub-03(/|$)).*|p.*\.tsv', True, 'random', '^sub-(.*?)(?:/|$).*', 'yes')
+    assert (tmp_path/'output'/'participants.tsv').is_file()
     assert not (tmp_path/'output'/edfpath).exists()
+    assert 'sub-02' not in outputdata.index
 
     # Check the participants.tsv file
     outputdata = pd.read_csv(tmp_path/'output'/'participants.tsv', sep='\t', index_col='participant_id')
@@ -397,7 +397,7 @@ def test_scramble_pseudo(tmp_path):
     shutil.copytree(input, derivative, ignore=shutil.ignore_patterns('derivatives'))
 
     # Test single-subject
-    exclude = r'(.*/)*sub-1([\._-].+)*(/|$).*'
+    exclude = r'(.*/)*sub-1([\._-].+)*(/|$).*|.*\.tsv'
     scramble_pseudo(tmp_path/'input', tmp_path/'output1', exclude, False, 'original','^sub-(.*?)(?:/|$).*', 'yes')
     assert     (tmp_path/'output1'/'participants.tsv').is_file()
     assert not (tmp_path/'output1'/'sub-0').exists()
@@ -411,7 +411,7 @@ def test_scramble_pseudo(tmp_path):
     assert not (tmp_path/'output1'/'derivatives'/'deriv-2'/'sub-2').exists()
 
     # Test leave-one-out
-    exclude = r'(?!(.*/)*sub-1([\._-].+)*(/|$)).*'           # = NO: PID folder, files starting with PID_ or PID-
+    exclude = r'(?!(.*/)*sub-1([\._-].+)*(/|$)).*|.*\.tsv'           # = NO: PID folder, files starting with PID_ or PID-
     scramble_pseudo(tmp_path/'input', tmp_path/'output-1', exclude, False, 'original','^sub-(.*?)(?:/|$).*', 'no')
     assert     (tmp_path/'output-1'/'participants.tsv').is_file()
     assert     (tmp_path/'output-1'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()

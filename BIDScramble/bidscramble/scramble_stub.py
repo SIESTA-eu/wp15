@@ -5,7 +5,7 @@ from pathlib import Path
 from . import get_inputfiles, get_extrafiles, __version__, __description__, __url__
 
 
-def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, bidsagnostics: bool=True, dryrun: bool=False, **_):
+def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, bidsagnostics: str='yes', dryrun: bool=False, **_):
 
     # Defaults
     inputdir  = Path(inputdir).resolve()
@@ -23,7 +23,7 @@ def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool
             outputitem.touch()
 
     # Copy the modality agnostic BIDS(-valid) root files
-    if bidsagnostics:
+    if bidsagnostics == 'yes':
         for inputfile in get_extrafiles(inputdir, bidsvalidate):
             outputfile = outputdir/inputfile.relative_to(inputdir)
             print(f"Copying: {inputfile} -> {outputfile}")
