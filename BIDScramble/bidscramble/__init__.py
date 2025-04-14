@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from pathlib import Path
 from importlib import metadata
-from typing import List, Tuple
+from typing import List, Tuple, Set
 from bids_validator import BIDSValidator
 
 __version__     = metadata.version('bidscramble')
@@ -12,17 +12,20 @@ __url__         = metadata.metadata('bidscramble')['Project-URL']
 validator       = BIDSValidator()
 
 
-def is_bids(item: Path):
+def is_bids(filepath: Path):
+    """Returns True if the (relative) filepath has a BIDS-valid naming"""
 
-    item = item.as_posix()
-    if not item.startswith('/'):
-        item = '/' + item
+    filepath = filepath.as_posix()
+    if not filepath.startswith('/'):
+        filepath = '/' + filepath
 
-    return validator.is_bids(item) or item == '/.bidsignore'
+    return validator.is_bids(filepath) or filepath == '/.bidsignore'
 
 
 def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: bool=False) -> Tuple[List[Path], List[Path]]:
     """
+    Recursively get the (modality specific) files from the input directory
+
     :param inputdir:     The input directory from which files are retrieved using rglob
     :param select:       The fullmatch regular expression pattern to select the files of interest
     :param pattern:      The rglob search pattern (e.g. useful for additional filtering on file extension)
@@ -39,11 +42,37 @@ def get_inputfiles(inputdir: Path, select: str, pattern: str='*', bidsvalidate: 
     return sorted(inputfiles), sorted(inputdirs)       # TODO: create a class and return input objects?
 
 
+def get_extrafiles(inputdir: Path, bidsvalidate: bool=False) -> Set[Path]:
+    """
+    Recursively get the modality agnostic from the BIDS root, sourcedata, stimuli, phenotype, code and derivatives directories
+
+    :param inputdir:     The path to the input dataset
+    :param bidsvalidate: Filters out BIDS files if True
+    :return:             The set of modality agnostic files
+    """
+
+    extrafiles = set(extrafile for extrafile in inputdir.iterdir() if extrafile.is_file())
+    for extra in ('stimuli', 'phenotype', 'code'):
+        if (extradir := inputdir/extra).is_dir():
+            extrafiles.update(extrafile for extrafile in extradir.rglob('*') if extrafile.is_file())
+    if (derivatives := inputdir/'derivatives').is_dir():
+        for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
+            extrafiles.update(get_extrafiles(derivativedir))
+    if (sourcedata := inputdir/'sourcedata').is_dir():
+        extrafiles.update(get_extrafiles(sourcedata))
+
+    if bidsvalidate:
+        for invalid in [extrafile for extrafile in extrafiles if not is_bids(extrafile.relative_to(inputdir))]:
+            extrafiles.remove(invalid)
+
+    return extrafiles
+
+
 def prune_participants_tsv(rootdir: Path):
     """
-    Removes rows from the participants tsv file if their subject directories do not exist
+    Recursively remove rows from the participants tsv file if their subject directories do not exist
 
-    :param rootdir: The BIDS (or BIDS-like) input directory with the participants.tsv file
+    :param rootdir: The BIDS (or BIDS-like) input directory with the participants.tsv file and, optionally, derivatives and sourcedata directories
     :return:
     """
 
@@ -60,6 +89,12 @@ def prune_participants_tsv(rootdir: Path):
                     table.drop(subid, inplace=True)
 
             table.to_csv(participants_tsv, sep='\t', encoding='utf-8', na_rep='n/a')
+
+    if (derivatives := rootdir/'derivatives').is_dir():
+        for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
+            prune_participants_tsv(derivativedir)
+    if (sourcedata := rootdir/'sourcedata').is_dir():
+        prune_participants_tsv(sourcedata)
 
 
 def console_scripts(show: bool=False) -> list:

@@ -2,32 +2,9 @@ import shutil
 import re
 import random
 import tempfile
-from typing import Set
 from tqdm import tqdm
 from pathlib import Path
-from . import get_inputfiles, prune_participants_tsv, is_bids
-
-
-def get_extrafiles(inputdir: Path, outputdir: Path) -> Set[Path]:
-    """
-    Recursively get the modality agnostic from the BIDWS root, sourcedata, stimuli, phenotype, code and derivatives directories
-
-    :param inputdir:     The path to the input dataset
-    :param outputdir:    The path to the output dataset
-    :return:             The set of modality agnostic files
-    """
-
-    extrafiles = set(extrafile for extrafile in inputdir.iterdir() if not (outputdir/extrafile.name).is_file())
-    for extra in ('stimuli', 'phenotype', 'code'):
-        if (extradir := inputdir/extra).is_dir():
-            extrafiles.update(extrafile for extrafile in extradir.rglob('*') if not (outputdir/extra/extrafile.name).is_file() and extrafile.name not in ('.', '..'))
-    if (derivatives := inputdir/'derivatives').is_dir():
-        for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
-            extrafiles.update(get_extrafiles(derivativedir, outputdir/'derivatives'/derivativedir.name))
-    if (sourcedata := inputdir/'sourcedata').is_dir():
-        extrafiles.update(get_extrafiles(sourcedata, outputdir/'sourcedata'))
-
-    return extrafiles
+from . import get_inputfiles, prune_participants_tsv, get_extrafiles
 
 
 def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str, participant: str, rootfiles: str, dryrun: bool=False, **_):
@@ -41,7 +18,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     :param bidsvalidate: If True, BIDS files are skipped if they do not validate
     :param method:       The method to generate the pseudonyms
     :param participant:  The findall() regular expression pattern that is used to extract the subject label from the relative filepath
-    :param rootfiles:    If 'yes', include all files in the root of the input directory (such as participants.tsv, etc.)
+    :param rootfiles:    If 'yes', include all modality agnostic files in the root of the input directory (such as participants.tsv, code, etc.)
     :param dryrun:       If True, do not modify anything
 
     Examples
@@ -60,8 +37,8 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
     extrafiles            = set()
     if rootfiles == 'yes':
-        extrafiles.update(get_extrafiles(inputdir, outputdir))
-        inputfiles += [extrafile for extrafile in extrafiles if extrafile not in inputfiles and extrafile.is_file() and (not bidsvalidate or is_bids(extrafile.relative_to(inputdir)))]
+        extrafiles.update(get_extrafiles(inputdir, bidsvalidate))
+        inputfiles += [extrafile for extrafile in extrafiles if extrafile not in inputfiles]
     subjectids = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
         pseudonyms = [next(tempfile._get_candidate_names()).replace('_','x') for _ in subjectids]

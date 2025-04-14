@@ -1,13 +1,12 @@
 import shutil
 import json
-import re
 from tqdm import tqdm
 from urllib.request import urlopen
 from pathlib import Path
-from . import get_inputfiles, __version__, __description__, __url__
+from . import get_inputfiles, get_extrafiles, __version__, __description__, __url__
 
 
-def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, dryrun: bool=False, **_):
+def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, bidsagnostics: bool=True, dryrun: bool=False, **_):
 
     # Defaults
     inputdir  = Path(inputdir).resolve()
@@ -24,35 +23,37 @@ def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool
         elif not dryrun:
             outputitem.touch()
 
-    # Create a dataset description file
-    dataset_file = inputdir/'dataset_description.json'
-    description  = {}
-    if dataset_file.is_file():
-        with dataset_file.open('r') as fid:
-            description = json.load(fid)
-    description['GeneratedBy'] = [{'Name':'BIDScramble', 'Version':__version__, 'Description:':__description__, 'CodeURL':__url__}]
-    description['DatasetType'] = 'derivative'
-    print(f"Writing: {dataset_file.name} -> {outputdir}")
-    if not dryrun:
-        with (outputdir/dataset_file.name).open('w') as fid:
-            json.dump(description, fid, indent=4)
+    # Copy the modality agnostic BIDS(-valid) root files
+    if bidsagnostics:
+        for inputfile in get_extrafiles(inputdir, bidsvalidate):
+            outputfile = outputdir/inputfile.relative_to(inputdir)
+            print(f"Copying: {inputfile} -> {outputfile}")
+            if not dryrun:
+                outputfile.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(inputfile, outputfile)
 
-    # Copy the modality agnostic root files if they exist
-    for fname in [name for name in ('README','README.txt','README.md','README.rst','CHANGES','LICENSE','CITATION.cff') if (inputdir/name).is_file()]:
-        print(f"Copying: {fname} -> {outputdir}")
+        # Create a dataset description file
+        description = {}
+        if (description_file := inputdir/'dataset_description.json').is_file():
+            with description_file.open('r') as fid:
+                description = json.load(fid)
+        description['GeneratedBy'] = [{'Name':'BIDScramble', 'Version':__version__, 'Description:':__description__, 'CodeURL':__url__}]
+        description['DatasetType'] = 'derivative'
+        print(f"Writing: {description_file.name} -> {outputdir}")
         if not dryrun:
-            shutil.copyfile(inputdir/fname, outputdir/fname)
+            with (outputdir/description_file.name).open('w') as fid:
+                json.dump(description, fid, indent=4)
 
-    # Download the LICENSE file if it's not there
-    license = description.get('License')
-    if not (inputdir/'LICENSE').is_file() and license:
-        response = urlopen('https://spdx.org/licenses/licenses.json')
-        licenses = json.loads(response.read())['licenses']
-        for item in licenses:
-            if license in (item['name'], item['licenseId']):
-                print(f"Downloading a '{item['licenseId']}' SPDX license file -> {outputdir}")
-                response = urlopen(item['detailsUrl'])
-                license  = json.loads(response.read())['licenseText']
-                if not dryrun:
-                    (outputdir/'LICENSE').write_text(license)
-                break
+        # Download the LICENSE file if it's not there
+        license = description.get('License')
+        if not (inputdir/'LICENSE').is_file() and license:
+            response = urlopen('https://spdx.org/licenses/licenses.json')
+            licenses = json.loads(response.read())['licenses']
+            for item in licenses:
+                if license in (item['name'], item['licenseId']):
+                    print(f"Downloading a '{item['licenseId']}' SPDX license file -> {outputdir}")
+                    response = urlopen(item['detailsUrl'])
+                    license  = json.loads(response.read())['licenseText']
+                    if not dryrun:
+                        (outputdir/'LICENSE').write_text(license)
+                    break
