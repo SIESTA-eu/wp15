@@ -87,7 +87,7 @@ There are 16 subjects.
 
 ### Computational requirements for the group level
 
-The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in 33 GB of temporary data per leave-one-out sample.
+The execution of the group-level pipeline takes 3.65 GB of RAM, 2500 seconds, and results in 33 GB of temporary data per leave-one-out sample.
 
 ### Output data
 
