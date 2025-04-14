@@ -18,7 +18,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     :param bidsvalidate: If True, BIDS files are skipped if they do not validate
     :param method:       The method to generate the pseudonyms
     :param participant:  The findall() regular expression pattern that is used to extract the subject label from the relative filepath
-    :param agnostics:    If 'yes', include all modality agnostic files in the root of the input directory (such as participants.tsv, code, etc.)
+    :param agnostics:    If 'yes', include all modality agnostic files in the input directory (such as participants.tsv, code, etc.)
     :param dryrun:       If True, do not modify anything
 
     Examples
