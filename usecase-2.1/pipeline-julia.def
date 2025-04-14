@@ -19,10 +19,12 @@ From: julia:latest
   ################################################################################
   # post installation of dependencies
   ################################################################################
-  echo 'import Pkg; Pkg.add("ArgParse")'   | julia
-  echo 'import Pkg; Pkg.add("CSV")'        | julia
-  echo 'import Pkg; Pkg.add("DataFrames")' | julia
-  echo 'import Pkg; Pkg.add("Statistics")' | julia
+  echo 'import Pkg; Pkg.add("ArgParse")'      | julia
+  echo 'import Pkg; Pkg.add("CSV")'           | julia
+  echo 'import Pkg; Pkg.add("DataFrames")'    | julia
+  echo 'import Pkg; Pkg.add("Statistics")'    | julia
+  echo 'import Pkg; Pkg.add("JSON3")'         | julia
+  echo 'import Pkg; Pkg.add("FilePathsBase")' | julia
   chmod +x /work/pipeline.jl
 
 %environment
