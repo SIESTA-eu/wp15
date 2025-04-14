@@ -412,7 +412,7 @@ def test_scramble_pseudo(tmp_path):
 
     # Test leave-one-out
     exclude = r'(?!(.*/)*sub-1([\._-].+)*(/|$)).*|.*\.tsv'           # = NO: PID folder, files starting with PID_ or PID-
-    scramble_pseudo(tmp_path/'input', tmp_path/'output-1', exclude, False, 'original','^sub-(.*?)(?:/|$).*', 'no')
+    scramble_pseudo(tmp_path/'input', tmp_path/'output-1', exclude, False, 'original','^sub-(.*?)(?:/|$).*', 'yes')
     assert     (tmp_path/'output-1'/'participants.tsv').is_file()
     assert     (tmp_path/'output-1'/'sub-0'/'anat'/'sub-0_T1w.nii').is_file()
     assert     (tmp_path/'output-1'/'sub-0_T1w.html').is_file()
