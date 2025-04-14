@@ -33,5 +33,4 @@ Stage: final
         echo "Error: No data found for participant_nr $3" >&2
         exit 1
     fi
-    scramble $1 $2 stub -s NOTHING
     exec scramble $1 $2 pseudo original -s "(?!(.*/)*$PID([\._-].+)*(/|$)).*"
