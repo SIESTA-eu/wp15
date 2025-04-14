@@ -2,9 +2,32 @@ import shutil
 import re
 import random
 import tempfile
+from typing import Set
 from tqdm import tqdm
 from pathlib import Path
 from . import get_inputfiles, prune_participants_tsv, is_bids
+
+
+def get_extrafiles(inputdir: Path, outputdir: Path) -> Set[Path]:
+    """
+    Recursively get the modality agnostic from the BIDWS root, sourcedata, stimuli, phenotype, code and derivatives directories
+
+    :param inputdir:     The path to the input dataset
+    :param outputdir:    The path to the output dataset
+    :return:             The set of modality agnostic files
+    """
+
+    extrafiles = set(extrafile for extrafile in inputdir.iterdir() if not (outputdir/extrafile.name).is_file())
+    for extra in ('stimuli', 'phenotype', 'code'):
+        if (extradir := inputdir/extra).is_dir():
+            extrafiles.update(extrafile for extrafile in extradir.rglob('*') if not (outputdir/extra/extrafile.name).is_file() and extrafile.name not in ('.', '..'))
+    if (derivatives := inputdir/'derivatives').is_dir():
+        for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
+            extrafiles.update(get_extrafiles(derivativedir, outputdir/'derivatives'/derivativedir.name))
+    if (sourcedata := inputdir/'sourcedata').is_dir():
+        extrafiles.update(get_extrafiles(sourcedata, outputdir/'sourcedata'))
+
+    return extrafiles
 
 
 def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str, participant: str, rootfiles: str, dryrun: bool=False, **_):
@@ -33,22 +56,11 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     outputdir  = Path(outputdir).resolve()
     outputdir_ = outputdir/'tmpdir_swap' if method != 'original' else outputdir
 
-    def get_extrafiles(inputdir: Path, outputdir: Path) -> list:
-        """Recursively get the modality agnostic from the root, sourcedata, phenotype and derivatives directories"""
-        extrafiles = [extrafile for extrafile in inputdir.iterdir() if not (outputdir/extrafile.name).is_file()]
-        for extra in ('sourcedata', 'phenotype'):
-            if (extradir := inputdir/extra).is_dir():
-                extrafiles += [extrafile for extrafile in extradir.iterdir() if not (outputdir/extra/extrafile.name).is_file()]
-        if (derivatives := inputdir/'derivatives').is_dir():
-            for derivativedir in [item for item in derivatives.iterdir() if item.is_dir()]:
-                extrafiles += get_extrafiles(derivativedir, outputdir/'derivatives'/derivativedir.name)
-        return extrafiles
-
     # Create pseudonyms for all selected subject identifiers
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
-    extrafiles            = []
+    extrafiles            = set()
     if rootfiles == 'yes':
-        extrafiles += get_extrafiles(inputdir, outputdir)
+        extrafiles.update(get_extrafiles(inputdir, outputdir))
         inputfiles += [extrafile for extrafile in extrafiles if extrafile not in inputfiles and extrafile.is_file() and (not bidsvalidate or is_bids(extrafile.relative_to(inputdir)))]
     subjectids = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
