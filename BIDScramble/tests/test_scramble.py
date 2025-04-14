@@ -29,18 +29,13 @@ def test_scramble_stub(tmp_path):
     urllib.request.urlretrieve('https://s3.amazonaws.com/openneuro.org/ds004148/README', tmp_path/'input'/'README')
     urllib.request.urlretrieve('https://s3.amazonaws.com/openneuro.org/ds004148/CHANGES', tmp_path/'input'/'CHANGES')
 
-    # Fix the spdx identifier
-    description = (tmp_path/'input'/'dataset_description.json').read_text().replace('CC0', 'CC0-1.0')
-    (tmp_path/'input'/'dataset_description.json').write_text(description)
-
     # Create the output data
     scramble_stub(tmp_path/'input', tmp_path/'output', '(?!.*derivatives(/|$)).*', False)
 
-    # Check that all output data - `derivatives` + `LICENSE` is there
-    assert (tmp_path/'output'/'LICENSE').is_file()
+    # Check that all output data - `derivatives` is there
     assert (tmp_path/'output'/'code').is_dir()
     assert not (tmp_path/'output'/'derivatives').exists()
-    assert len(list((tmp_path/'input').rglob('*'))) == len(list((tmp_path/'output').rglob('*')))
+    assert len(list((tmp_path/'input').rglob('*'))) - 1 == len(list((tmp_path/'output').rglob('*')))    # -> The empty derivatives directory is not copied
 
     # Check that the 'GeneratedBy' and 'DatasetType' have been written
     with (tmp_path/'output'/'dataset_description.json').open('r') as fid:

@@ -1,7 +1,6 @@
 import shutil
 import json
 from tqdm import tqdm
-from urllib.request import urlopen
 from pathlib import Path
 from . import get_inputfiles, get_extrafiles, __version__, __description__, __url__
 
@@ -43,17 +42,3 @@ def scramble_stub(inputdir: str, outputdir: str, select: str, bidsvalidate: bool
         if not dryrun:
             with (outputdir/description_file.name).open('w') as fid:
                 json.dump(description, fid, indent=4)
-
-        # Download the LICENSE file if it's not there
-        license = description.get('License')
-        if not (inputdir/'LICENSE').is_file() and license:
-            response = urlopen('https://spdx.org/licenses/licenses.json')
-            licenses = json.loads(response.read())['licenses']
-            for item in licenses:
-                if license in (item['name'], item['licenseId']):
-                    print(f"Downloading a '{item['licenseId']}' SPDX license file -> {outputdir}")
-                    response = urlopen(item['detailsUrl'])
-                    license  = json.loads(response.read())['licenseText']
-                    if not dryrun:
-                        (outputdir/'LICENSE').write_text(license)
-                    break
