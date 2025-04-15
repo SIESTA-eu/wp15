@@ -28,8 +28,10 @@ class DefaultsFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDesc
 def addparser_stub(parsers, _help: str):
 
     description = textwrap.dedent("""
-    Creates a copy of the input directory in which all files are empty stubs. Optionally modality agnostic BIDS files
-    are copied over (with content).""")
+    Creates a copy of the input directory tree in which all files are empty stubs. Optionally, modality agnostic BIDS
+    files from the input directory are copied over (with content), such as the README, dataset_descrption and participants
+    rootfiles, as well as files in phenotype, code, and similar files in sourcedata and derivatives. In this way you can
+    create a richer BIDS output folder without the modality specific data files.""")
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir stub\n'
@@ -38,7 +40,7 @@ def addparser_stub(parsers, _help: str):
              r"  scramble inputdir outputdir stub -s '(?!sub.*scans.tsv|/func/).*'"'\n ')
 
     parser = parsers.add_parser('stub', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
-    parser.add_argument('-a','--agnostics', help='If yes, in addition to the included files (see `--select` for usage), add all modality agnostic files from the input directory (such as participants.tsv, code, etc.)', choices=['yes','no'], default='yes')
+    parser.add_argument('-a','--agnostics', help='If yes, in addition to the included files (see `--select` for usage), add modality agnostic files', choices=['yes','no'], default='yes')
     parser.set_defaults(func=scramble_stub)
 
 
