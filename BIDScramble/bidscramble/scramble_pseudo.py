@@ -4,10 +4,10 @@ import random
 import tempfile
 from tqdm import tqdm
 from pathlib import Path
-from . import get_inputfiles, prune_participants_tsv
+from . import get_inputfiles, get_extrafiles, prune_participants_tsv
 
 
-def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str, participant: str, rootfiles: str, dryrun: bool=False, **_):
+def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bool, method: str, participant: str, agnostics: str, dryrun: bool=False, **_):
     """
     Adds pseudonymized versions of the input directory to the output directory, such that the subject label is replaced by a pseudonym
     anywhere in the filepath as well as inside all text files (such as json and tsv-files).
@@ -18,7 +18,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     :param bidsvalidate: If True, BIDS files are skipped if they do not validate
     :param method:       The method to generate the pseudonyms
     :param participant:  The findall() regular expression pattern that is used to extract the subject label from the relative filepath
-    :param rootfiles:    If 'yes', include all files in the root of the input directory (such as participants.tsv, etc.)
+    :param agnostics:    If 'yes', include all modality agnostic files in the input directory (such as participants.tsv, code, etc.)
     :param dryrun:       If True, do not modify anything
 
     Examples
@@ -34,14 +34,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     outputdir_ = outputdir/'tmpdir_swap' if method != 'original' else outputdir
 
     # Create pseudonyms for all selected subject identifiers
-    bidsfiles             = [bidsfile for bidsfile in inputdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/bidsfile.name).is_file()]
-    if (inputdir/'derivatives').is_dir():
-        for derivdir in [item for item in (inputdir/'derivatives').iterdir() if item.is_dir()]:
-            bidsfiles    += [bidsfile for bidsfile in derivdir.iterdir() if rootfiles=='yes' and bidsfile.is_file() and not (outputdir/'derivatives'/derivdir.name/bidsfile.name).is_file()]
-    if (inputdir/'phenotype').is_dir():
-        bidsfiles        += [bidsfile for bidsfile in (inputdir/'phenotype').iterdir() if rootfiles=='yes' and not (outputdir/'phenotype'/bidsfile.name).is_file()]
     inputfiles, inputdirs = get_inputfiles(inputdir, select, '*', bidsvalidate)
-    inputfiles           += [bidsfile for bidsfile in bidsfiles if bidsfile not in inputfiles]
     subjectids            = sorted(set(subid for item in inputfiles + inputdirs for subid in re.findall(participant, str(item.relative_to(inputdir))) if subid))
     if method == 'random':
         pseudonyms = [next(tempfile._get_candidate_names()).replace('_','x') for _ in subjectids]
@@ -71,24 +64,24 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
     # Pseudonymize the filenames and content of all selected subjects
     if method != 'original':
         print(f"Pseudonymizing the data of {len(subjectids)} subjects in: {outputdir}")
-        for inputitem in tqdm(inputdirs + inputfiles, unit='file', colour='green', leave=False):
+        extrafiles = sorted(get_extrafiles(inputdir, bidsvalidate)) if agnostics == 'yes' else []
+        for inputitem in tqdm(inputdirs + inputfiles + extrafiles, unit='file', colour='green', leave=False):
 
             # Read the non-binary file content
             outputitem = outputdir_/inputitem.relative_to(inputdir)
             pseudoitem = outputdir/inputitem.relative_to(inputdir)
-            newtext    = ''
             try:
                 newtext = outputitem.read_text() if outputitem.is_file() else ''
-            except UnicodeDecodeError:
-                pass
+            except Exception:
+                newtext = ''
 
             # Replace each subjectid with its pseudonym
             inputid = re.findall(participant, str(inputitem.relative_to(inputdir)))
             for subjectid, pseudonym in zip(subjectids, pseudonyms):
 
                 # Pseudonymize the filepath
-                if (subjectid in inputid or inputitem in bidsfiles) and outputitem.exists():       # NB: This does not support the inheritance principle (sub-* files in root)
-                    pseudoitem = outputdir/str(inputitem.relative_to(inputdir)).replace(f"sub-{subjectid}", f"sub-{pseudonym}")
+                if (subjectid in inputid) and outputitem.exists():          # NB: This does not support the inheritance principle (sub-* files in root)
+                    pseudoitem = outputdir/re.sub(f"sub-{re.escape(subjectid)}(?=[._/]|$)", f"sub-{pseudonym}", inputitem.relative_to(inputdir).as_posix())
                     print(f"\t{'Renaming' if outputitem.is_file() else 'Making'} sub-{subjectid} -> {pseudoitem}")
                     if not dryrun:
                         if outputitem.is_file():
@@ -98,7 +91,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
                             pseudoitem.mkdir(parents=True, exist_ok=True)
 
                 # Pseudonymize the file content (for **all** subject ids)
-                newtext = newtext.replace(f"sub-{subjectid}", f"sub-^#^{pseudonym}")    # Add temporary `^#^` characters to avoid recursive replacements
+                newtext = re.sub(f"sub-{re.escape(subjectid)}(?=[._/\t\n]|$)", f"sub-^#^{pseudonym}", newtext)    # Add temporary `^#^` characters to avoid recursive replacements
 
             # Write the non-binary pseudonymized file content
             if newtext:

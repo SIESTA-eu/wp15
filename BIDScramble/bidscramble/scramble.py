@@ -28,25 +28,25 @@ class DefaultsFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDesc
 def addparser_stub(parsers, _help: str):
 
     description = textwrap.dedent("""
-    Creates a copy of the input directory in which all files are empty stubs. Exceptions to
-    this are the 'dataset_description.json', 'README', 'CHANGES', 'LICENSE' and 'CITATION.cff'
-    files, which are copied over and updated if possible.""")
+    Creates a copy of the input directory in which all files are empty stubs. Optionally modality agnostic BIDS files
+    are copied over (with content).""")
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir stub\n'
-              r"  scramble inputdir outputdir stub -s '.*\.(nii|json|tsv)'\n"
-              r"  scramble inputdir outputdir stub -s '(?!derivatives(/|$)).*'\n"
-              r"  scramble inputdir outputdir stub -s '(?!sub.*scans.tsv|/func/).*'\n ")
+             r"  scramble inputdir outputdir stub -s '.*\.(nii|json|tsv)'"'\n'
+             r"  scramble inputdir outputdir stub -s '(?!derivatives(/|$)).*'"'\n'
+             r"  scramble inputdir outputdir stub -s '(?!sub.*scans.tsv|/func/).*'"'\n ')
 
     parser = parsers.add_parser('stub', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
+    parser.add_argument('-a','--agnostics', help='If yes, in addition to the included files (see `--select` for usage), add all modality agnostic files from the input directory (such as participants.tsv, code, etc.)', choices=['yes','no'], default='yes')
     parser.set_defaults(func=scramble_stub)
 
 
 def addparser_tsv(parsers, _help: str):
 
     description = textwrap.dedent("""
-    Adds scrambled versions of the tsv files in the input directory to the output directory. If
-    no scrambling method is specified, the default behavior is to null all values.""")
+    Adds scrambled versions of the tsv files in the input directory to the output directory. If no scrambling
+    method is specified, the default behavior is to null all values.""")
 
     epilog = ('examples:\n'
               '  scramble inputdir outputdir tsv\n'
@@ -152,11 +152,11 @@ def addparser_swap(parsers, _help: str):
     Randomly swaps the content of data files between a group of similar files in the input
     directory and save them as output.""")
 
-    epilog = (r'examples:\n'
-              r'  scramble inputdir outputdir swap\n'
-              r"  scramble inputdir outputdir swap -s '.*\.(nii|json|tsv)'\n"
-              r"  scramble inputdir outputdir swap -s '(?!derivatives(/|$)).*' -b\n"
-              r"  scramble inputdir outputdir swap -g subject session run\n ")
+    epilog = ('examples:\n'
+              '  scramble inputdir outputdir swap\n'
+             r"  scramble inputdir outputdir swap -s '.*\.(nii|json|tsv)'"'\n'
+             r"  scramble inputdir outputdir swap -s '(?!derivatives(/|$)).*' -b"'\n'
+             r"  scramble inputdir outputdir swap -g subject session run"'\n ')
 
     parser = parsers.add_parser('swap', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.add_argument('-g','--grouping', metavar='ENTITY', help='A list of (full-name) BIDS entities that make up a group between which file contents are swapped. See: https://bids-specification.readthedocs.io/en/stable/appendices/entities.html', nargs='+', default=['subject'], type=str)
@@ -166,19 +166,18 @@ def addparser_swap(parsers, _help: str):
 def addparser_pseudo(parsers, _help: str):
 
     description = textwrap.dedent("""
-    Adds pseudonymized versions of the input directory to the output directory, such that the
-    subject label is replaced by a pseudonym anywhere in the filepath as well as inside all
-    text files (such as json and tsv-files).""")
+    Adds pseudonymized versions of the input directory to the output directory, such that the subject label is
+    replaced by a pseudonym anywhere in the filepath as well as inside all text files (such as json and tsv-files).""")
 
-    epilog = (r'examples:\n'
-              r'  scramble inputdir outputdir pseudo\n'
-              r"  scramble inputdir outputdir_remove1 pseudo random  -s '(?!sub-003(/|$)).*' \n"
-              r"  scramble inputdir outputdir_keep1 pseudo original -s 'sub-003(/|$).*'\n ")
+    epilog = ('examples:\n'
+              '  scramble inputdir outputdir pseudo\n'
+             r"  scramble inputdir outputdir_remove1 pseudo random  -s '(?!sub-003(/|$)).*'"'\n'
+             r"  scramble inputdir outputdir_keep1 pseudo original -s 'sub-003(/|$).*'"'\n ')
 
     parser = parsers.add_parser('pseudo', parents=[parent], formatter_class=DefaultsFormatter, description=description, epilog=epilog, help=_help)
     parser.add_argument('method', help='The method to generate the pseudonyms', choices=['random','permute','original'], default='permute')
     parser.add_argument('-p','--participant', metavar='PATTERN', help='The findall() regular expression pattern that is used to extract the subject label from the relative filepath. NB: Do not change this if the input data is in BIDS format', default='^sub-(.*?)(?:/|$).*')
-    parser.add_argument('-r','--rootfiles', help='In addition to the included files (see `--select` for usage), include all files in the root of the input directory (such as participants.tsv, etc)', choices=['yes','no'], default='yes')
+    parser.add_argument('-a','--agnostics', help='If yes, in addition to the included files (see `--select` for usage), pseudomymize all modality agnostic files in the input directory (such as participants.tsv, code, etc.)', choices=['yes','no'], default='yes')
     parser.set_defaults(func=scramble_pseudo)
 
 
