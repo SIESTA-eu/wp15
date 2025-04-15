@@ -91,7 +91,7 @@ def scramble_pseudo(inputdir: str, outputdir: str, select: str, bidsvalidate: bo
                             pseudoitem.mkdir(parents=True, exist_ok=True)
 
                 # Pseudonymize the file content (for **all** subject ids)
-                newtext = re.sub(f"sub-{re.escape(subjectid)}(?=[._/\t\n]|$)", f"sub-^#^{pseudonym}", newtext)    # Add temporary `^#^` characters to avoid recursive replacements
+                newtext = re.sub(f"sub-{re.escape(subjectid)}(?=[.,: _/\t\n]|$)", f"sub-^#^{pseudonym}", newtext)    # Add temporary `^#^` characters to avoid recursive replacements
 
             # Write the non-binary pseudonymized file content
             if newtext:
