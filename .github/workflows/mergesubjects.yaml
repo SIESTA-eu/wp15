@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infprint("Usage: singlesubject.py <inputdir> <outputdir> <participant_nr>")rastructure/mergesubjects
+        working-directory: ./infrastructure/mergesubjects
 
     steps:
       - name: Checkout v4
