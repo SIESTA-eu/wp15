@@ -56,23 +56,30 @@ Installing DatLeak is done by cloning its repository.
 ```console
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
+#### Usage 
 
-DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer.
+```
+python DatLeak.py <original_file> <scrambled_file> [ignore_value] [ignore_col]
+```
+DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer. You can see some practical usage down here:
+
 
 ```console
-python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999 0
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv None 0
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv
 ```
 
 This will print a report on screen with the percentage of rows with partial leakage, the percentage of rows with full leakage, the average matching cells per row, and the standard deviation of the matching cells per row.
 
 ```console
-Partial Leakage: 18.33%
-Full Leakage: 81.67%
-Average Matching Cells per Row: 254.03
-Standard Deviation of Matching Cells per Row: 10.15
+ - Full Leakage (identical row/participant): 0.00%
+ - Partial Leakage (rows/participants have data partially identical): 100.00%
+ - Average portion of row/participants that are identical: 46.73
+ - Standard Deviation of row/participants that are identical: 6.26
 ```
 
-If full leakage is not at 0%, the scrambler should be re-run. Partial leakage is left at the appreciation of the data right holder.
+Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable.
 
 ### Data citation
 

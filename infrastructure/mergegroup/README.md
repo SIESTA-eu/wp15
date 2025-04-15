@@ -74,7 +74,7 @@ The output is stored in `group-merged/results.tsv`, which each row or line is a 
 Since each of the tests has group-[1:3], the `results.tsv` file will have 3 lines. This can be tested by
 
 ```bash
-for file in whitelist*.txt ; do mergegroup.py group-1 group-2 group-3 group-merged $file ; wc -l group-merged/results.tsv ; done
+for file in whitelist*.txt ; do python mergegroup.py group-1 group-2 group-3 group-merged $file ; wc -l group-merged/group-merged.tsv ; done
 ```
 
 where the output will be similar for each `whitelist.txt`
