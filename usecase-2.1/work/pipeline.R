@@ -15,7 +15,7 @@
 
 # This code is shared under the CC0 license
 #
-# Copyright (C) 2024, SIESTA workpackage 15 team
+# Copyright (C) 2024-2025, SIESTA workpackage 15 team
 
 # This part of the script deals with possibly missing packages on-the-fly:
 # It downloads them and puts them in a tempdir + adds the tempdir to the path
@@ -94,7 +94,7 @@ dataset_description <- list(
   "ReferencesAndLinks" = list("https://eosc-siesta.eu", "https://github.com/SIESTA-eu/wp15"),
   "SourceDatasets" = list(
     list(
-      "DOI" = "10.18112/openneuro.ds004148.v1.0.1",
+      "DOI" = "10.18112/openneuro.ds004148.v1.0.1", # FIXME, the DOI of the input dataset should be inserted here
       "Version" = "1.0.1"
     )
   ),
@@ -143,8 +143,8 @@ if (level == "participant") {
     dir.create(file.path(outputdir, participants$participant_id[i]), recursive = TRUE, showWarnings = FALSE)
   }
 } else if (level == "group") {
-  outputfile <- file.path(outputdir, "group", "results.tsv")
-  dir.create(file.path(outputdir, "group"), recursive = TRUE, showWarnings = FALSE)
+  outputfile <- file.path(outputdir, "derivatives", "group", "results.tsv")
+  dir.create(file.path(outputdir, "derivatives", "group"), recursive = TRUE, showWarnings = FALSE)
 
   # Use the column names and capitalization from the original dataset
   # Ignore missing values

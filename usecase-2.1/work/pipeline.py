@@ -4,7 +4,7 @@
 
 This code is shared under the CC0 license
 
-Copyright (C) 2024, SIESTA workpackage 15 team
+Copyright (C) 2024-2025, SIESTA workpackage 15 team
 """
 
 import pandas as pd
@@ -24,8 +24,8 @@ def main(options: dict):
 
     The ``options`` keys:
     ---------------------
-      - inputdir:   Directory containing participants.tsv (str)
-      - outputdir:  Directory to save results.tsv (str)
+      - inputdir:   Directory containing the BIDS input dataset (str)
+      - outputdir:  Directory to save the derived BIDS output dataset (str)
       - level:      Analysis level, either "group" or "participant" (str)
       - verbose:    Enable verbose output (bool)
       - start-idx:  Start index for participant selection (int)
@@ -36,6 +36,12 @@ def main(options: dict):
         print('options =')
         print(options)
 
+    dataset_description_json = Path(options['inputdir']) / 'dataset_description.json'
+    with open(dataset_description_json, 'r', encoding='utf-8') as f:
+        input_dataset_description = json.load(f)
+        if options.get('verbose'):
+            print(f"dataset_description = {dataset_description}")
+
     # Create the output directory and its parents if they don't exist
     Path(options['outputdir']).mkdir(parents=True, exist_ok=True)
 
@@ -45,7 +51,7 @@ def main(options: dict):
         "Name": "SIESTA Use Case 2.1",
         "BIDSVersion": "1.10.0",
         "DatasetType": "derivative",
-        "License": "CC0", # same as input dataset
+        "License": input_dataset_description['License'],
         "Authors": ["SIESTA workpackage 15 team"],
         "Acknowledgements": ["SIESTA workpackage 15 team"],
         "HowToAcknowledge": ["Please cite the SIESTA paper"],
@@ -53,18 +59,17 @@ def main(options: dict):
         "ReferencesAndLinks": ["https://eosc-siesta.eu", "https://github.com/SIESTA-eu/wp15"],
         "SourceDatasets": [
             {
-                "DOI": "10.18112/openneuro.ds004148.v1.0.1",
-                "Version": "1.0.1"
+                "DOI": input_dataset_description['DatasetDOI'],
             }    
         ],
         "GeneratedBy": [
             {
                 "Name": "Python version of SIESTA use case 2.1",
                 "Description": "This code computes averages from the participants.tsv file",
-                "Version": "x.y.z",     # FIXME, the tagged version number should be inserted here 
+                "Version": "x.y.z", # FIXME, the tagged version number should be inserted here 
                 "Container": {
                     "Type": "apptainer",
-                    "Tag": "latest",    # FIXME, the tagged version number should be inserted here
+                    "Tag": "latest", # FIXME, the tagged version number should be inserted here
                     "URI": "oras://ghcr.io/siesta-eu/pipeline-2.1.sif:latest"
                 }
             }
@@ -104,10 +109,10 @@ def main(options: dict):
             Path(outputdir).mkdir(parents=True, exist_ok=True)
 
     elif options.get('level') == 'group':
-        outputfile = Path(options['outputdir']) / 'group' / 'results.tsv'
+        outputfile = Path(options['outputdir']) / 'derivatives' / 'group' / 'results.tsv'
 
         # Create the group output directory and its parents if they don't exist
-        outputdir = Path(options['outputdir']) / 'group'
+        outputdir = Path(options['outputdir']) / 'derivatives' / 'group' 
         outputdir.mkdir(parents=True, exist_ok=True)
 
         # Compute averages
@@ -135,8 +140,8 @@ def main(options: dict):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('inputdir', type=str, help='Directory containing participants.tsv')
-    parser.add_argument('outputdir', type=str, help='Directory to save results.tsv')
+    parser.add_argument('inputdir', type=str, help='Directory containing the BIDS input dataset')
+    parser.add_argument('outputdir', type=str, help='Directory to save the derived BIDS output dataset')
     parser.add_argument('level', type=str, help='The analysis level', choices=['participant', 'group'])
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
     parser.add_argument('--start-idx', type=int, default=None, help='Start index for participant selection')

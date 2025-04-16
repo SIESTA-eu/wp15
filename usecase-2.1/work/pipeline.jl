@@ -15,7 +15,7 @@
 
 # This code is shared under the CC0 license
 #
-# Copyright (C) 2024, SIESTA workpackage 15 team
+# Copyright (C) 2024-2025, SIESTA workpackage 15 team
 
 using ArgParse
 using CSV
@@ -93,7 +93,7 @@ function main(options)
         "ReferencesAndLinks" => ["https://eosc-siesta.eu", "https://github.com/SIESTA-eu/wp15"],
         "SourceDatasets" => [
             Dict(
-                "DOI" => "10.18112/openneuro.ds004148.v1.0.1",
+                "DOI" => "10.18112/openneuro.ds004148.v1.0.1", # FIXME, the DOI of the input dataset should be inserted here
                 "Version" => "1.0.1"
             )    
         ],
@@ -139,10 +139,10 @@ function main(options)
         end
 
     elseif haskey(options, "level") && options["level"] == "group"
-        outputfile = joinpath(options["outputdir"], "group", "results.tsv")
+        outputfile = joinpath(options["outputdir"], "derivatives", "group", "results.tsv")
 
         # Create the group output directory and its parents if they don't exist
-        mkpath(joinpath(options["outputdir"], "group"))
+        mkpath(joinpath(options["outputdir"], "derivatives", "group"))
 
         # Compute averages
         averagedAge    = mean(skipmissing(participants.age))
