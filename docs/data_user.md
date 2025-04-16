@@ -67,16 +67,17 @@ input
 
 ### Output data handling
 
-A requirement for the resampling implemented in SIESTA wp15 is that the output data from the analysis pipeline must be formatted as a [BIDS](https://bids.neuroimaging.io) derivative dataset, i.e., a BIDS dataset with a `dataset_description.json` that specifies `DatasetType: derivatives`. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
+A requirement for the resampling implemented in SIESTA wp15 is that the output data from the analysis pipeline must be formatted as a [BIDS](https://bids.neuroimaging.io) derivative dataset, i.e., a BIDS compliant dataset with a `dataset_description.json` that specifies `"DatasetType": "derivative"`. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
 
-The participant-level analysis should write its results in `sub-xxx` directories that arew placed directly underneath the output directory. The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis can be written at the top level of the output directory, or in a dedicated `group` directory.
+The participant-level analysis must write its results in `sub-xxx` directories that are placed directly underneath the output directory. You should _not_ place the participant-level results in a subdirectory named `derivatives` inside the output directory.
 
-You should _not_ make a directory named `derivatives` inside the output directory. You should also _not_ make multiple side-by-side derivatives in the output directory.
+The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis should be written inside a `derivatives` subsirectory in the output. We recommend to place group results in a `derivatives/group` or a `derivatives/pipelinename` subdirectory.
 
 The output is for example formatted as
 
 ```console
 output
+├── dataset_description.json (with "DatasetType" specified as "derivative")
 ├── sub-01
 |   └ ...
 ├── sub-02
@@ -84,14 +85,22 @@ output
 ├── sub-03
 |   └ ...
 ...
-├── someresults.tsv
-└── group
-    └ otherresults.nii.gz
+└── derivatives
+    └── group
+        ├── someresults.tsv
+        └── otherresults.nii.gz
 ```
 
 #### Whitelisting
 
 The participant and group-level analysis result in a number of files, some of which are only temporary work-in-progress, whereas others represent the primary research outcomes of the analysis pipeline. The data user has to provide a text file `whitelist.txt` that lists all the desired outcomes, i.e., all files resulting from the group-level analysis that are to be retained. Noise calibration will be done on the numerical data in these files, and a differentially private version of these files will be shared with the data user. 
+
+An example for the whitelist is
+
+```
+derivatives/group/someresults.tsv
+derivatives/group/otherresults.nii.gz
+```
 
 Files that are not in the `whitelist.txt` will never be shared with the data user.
 
