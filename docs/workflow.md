@@ -77,6 +77,7 @@ Review the group-level results with the calibrated noise and release them to the
 - pipeline.sif
 - singlesubject.sif
 - leaveoneout.sif
+- cleanup.sif
 - mergesubjects.sif
 - mergegroup.sif
 - calibratenoise.sif
