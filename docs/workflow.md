@@ -42,12 +42,14 @@ Combine the single subject input and results into merged datasets.
     ./mergesubjects.sif $(eval echo singlesubject-{1..$NSUBJ}-input)  singlesubject-merged-input    # this should result in the same as "input"
     ./mergesubjects.sif $(eval echo singlesubject-{1..$NSUBJ}-output) singlesubject-merged-output
 
-Run the group-level analysis on the leave-one-out resampled datasets.
+Run the group-level analysis on the leave-one-out resampled datasets. Clean up the work-in-progress data as soon as possible.
 
     for SUBJ in `seq $NSUBJ`; do
         ./leaveoneout.sif input                       leaveoneout-$SUBJ-input  $SUBJ
         ./leaveoneout.sif singlesubject-merged-output leaveoneout-$SUBJ-output $SUBJ
         ./pipeline.sif    leaveoneout-$SUBJ-input     leaveoneout-$SUBJ-output group
+        ./cleanup.sif     leaveoneout-$SUBJ-input
+        ./cleanup.sif     leaveoneout-$SUBJ-output ./whitelist.txt
     done
 
 Merge the leave-one-out results and calibrate the noise.
@@ -59,7 +61,7 @@ Run the group-level analysis on all subjects together and add the calibrated noi
 
     ./pipeline.sif singlesubject-merged-input singlesubject-merged-output group  # this should result in the same as "output"
     ./addnoise.sif singlesubject-merged-output noise singlesubject-merged-output-noise
-    ./addnoise.sif output noise output-noise    # this should result in the same "singlesubject-merged-output-noise"
+    ./addnoise.sif output noise output-noise    # this should result in the same as "singlesubject-merged-output-noise"
 
 ## Data rights holder
 
@@ -75,6 +77,7 @@ Review the group-level results with the calibrated noise and release them to the
 - pipeline.sif
 - singlesubject.sif
 - leaveoneout.sif
+- cleanup.sif
 - mergesubjects.sif
 - mergegroup.sif
 - calibratenoise.sif

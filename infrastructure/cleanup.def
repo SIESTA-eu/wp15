@@ -1,0 +1,28 @@
+BootStrap: docker
+From: python:3-slim
+
+%help
+
+    The general form to run the cleanup command is:
+        apptainer run cleanup.sif <directory> [whitelist.txt] [--dry-run]
+
+%labels
+    org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+    cleanup/cleanup.py /opt/cleanup.py
+
+%post
+    ################################################################################
+    # general updates to the base image
+    ################################################################################
+    apt update -y && apt-get install -y python3-pip
+    echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+    echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+    DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  
+%environment
+    export LC_ALL=C
+
+%runscript
+    python3 /opt/cleanup.py "$@"
