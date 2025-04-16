@@ -10,10 +10,10 @@ The following workflow includes a number of steps that are not needed for the fi
 
 ## Data rights holder
 
-Transfer the data to the platform, provide a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user.
+Transfer the data to the platform, construct a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user.
 
     ./download.sif  input
-    ./scramble      input scrambled-input
+    ./scramble.sif  input scrambled-input
     ./privacy.sif   input scrambled-input
 
 ## Data user
