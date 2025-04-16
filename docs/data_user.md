@@ -67,7 +67,7 @@ input
 
 ### Output data handling
 
-Output data from the analysis pipeline must be formatted according to [BIDS](https://bids.neuroimaging.io) derivatives. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
+A requirement for the resampling implemented in SIESTA wp15 is that the output data from the analysis pipeline must be formatted as a [BIDS](https://bids.neuroimaging.io) derivative dataset, i.e., a BIDS dataset with a `dataset_description.json` that specifies `DatasetType: derivatives`. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
 
 The participant-level analysis should write its results in `sub-xxx` directories that arew placed directly underneath the output directory. The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis can be written at the top level of the output directory, or in a dedicated `group` directory.
 
