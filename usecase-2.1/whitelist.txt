@@ -1,1 +1,1 @@
-group/results.tsv
+derivatives/group/results.tsv
