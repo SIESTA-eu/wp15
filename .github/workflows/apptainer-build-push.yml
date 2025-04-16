@@ -194,6 +194,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build privacy.sif          privacy.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build singlesubject.sif    singlesubject.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build leaveoneout.sif      leaveoneout.def
+          cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build cleanup.sif          cleanup.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build mergesubjects.sif    mergesubjects.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build mergegroup.sif       mergegroup.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build calibratenoise.sif   calibratenoise.def
@@ -210,6 +211,8 @@ jobs:
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/singlesubject.sif    oras://ghcr.io/${NAMESPACE}/singlesubject.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/leaveoneout.sif      oras://ghcr.io/${NAMESPACE}/leaveoneout.sif:${GITHUB_REF_NAME}
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/leaveoneout.sif      oras://ghcr.io/${NAMESPACE}/leaveoneout.sif:latest
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/cleanup.sif          oras://ghcr.io/${NAMESPACE}/cleanup.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/cleanup.sif          oras://ghcr.io/${NAMESPACE}/cleanup.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergesubjects.sif    oras://ghcr.io/${NAMESPACE}/mergesubjects.sif:${GITHUB_REF_NAME}
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergesubjects.sif    oras://ghcr.io/${NAMESPACE}/mergesubjects.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergegroup.sif       oras://ghcr.io/${NAMESPACE}/mergegroup.sif:${GITHUB_REF_NAME}
