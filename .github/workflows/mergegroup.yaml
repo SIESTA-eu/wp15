@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest pandas h5py scipy nibabel more_itertools --quiet
+          pip install pytest pandas h5py scipy nibabel more_itertools tqdm --quiet
       
       - name: Run tests
         run: pytest test_mergegroup.py -v -s
