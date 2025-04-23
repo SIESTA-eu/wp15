@@ -95,7 +95,7 @@ The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
 
 ### Computational requirements for the participant level
 
-The execution of the pipeline for each participant takes XX GB of RAM, about 900 seconds per subject, and results in 685 GB of temporary data per subject in the output folder + an unspecified amount of anatomical segmentation related intermediate data (still) written into the input folder.
+The execution of the pipeline for each participant takes XX GB of RAM, about 900 seconds per subject, and results in 685 GB of temporary data per subject in the output folder + an unspecified amount of anatomical image segmentation related intermediate data written into the input folder.
 
 There are 44(?) subjects, 27 of which make it through the participant pipeline.
 
