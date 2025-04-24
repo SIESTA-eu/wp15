@@ -55,9 +55,19 @@ Some of these allow for recursively downloading a directory containing files and
 
 ## Data transfer out from the system (export)
 
-The data user might want to download the scrambled data for pipeline development on their local computer.
+A scrambled version of the data is provided by the data rights holder to the data user that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anonymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development. The data user might want to download the scrambled data for pipeline development on their local computer.
 
 The data user will also want to download the results of the application of the pipeline on the sensitive input data.
+
+> [!IMPORTANT]
+> It is as of yet unclear how data transfer out of the system will be implemented. This is to be done with [WP11](https://confluence.ifca.es/spaces/SIESTA/pages/160956465/WP10+WP11+-+Data+privacy+and+anonymization+tools+Data+stage+out+and+risk+control).
+
+### Implementing the container
+
+The data user implements and tests the analysis pipeline in an interactive environment. Along the way they document the software that is to be installed and the additional requirements and dependencies. This is to result in a container definition file that can be used to build the container image.
+
+> [!IMPORTANT]  
+> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.
 
 ## Computational requirements
 
