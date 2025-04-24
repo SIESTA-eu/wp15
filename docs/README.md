@@ -10,12 +10,12 @@ The GDPR defines anonymous or personal data. Personal data means any information
 
 In this work package we deal with data that is acquired for research purposes, represented as digital datasets in which data from multiple individual participants is combined. Since the data is acquired for medical neuroimaging research purposes, we assume that it pertains to indirect personal data. Participants can be considered to represent individual records in the dataset. The data is assumed to be homogeneous, i.e., the same variables are collected for all participants.
 
-We distinguish two representations of the data that serves as the input of the analysis pipeline;
+We distinguish two representations of the data that serves as the input of the analysis pipeline:
 
-1. Source or input data. This type typically concerns original research data (such as EEG and MEG, MRI) that, alongside features of scienctific interest, contains a rich set of _indirect_ personal data (but no _direct_ personal data). When linked with other data sources, indirect personal data may allow for re-identification of direct personal data (such as a subject's name or birthdate), and hence makes the input data unfit for unrestricted public sharing.
+1. Source or input data. This typically concerns unprocessed or minimally processed research data (such as EEG and MEG, MRI) and corresponds to the data of scienctific interest. This data contains a rich set of _indirect_ personal data (but no _direct_ personal data). When linked with other data sources, indirect personal data may allow for re-identification of direct personal data (such as a subject's name or birthdate), and hence makes the input data unfit for unrestricted public sharing.
 2. Scrambled or synthetic input data. This type of data is derived from the input data, such that the indirect personal features have been removed (to a varying degree) from the data, while the scientific features of interest are preserved sufficiently to allow implementing and testing an analysis pipeline.
 
-We distinguish three representations of the data that results as output from the analysis pipeline;
+We distinguish three representations of the data that results as output from the analysis pipeline:
 
 1. Results from the scrambled data. This follows from the pipeline evaluated on the scrambled data. Devpending on the amount of scrambling, this data may or may not be complete nonsense. It can however be used to evaluate whether the pipeline computations were performed correctly and to organize and identify the desired output data. The results of the pipeline applied to the scrambled data are directly available to the data user.
 2. Actual results from the input data. The results of the pipeline applied to the input data are not directly accessible.

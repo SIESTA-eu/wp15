@@ -22,7 +22,7 @@ input
     └ ses-02/...
 ```
 
-The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform.
+The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform. The data is originally stored on a system in the research institution and gets transferred to the secure SIESTA storage system.
 
 Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for data ingestion into SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the institutional storage or repository. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
 
