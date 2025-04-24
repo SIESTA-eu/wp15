@@ -4,7 +4,7 @@
 
 This workflow is a more technical specification for the platform operator and for the ICT cloud specialists.
 
-## Intruduction
+## Introduction
 
 This document outlines the computational workflow and the handling of input data, intermedate or work-in-progress data, and output data.
 
