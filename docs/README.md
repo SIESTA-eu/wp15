@@ -31,13 +31,11 @@ We distinguish three representations of the data that results as output from the
 
 ## User roles
 
-Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles:
+Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles. For each of the roles we have provided specific documentation (see links below). If you fall within one of the specific roles, please read the documentation aimed at your role first. It may contribute to your overall understanding to subsequently also go over the documentation for the other roles.
 
 1. [Data rights holder](data_rights_holder.md)
 2. [Data user](data_user.md)
 3. [Platform operator](platform_operator.md)
-
-Each of these roles has its own section in the documentation, please click on the respective links.
 
 ## Data flow
 
