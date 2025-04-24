@@ -16,8 +16,16 @@ The data analysis can be implemented on the basis of any analysis tool and/or an
 
 The final implementation should be containerized and implemented as a [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) with a participant- and a group-level step (see below).
 
+The motivation for containerizing the analysis pipeline is:
+
+- to be able to run the analysis pipeline in the cloud (i.e., on someone else's computer)
+- to ensure that all software dependencies are identified and installed properly
+- to protect the sensitive data that is processed from being disclosed
+
+In general the sharing of an analysis pipeline with other researchers would not require to contanerise it, you only have to share your code, a specification of its requirements, and documentation how to execute it. However, containerizing a data analysis pipeline ensures **reproducibility** (same environment everywhere), **portability** (runs on any system), and **scalability** (easy cloud deployment). It isolates dependencies, avoids setup conflicts, and simplifies sharing with others. Plus, it integrates with continuous-integration, continuous-deployment and **orchestration** tools for automation and scaling (like Docker Swarm or Kubernetes).
+
 > [!IMPORTANT]  
-> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container is the responsibility of the platform operator.
+> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.
 
 ### General recommendations
 
@@ -100,11 +108,11 @@ output
 
 #### Whitelisting
 
-The participant and group-level analysis result in a number of files, some of which are only temporary work-in-progress, whereas others represent the primary research outcomes of the analysis pipeline. The data user has to provide a text file `whitelist.txt` that lists all the desired outcomes, i.e., all files resulting from the group-level analysis that are to be retained. Noise calibration will be done on the numerical data in these files, and a differentially private version of these files will be shared with the data user. 
+The participant and group-level analysis result in a number of files, some of which are only temporary work-in-progress, whereas others represent the primary research outcomes of the analysis pipeline. The data user has to provide a text file `whitelist.txt` that lists all the desired outcomes, i.e., all files resulting from the group-level analysis that are to be retained. Noise calibration will be done on the numerical data in these files, and a differentially private version of these files will be shared with the data user.
 
 An example for the whitelist is
 
-```
+```console
 derivatives/group/someresults.tsv
 derivatives/group/otherresults.nii.gz
 ```
