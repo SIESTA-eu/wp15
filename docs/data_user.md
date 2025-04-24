@@ -8,7 +8,7 @@ SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging
 
 ## Developing and testing the analysis
 
-A scrambled version of the data is provided by the data rights holder that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anoymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development.
+A scrambled version of the data is provided by the data rights holder that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anonymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development.
 
 The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
 
