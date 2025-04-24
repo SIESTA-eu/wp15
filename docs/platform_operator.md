@@ -64,7 +64,7 @@ The data user will also want to download the results of the application of the p
 
 ### Implementing the container
 
-The data user implements and tests the analysis pipeline in an interactive environment. Along the way they document the software that is to be installed and the additional requirements and dependencies. This is to result in a container definition file that can be used to build the container image.
+The data user develops, implements and tests the analysis pipeline in an interactive environment. Along the way they document the software that is to be installed and the additional requirements and dependencies. This is to result in a container definition file that can be used to build the container image. The container must follow the [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) specification.
 
 > [!IMPORTANT]  
 > It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.
