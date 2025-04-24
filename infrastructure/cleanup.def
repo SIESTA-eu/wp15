@@ -3,14 +3,14 @@ From: python:3-slim
 
 %help
 
-    The general form to run the mergegroup command is:
-        apptainer run mergegroup.sif <input dir 1> <input dir 2> <input dir 3> ... <output dir> <whitelist.txt>"
+    The general form to run the cleanup command is:
+        apptainer run cleanup.sif <directory> [whitelist.txt] [--dry-run]
 
 %labels
     org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
 %files
-    mergegroup/mergegroup.py /opt/mergegroup.py
+    cleanup/cleanup.py /opt/cleanup.py
 
 %post
     ################################################################################
@@ -20,10 +20,9 @@ From: python:3-slim
     echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
     echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
     DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-    pip install more_itertools numpy nibabel h5py scipy tqdm --quiet
   
 %environment
     export LC_ALL=C
 
 %runscript
-    python3 /opt/mergegroup.py "$@"
+    python3 /opt/cleanup.py "$@"

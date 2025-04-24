@@ -8,9 +8,16 @@ SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging
 
 ## Developing and testing the analysis
 
+A scrambled version of the data is provided by the data rights holder that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anonymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development.
+
 The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
 
+### Implementing the container
+
 The final implementation should be containerized and implemented as a [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) with a participant- and a group-level step (see below).
+
+> [!IMPORTANT]  
+> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container is the responsibility of the platform operator.
 
 ### General recommendations
 
@@ -67,16 +74,17 @@ input
 
 ### Output data handling
 
-Output data from the analysis pipeline must be formatted according to [BIDS](https://bids.neuroimaging.io) derivatives. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
+A requirement for the resampling implemented in SIESTA wp15 is that the output data from the analysis pipeline must be formatted as a [BIDS](https://bids.neuroimaging.io) derivative dataset, i.e., a BIDS compliant dataset with a `dataset_description.json` that specifies `"DatasetType": "derivative"`. The output directory holds both the intermediate results from the participant-level analysis _and_ the final results from the group-level analysis.
 
-The participant-level analysis should write its results in `sub-xxx` directories that arew placed directly underneath the output directory. The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis can be written at the top level of the output directory, or in a dedicated `group` directory.
+The participant-level analysis must write its results in `sub-xxx` directories that are placed directly underneath the output directory. You should _not_ place the participant-level results in a subdirectory named `derivatives` inside the output directory.
 
-You should _not_ make a directory named `derivatives` inside the output directory. You should also _not_ make multiple side-by-side derivatives in the output directory.
+The group-level analysis has access to the original input data and to these intermediate participant-level output results. The output data for the group-level analysis should be written inside a `derivatives` subsirectory in the output. We recommend to place group results in a `derivatives/group` or a `derivatives/pipelinename` subdirectory.
 
 The output is for example formatted as
 
 ```console
 output
+├── dataset_description.json (with "DatasetType" specified as "derivative")
 ├── sub-01
 |   └ ...
 ├── sub-02
@@ -84,14 +92,22 @@ output
 ├── sub-03
 |   └ ...
 ...
-├── someresults.tsv
-└── group
-    └ otherresults.nii.gz
+└── derivatives
+    └── group
+        ├── someresults.tsv
+        └── otherresults.nii.gz
 ```
 
 #### Whitelisting
 
 The participant and group-level analysis result in a number of files, some of which are only temporary work-in-progress, whereas others represent the primary research outcomes of the analysis pipeline. The data user has to provide a text file `whitelist.txt` that lists all the desired outcomes, i.e., all files resulting from the group-level analysis that are to be retained. Noise calibration will be done on the numerical data in these files, and a differentially private version of these files will be shared with the data user. 
+
+An example for the whitelist is
+
+```
+derivatives/group/someresults.tsv
+derivatives/group/otherresults.nii.gz
+```
 
 Files that are not in the `whitelist.txt` will never be shared with the data user.
 
@@ -130,3 +146,6 @@ If the data user want to make use other non-free software in the analysis (for e
 The data user may want to download the scrambled version of the data for local development and testing of the analysis pipeline.
 
 The data user will also want to download the differentially private results of the application of their pipeline to the original sensitive data.
+
+> [!IMPORTANT]
+> It is as of yet unclear how data transfer out of the system will be implemented. This is to be done with [WP11](https://confluence.ifca.es/spaces/SIESTA/pages/160956465/WP10+WP11+-+Data+privacy+and+anonymization+tools+Data+stage+out+and+risk+control).

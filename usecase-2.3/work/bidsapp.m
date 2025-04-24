@@ -22,7 +22,7 @@ function bidsapp(varargin)
 %
 % See also INPUTPARSER, ARGUMENTS, FT_GETOPT
 
-% Copyright (C) 2024, Robert Oostenveld
+% Copyright (C) 2024-2025, Robert Oostenveld
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parse the command-line options

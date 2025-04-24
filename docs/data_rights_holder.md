@@ -22,7 +22,7 @@ input
     └ ses-02/...
 ```
 
-The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform.
+The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform. The data is originally stored on a system in the research institution and gets transferred to the secure SIESTA storage system.
 
 Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for data ingestion into SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the institutional storage or repository. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
 
@@ -40,6 +40,10 @@ The data rights holder can use the account and the data transfer mechanism provi
 
 The data rights holder can provide the platform operator with instructions and access to download the data from the institutional storage system. Besides providing an account to access the data for download and explaining how the data transfer works, the data rights holder must provide a method to check completeness and integrity of the data after transfer, for example by providing a [manifest file](https://en.wikipedia.org/wiki/Manifest_file) with checksums.
 
+## Providing scrambled data
+
+The data rights holder is responsible for providing a scrambled (locally differentially private) version of the dataset to the data user, so that the data user knows what the dataset contains, how it is organized, and that they can implement the analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
+
 ## Privacy considerations
 
 ### For the raw input data
@@ -49,11 +53,10 @@ It is the responsibility of the data rights holder to employ data minimization a
 It is the responsibility of the platform operator to ensure that data users cannot access the input data, as that is assumed to contain sensitive information.
 
 In WP15, we have not considered the network and storage aspect on the SIESTA platform, where encryption in transit and at rest may or may not apply.
+
 ### For the scrambled data
 
-The scrambled data is needed for the data user to implement and test their analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
-
-It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identiiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the scrambled data prior to it being released.
+The scrambled data is needed for the data user to implement and test their analysis pipeline. It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identiiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the scrambled data prior to it being released.
 
 ### For the results from the pipeline
 
