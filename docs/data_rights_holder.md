@@ -1,6 +1,12 @@
 # Data rights holder
 
-The data rights holder is the person or organization responsible for the dataset. They decide under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
+## Audience
+
+This document is aimed at the data rights holder, i.e., the person or organization responsible for the dataset. We assume that the SIESTA data rights holder is working in a different institute than the [data user](./data_user.md); if they were working in the same institution, they could share directly and the SIESTA platform would not be needed.
+
+## Introduction
+
+The data rights holder decides under which conditions the dataset can be shared, with whom, and they are responsible for initiating the data transfer. It is also the responsibility of the data rights holder to organize the data according to the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
 The BIDS-formatted input data is for example structured as
 
@@ -22,7 +28,7 @@ input
     └ ses-02/...
 ```
 
-The platform operator and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform. The data is originally stored on a system in the research institution and gets transferred to the secure SIESTA storage system.
+The [platform operator](./platform_operator.md) and the data rights holder have to settle on a way to transfer the data. We assume in the following that the data rights holder is working at some research institution in Europe (or at home, for that matter) and that the SIESTA platform operator is working at the compute center that hosts the SIESTA platform. The data is originally stored on a system in the research institution and gets transferred to the secure SIESTA storage system.
 
 Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data". Specifically for data ingestion into SIESTA, uploading can be considered as the situation where the data rights holder delivers the data at the SIESTA central storage, whereas downloading can be considered where the platform operator picks up the data from the institutional storage or repository. Downloading data is used in the initial use cases (2.1 to 2.5), since the data in those cases is publicly shared, hosted on institutional repositories, and the data rights holder needs to go and pick it up.
 
@@ -62,7 +68,7 @@ The scrambled data is needed for the data user to implement and test their analy
 
 The scrambled data is anonymous, hence the pipeline applied to the scrambled data is also anonymous and its result can be shared without restrictions.
 
-The direct output of the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to make the direct output differentially private as, for example, explained on [Wikipedia](https://en.wikipedia.org/wiki/Differential_privacy).
+The output that results from the pipeline applied to the original input data cannot be guaranteed to be anonymous. Noise needs to be added to this direct output to make the results  differentially private as, for example, explained on [Wikipedia](https://en.wikipedia.org/wiki/Differential_privacy).
 
 ## Differentially private output data
 

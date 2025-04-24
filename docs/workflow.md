@@ -1,5 +1,11 @@
 # Computational workflow
 
+## Audience
+
+This workflow is a more technical specification for the platform operator and for the ICT cloud specialists.
+
+## Intruduction
+
 This document outlines the computational workflow and the handling of input data, intermedate or work-in-progress data, and output data.
 
 Whenever `filename.sif` is mentioned below, it is assumed that this might be either an Apptainer or Singularity container (for wp15 development and testing), or a Docker container (for execution in Kubernetes). Arguments that are specified to the containers correspond to the input and the output directories (for wp15 development and testing) or the encrypted volumes that are to be mounted. The containers that execute a computational pipeline have an additional argument, specifying whether the analysis is to be done at the participant or group level. The Apptainer or Docker containers do not take additional command-line options that are to be specified by the data rights holder or by the data user. The interaction of the data rights holder or data user with tools and data happens _inside_ the container. For this purpose, some of the containers will need to provide an interactive graphical desktop with VNC or ThinLinc.
