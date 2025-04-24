@@ -8,9 +8,16 @@ SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging
 
 ## Developing and testing the analysis
 
+A scrambled version of the data is provided by the data rights holder that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anoymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development.
+
 The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
 
+### Implementing the container
+
 The final implementation should be containerized and implemented as a [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) with a participant- and a group-level step (see below).
+
+> [!IMPORTANT]  
+> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container is the responsibility of the platform operator.
 
 ### General recommendations
 
@@ -139,3 +146,6 @@ If the data user want to make use other non-free software in the analysis (for e
 The data user may want to download the scrambled version of the data for local development and testing of the analysis pipeline.
 
 The data user will also want to download the differentially private results of the application of their pipeline to the original sensitive data.
+
+> [!IMPORTANT]
+> It is as of yet unclear how data transfer out of the system will be implemented. This is to be done with [WP11](https://confluence.ifca.es/spaces/SIESTA/pages/160956465/WP10+WP11+-+Data+privacy+and+anonymization+tools+Data+stage+out+and+risk+control).
