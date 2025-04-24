@@ -26,8 +26,8 @@ We distinguish two representations of the data that serves as the input of the a
 We distinguish three representations of the data that results as output from the analysis pipeline:
 
 1. Results from the scrambled data. This follows from the pipeline evaluated on the scrambled data. Devpending on the amount of scrambling, this data may or may not be complete nonsense. It can however be used to evaluate whether the pipeline computations were performed correctly and to organize and identify the desired output data. The results of the pipeline applied to the scrambled data are directly available to the data user.
-2. Actual results from the input data. The results of the pipeline applied to the input data are not directly accessible.
-3. Differentially private results. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private and to prevent any data leakage. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally.
+2. Actual results from the input data. The results of the pipeline applied to the input data are not guarateed to be anonymous or differentially private and hence are not to be made directly accessible.
+3. Differentially private results. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private and to prevent any data leakage. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally. The noise that is needed for differential privacy is determined using a resampling strategy.
 
 ## User roles
 
