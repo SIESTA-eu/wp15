@@ -1,8 +1,12 @@
 # Platform operator
 
-The platform operator is the person or organization responsible for the SIESTA infrastructure. They take care of the secure storage and compute environment and allow "data rights holders" to upload data to the platform and "data users" to perform analyses on that data and to download the results.
+## Audience
 
-Uploading is in general considered as "sending data away" over the network, whereas downloading is "receiving data".
+This document is aimed at the platform operator, i.e., the person or organization responsible for the SIESTA infrastructure.
+
+## Introduction
+
+The platform operator take care of the secure storage and compute environment and allows "data rights holders" to transfer data to the platform and "data users" to perform analyses on that data and to download the results.
 
 SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging Data Structure) standard, which is a formalized framework for organizing and describing neuroimaging and behavioral data in a consistent, machine-readable manner to facilitate data sharing and reproducibility.
 
@@ -28,6 +32,8 @@ Besides storing the dataset, disk space should be made available to allow for in
 ## Data transfer into the system (import)
 
 The platform operator and the data rights holder have to settle on a way to transfer the data. We refer to this as _uploading_ in case the platform operator creates an account for the data rights holder on the SIESTA platform and if the data rights holder initiates and controls the transfer. We refer to _downloading_ if the data rights holder creates an account on their system for the platform operator, and if the latter initiates and controls the transfer.
+
+Note that _uploading_ is in general considered as "sending data away" over the network, whereas _downloading_ is "receiving data".
 
 ### Uploading the data by the data rights holder
 
@@ -64,7 +70,7 @@ The data user will also want to download the results of the application of the p
 
 ### Implementing the container
 
-The data user implements and tests the analysis pipeline in an interactive environment. Along the way they document the software that is to be installed and the additional requirements and dependencies. This is to result in a container definition file that can be used to build the container image.
+The data user develops, implements and tests the analysis pipeline in an interactive environment. Along the way they document the software that is to be installed and the additional requirements and dependencies. This is to result in a container definition file that can be used to build the container image. The container must follow the [BIDS app](https://doi.org/10.1371/journal.pcbi.1005209) specification.
 
 > [!IMPORTANT]  
 > It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.

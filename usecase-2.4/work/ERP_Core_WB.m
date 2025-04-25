@@ -624,6 +624,9 @@ if strcmpi(AnalysisLevel,'2')
             indir      = fullfile(InputDataset,TaskLabel{t});
         elseif contains(InputDataset,TaskLabel{t})
             indir     = InputDataset;
+        elseif exist(fullfile(OutputLocation,sprintf('%s.study',TaskLabel{t})), 'file')
+            % JM thinks that this should be OK
+            indir = OutputLocation;
         else
             error('Enter the name of a folder containing the task name(s)')
         end
@@ -638,6 +641,24 @@ if strcmpi(AnalysisLevel,'2')
             AvgChanlocs = load(fullfile(indir,'limo_chanlocs.mat'));
         elseif isfile(fullfile(indir,'limo_gp_level_chanlocs.mat'))
             AvgChanlocs = load(fullfile(indir,'limo_gp_level_chanlocs.mat'));
+        else
+            error('missing AvgChanlocs file')
+        end
+
+        if isfile(fullfile(indir,'AvgChanlocs.mat'))
+            tmp = load(fullfile(indir,'AvgChanlocs.mat'));
+            AvgChanlocs = tmp.AvgChanlocs; clear tmp;
+        elseif isfile(fullfile(fileparts(indir),'AvgChanlocs.mat'))
+            tmp = load(fullfile(fileparts(indir),'AvgChanlocs.mat'));
+            AvgChanlocs = tmp.AvgChanlocs; clear tmp;
+        elseif isfile(fullfile(indir,'limo_chanlocs.mat'))
+            AvgChanlocs = load(fullfile(indir,'limo_chanlocs.mat'));
+        elseif isfile(fullfile(indir,'limo_gp_level_chanlocs.mat'))
+            AvgChanlocs = load(fullfile(indir,'limo_gp_level_chanlocs.mat'));
+        elseif exist(fullfile(OutputLocation, 'AvgChanlocs.mat'), 'file')
+            % JM thinks that this should be OK
+            tmp = load(fullfile(OutputLocation, 'AvgChanlocs.mat'));
+            AvgChanlocs = tmp.AvgChanlocs; clear tmp;
         else
             error('missing AvgChanlocs file')
         end
@@ -673,11 +694,39 @@ if strcmpi(AnalysisLevel,'2')
         mkdir(outdir);
         cd(outdir);
 
+        d1 = dir(fullfile(indir, 'sub-*', sprintf('ses-%s',TaskLabel{t}),'*','*','con_1.mat'));
+        d2 = dir(fullfile(indir, 'sub-*', sprintf('ses-%s',TaskLabel{t}),'*','*','con_2.mat'));
+        con1_file = sprintf('%s.txt', tempname);
+        con2_file = sprintf('%s.txt', tempname);
+        fid1 = fopen(con1_file, 'w');
+        fid2 = fopen(con2_file, 'w');
+        for id = 1:numel(d1)
+          con1_files{id} = fullfile(d1(id).folder, d1(id).name);
+          fprintf(fid1, [con1_files{id} '\n']);
+        end
+        for id = 1:numel(d2)
+          con2_files{id} = fullfile(d2(id).folder, d2(id).name);
+          fprintf(fid2, [con2_files{id} '\n']);
+        end
+        fclose(fid1);
+        fclose(fid2);
+
+
+        dlimo = dir(fullfile(indir, 'sub-*', sprintf('ses-%s',TaskLabel{t}),'*','*','LIMO.mat'));
+        limo_file = sprintf('%s.txt', tempname);
+        fid = fopen(limo_file, 'w');
+        for id = 1:numel(dlimo)
+          limo_files{id} = fullfile(dlimo(id).folder, dlimo(id).name);
+          fprintf(fid, [limo_files{id} '\n']);
+        end
+        fclose(fid);
+
         % start processing
         if strcmpi(TaskLabel{t},'ERN')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
-
+            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
+            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+            
+            
             for c = 1:3
                 if c == 1
                     mkdir(fullfile(outdir,'ERN'));
@@ -687,8 +736,7 @@ if strcmpi(AnalysisLevel,'2')
                         'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
                     limo_get_effect_size('one_sample_ttest_parameter_1.mat')
                     % mean contrast values
-                    limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                        1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')                    
+                    limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')                    
                     out.(TaskLabel{t}).ERN = get_rfxfiles(pwd);
                 elseif c == 2
                     mkdir(fullfile(outdir,'CRN'));
@@ -698,8 +746,7 @@ if strcmpi(AnalysisLevel,'2')
                         'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
                     limo_get_effect_size('one_sample_ttest_parameter_1.mat')
                     % mean contrast values
-                    limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
-                        1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')
+                    limo_central_tendency_and_ci(con2_file, 1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')
                     out.(TaskLabel{t}).CRN = get_rfxfiles(pwd);
                 else
                     mkdir(fullfile(outdir,'Difference_wave'));
@@ -715,10 +762,8 @@ if strcmpi(AnalysisLevel,'2')
                     % ERPs (use limo_add_plots to visualize)
                     ERN = [0 1 0 1 1 0 1 0];
                     CRN = [1 0 1 0 0 1 0 1];
-                    limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_ERN_ERN_GLM_Channels_Time_WLS.txt'), ...
-                        find(ERN), AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_errors')
-                    limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_ERN_ERN_GLM_Channels_Time_WLS.txt'), ...
-                        find(CRN), AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_correct')
+                    limo_central_tendency_and_ci(limo_file, find(ERN), AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_errors');
+                    limo_central_tendency_and_ci(limo_file, find(CRN), AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_correct');
                     Diff = limo_plot_difference('ERPs_errors_single_subjects_Weighted mean.mat',...
                         'ERPs_correct_single_subjects_Weighted mean.mat',...
                         'type','paired','fig',0,'name','ERP_diff');
@@ -730,15 +775,13 @@ if strcmpi(AnalysisLevel,'2')
         elseif strcmpi(TaskLabel{t},'MMN')
 
             limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'Beta_files_MMN_MMN_GLM_Channels_Time_WLS.txt'), ...
+                'LIMOfiles',limo_file, ...
                 'parameter',[1 2], 'analysis_type',...
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % ERPs (use limo_add_plots to visualize)
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_MMN_MMN_GLM_Channels_Time_WLS.txt'), ...
-                1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_deviant')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_MMN_MMN_GLM_Channels_Time_WLS.txt'), ...
-                2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_standard')
+            limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_deviant')
+            limo_central_tendency_and_ci(limo_file, 2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_standard')
             Diff = limo_plot_difference('ERPs_deviant_single_subjects_Weighted mean.mat',...
                 'ERPs_standard_single_subjects_Weighted mean.mat',...
                 'type','paired','fig',0,'name','ERP_MMN');
@@ -746,20 +789,20 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).MMN = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N170')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+            
+
+            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
+            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             mkdir(fullfile(outdir,'Cars_vs_Faces'));
             cd(fullfile(outdir,'Cars_vs_Faces'));
             limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'Beta_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
+                'LIMOfiles', limo_file, ...
                 'parameter',[2 1], 'analysis_type',...
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % ERPs (use limo_add_plots to visualize)
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces')
+            limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars')
+            limo_central_tendency_and_ci(limo_file, 2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces')
             Diff = limo_plot_difference('ERPs_Faces_single_subjects_Weighted mean.mat',...
                 'ERPs_Cars_single_subjects_Weighted mean.mat',...
                 'type','paired','fig',0,'name','ERP_Difference');
@@ -778,27 +821,21 @@ if strcmpi(AnalysisLevel,'2')
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % Param avg (use limo_add_plots to visualize)
             % we can also do double diff ERP if needed (do as above twice)
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_Cars')
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_Faces')
+            limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_Cars')
+            limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_Faces')
             Diff = limo_plot_difference('Con_Faces_single_subjects_mean.mat',...
                 'Con_Cars_single_subjects_mean.mat',...
                 'type','paired','fig',0,'name','Con_diff');
             save('Parameter_difference','Diff')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                1 , AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                3, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars_control')
+            limo_central_tendency_and_ci(limo_file, 1 , AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars')
+            limo_central_tendency_and_ci(limo_file, 3, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars_control')
             set1      = load('ERPs_Cars_single_subjects_Weighted mean.mat');
             set2      = load('ERPs_Cars_control_single_subjects_Weighted mean.mat');
             Data.data = set1.Data.data - set2.Data.data;
             Data.limo = set1.Data.limo;
             save('ERPs_Cars_diff_single_subjects_Weighted mean.mat','Data')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                4, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces_control')
+            limo_central_tendency_and_ci(limo_file, 2, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces')
+            limo_central_tendency_and_ci(limo_file, 4, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Faces_control')
             set1      = load('ERPs_Faces_single_subjects_Weighted mean.mat');
             set2      = load('ERPs_Faces_control_single_subjects_Weighted mean.mat');
             Data.data = set1.Data.data - set2.Data.data;
@@ -814,8 +851,7 @@ if strcmpi(AnalysisLevel,'2')
             labels = arrayfun(@(x) x.labels, AvgChanlocs.expected_chanlocs, 'UniformOutput', false);
             table_channels{1} = labels(1:12)'; table_channels{2} = labels([16 18 19 20 23:30])';
             channels = limo_pair_channels(AvgChanlocs.expected_chanlocs,'pairs',table_channels,'figure','off');
-            limo_ipsi_contra(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
+            limo_ipsi_contra(con1_files, con2_files,...
                 'channellocs',AvgChanlocs,'channelpairs',channels,nboot,tfce)
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             load LIMO.mat %#ok<LOAD>
@@ -849,8 +885,9 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N2pc = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N400')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+            
+            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
+            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             for N=size(con1_files,2):-1:1
                 data{1,N} = con1_files{N};
                 data{2,N} = con2_files{N};
@@ -860,17 +897,15 @@ if strcmpi(AnalysisLevel,'2')
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % Param avg (use limo_add_plots to visualize)
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_related')
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_unrelated')
+            limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_related')
+            limo_central_tendency_and_ci(con2_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_unrelated')
             Diff = limo_plot_difference('Con_unrelated_single_subjects_mean.mat',...
                 'Con_related_single_subjects_mean.mat',...
                 'type','paired','fig',0,'name','Con_diff');
             save('Parameter_difference','Diff')
-            limo_central_tendency_and_ci(fullfile(indir,['LIMO_N400' filesep 'LIMO_files_N400_N400_GLM_Channels_Time_WLS.txt']),...
+            limo_central_tendency_and_ci(limo_file,...
                 'con_1', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_related')
-            limo_central_tendency_and_ci(fullfile(indir,['LIMO_N400' filesep 'LIMO_files_N400_N400_GLM_Channels_Time_WLS.txt']),...
+            limo_central_tendency_and_ci(limo_file,...
                 'con_2', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_unrelated')
             Diff = limo_plot_difference('ERPs_unrelated_single_subjects_Weighted mean.mat',...
                 'ERPs_related_single_subjects_Weighted mean.mat',...
@@ -879,8 +914,9 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N400 = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'P3')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+                        
+            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
+            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             for N=size(con1_files,2):-1:1
                 data{1,N} = con2_files{N};
                 data{2,N} = con1_files{N};
@@ -890,18 +926,14 @@ if strcmpi(AnalysisLevel,'2')
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % Param avg (use limo_add_plots to visualize)
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_distractors')
-            limo_central_tendency_and_ci(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
-                1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_targets')
+            limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_distractors')
+            limo_central_tendency_and_ci(con2_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_targets')
             Diff = limo_plot_difference('Con_targets_single_subjects_mean.mat',...
                 'Con_distractors_single_subjects_mean.mat',...
                 'type','paired','fig',0,'name','Con_diff');
             save('Parameter_difference','Diff')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_P3_P3_GLM_Channels_Time_WLS.txt'),...
-                'con_1', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_distractors')
-            limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_P3_P3_GLM_Channels_Time_WLS.txt'),...
-                'con_2', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_targets')
+            limo_central_tendency_and_ci(limo_file, 'con_1', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_distractors')
+            limo_central_tendency_and_ci(limo_file, 'con_2', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_targets')
             Diff = limo_plot_difference('ERPs_targets_single_subjects_Weighted mean.mat',...
                 'ERPs_distractors_single_subjects_Weighted mean.mat',...
                 'type','paired','fig',0,'name','ERP_diff');

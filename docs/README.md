@@ -2,7 +2,15 @@
 
 _This contains the draft end-user documentation for the medical imaging use case. Eventually it should move elsewhere and be integrated with the other use cases._
 
-The 2nd use case in the SIESTA project is on medical imaging and restricts its focus to neuroimaging. In SIESTA it is dealt with in work package 15. Hence sometimes we refer to it as "wp15" and at other moments as "usecase-2".
+The 2nd use case in the [SIESTA](https://eosc-siesta.eu)  project is on medical imaging and restricts its focus to neuroimaging. In SIESTA it is dealt with in work package 15. Hence sometimes we refer to it as "wp15" and at other moments as "usecase-2".
+
+## Scope
+
+The [SIESTA](https://eosc-siesta.eu) project aims to develop and implement Secure Interactive Environments for SensiTive data Analytics. So it is about the **analysis** of **sensitive** data, not about straight-forward data sharing where one party uploads data and another party downloads that data. It is also not about a general-purpose data analysis platform for any type of data, but specifically for sensitive data.
+
+For straight-forward data sharing you should look into research data repositories, such as [OpenNeuro](https://openneuro.org), [EBRAINS](https://search.kg.ebrains.eu/?category=Dataset), the [Radboud Data Repository](https://data.ru.nl), [Public-nEUro](https://publicneuro.eu), [DataVerse](https://dataverse.org/installations), or [Zenodo](https://zenodo.org). [Re3data](https://www.re3data.org) is a registry with many research data repositories.
+
+For generic online platforms to analyze your own data or data that you have downloaded you can look at [Brainlife](https://brainlife.io/about/), the [NeuroScience Gateway](https://nsgprod.sdsc.edu:8443/portal2/login!input.action), or at local compute facilities offered at your institution.
 
 ## Data
 
@@ -23,13 +31,11 @@ We distinguish three representations of the data that results as output from the
 
 ## User roles
 
-Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles:
+Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles. For each of the roles we have provided specific documentation (see links below). If you fall within one of the specific roles, please read the documentation aimed at your role first. It may contribute to your overall understanding to subsequently also go over the documentation for the other roles.
 
 1. [Data rights holder](data_rights_holder.md)
 2. [Data user](data_user.md)
 3. [Platform operator](platform_operator.md)
-
-Each of these roles has its own section in the documentation, please click on the respective links.
 
 ## Data flow
 
