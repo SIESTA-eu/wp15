@@ -123,6 +123,12 @@ derivatives/group/otherresults.nii.gz
 
 Files that are not in the `whitelist.txt` will never be shared with the data user.
 
+### What limitations the resampling imposes on participant vs group level analyses
+
+- It is recommended to not write in the input directory, instead use somne BIDS import function/copy the data needed if necessary.
+- If analyses depends on getting information from the entire sample/all the participants, consider how having a leave one out procedure impact the results.
+
+
 ## Storage requirements
 
 The data user must specify to the platform operator what the storage requirements are for the participant- and group-level analyses. How many file are created, how much storage does that require, what is the retention period of the intermediate data, and what data files comprise the final results for the data user.
