@@ -109,7 +109,8 @@ def parse_nii(filepath):
         print(f"Error loading NIfTI file {filepath}: {str(e)}", file=sys.stderr)
         return None
 
-def parse_mat(filepath):    
+def parse_mat(filepath):   
+    meta_keys = {'__header__', '__version__', '__globals__', '#refs#'}
     try:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"File {filepath} does not exist")
@@ -118,7 +119,17 @@ def parse_mat(filepath):
             raise ValueError(f"{filepath} is not a regular file")
             
         try:
-            return scipy.io.loadmat(filepath)
+            val = scipy.io.loadmat(filepath)
+            val = {k: v for k, v in val.items() if k not in meta_keys and not k.startswith('__')}
+            val = [list(collapse(val[k])) for k in list(val.keys())][0]
+            f_val = []
+            #print(set([type(i) for i in val]))
+            for v in val:
+                if isinstance(v, np.str_) or v is None:
+                    pass
+                else:
+                    f_val.append(v)
+            return f_val
         except NotImplementedError:
             try:
                 with h5py.File(filepath, 'r') as file:
@@ -287,7 +298,7 @@ def main(args=None):
                     except Exception as e:
                         print(f"Error processing file {input_dir}: {str(e)}", file=sys.stderr)
                         continue
-                
+
                 if txt_aux:
                     txt_values.append(txt_aux)
                 if ctsv_aux:
@@ -295,14 +306,14 @@ def main(args=None):
                 if nii_aux:
                     nii_values.append(nii_aux)
                 if mat_aux:
-                    mat_values.append([prep_(i) for i in mat_aux])
+                    mat_values.append(list(collapse([i for i in mat_aux])))
                 
                 try:
                     if ctsv_values:
                         ctsv_values = list(np.array(ctsv_values).T)
                     if mat_values:
                         mat_values = list(np.array(mat_values).T)
-                    
+
                     merged_lists = [list(filter(lambda x: x is not None, sublist)) 
                                   for sublist in zip_longest(
                                       [[list(pair)] for pair in zip(*[sublist for sublist in txt_values])],
