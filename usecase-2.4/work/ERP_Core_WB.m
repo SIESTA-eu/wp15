@@ -721,19 +721,23 @@ if strcmpi(AnalysisLevel,'2')
         end
         fclose(fid);
 
+        dbeta = dir(fullfile(indir, 'sub-*', sprintf('ses-%s',TaskLabel{t}),'*','*','Betas.mat'));
+        beta_file = sprintf('%s.txt', tempname);
+        fid = fopen(beta_file, 'w');
+        for id = 1:numel(dbeta)
+          beta_files{id} = fullfile(dbeta(id).folder, dbeta(id).name);
+          fprintf(fid, [beta_files{id} '\n']);
+        end
+        fclose(fid);
+
+        opts_limo_rs = {'analysis_type', 'Full scalp analysis', 'type', 'Channels', 'nboot', nboot, 'tfce', tfce};
         % start processing
         if strcmpi(TaskLabel{t},'ERN')
-            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
-            
-            
             for c = 1:3
                 if c == 1
                     mkdir(fullfile(outdir,'ERN'));
                     cd(fullfile(outdir,'ERN'));
-                    limo_random_select('one sample t-test',AvgChanlocs,...
-                        'LIMOfiles',con1_files,'parameter',1, 'analysis_type',...
-                        'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+                    limo_random_select('one sample t-test', AvgChanlocs,  'LIMOfiles', con1_files, 'parameter', 1, opts_limo_rs{:});
                     limo_get_effect_size('one_sample_ttest_parameter_1.mat')
                     % mean contrast values
                     limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')                    
@@ -741,9 +745,7 @@ if strcmpi(AnalysisLevel,'2')
                 elseif c == 2
                     mkdir(fullfile(outdir,'CRN'));
                     cd(fullfile(outdir,'CRN'));
-                    limo_random_select('one sample t-test',AvgChanlocs,...
-                        'LIMOfiles',con2_files,'parameter',1, 'analysis_type',...
-                        'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+                    limo_random_select('one sample t-test', AvgChanlocs, 'LIMOfiles', con2_files, 'parameter', 1, opts_limo_rs{:});
                     limo_get_effect_size('one_sample_ttest_parameter_1.mat')
                     % mean contrast values
                     limo_central_tendency_and_ci(con2_file, 1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')
@@ -755,9 +757,7 @@ if strcmpi(AnalysisLevel,'2')
                         data{1,N} = con1_files{N};
                         data{2,N} = con2_files{N};
                     end
-                    limo_random_select('paired t-test',AvgChanlocs,...
-                        'LIMOfiles',data, 'analysis_type',...
-                        'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+                    limo_random_select('paired t-test', AvgChanlocs, 'LIMOfiles', data, opts_limo_rs{:});
                     limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
                     % ERPs (use limo_add_plots to visualize)
                     ERN = [0 1 0 1 1 0 1 0];
@@ -773,11 +773,7 @@ if strcmpi(AnalysisLevel,'2')
             end
 
         elseif strcmpi(TaskLabel{t},'MMN')
-
-            limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',limo_file, ...
-                'parameter',[1 2], 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+            limo_random_select('paired t-test',AvgChanlocs, 'LIMOfiles',beta_file, 'parameter',[1 2], opts_limo_rs{:});
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % ERPs (use limo_add_plots to visualize)
             limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_deviant')
@@ -789,16 +785,9 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).MMN = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N170')
-            
-
-            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             mkdir(fullfile(outdir,'Cars_vs_Faces'));
             cd(fullfile(outdir,'Cars_vs_Faces'));
-            limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles', limo_file, ...
-                'parameter',[2 1], 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+            limo_random_select('paired t-test', AvgChanlocs, 'LIMOfiles', limo_file, 'parameter',[2 1], opts_limo_rs{:});
             limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % ERPs (use limo_add_plots to visualize)
             limo_central_tendency_and_ci(limo_file, 1, AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_Cars')
@@ -815,9 +804,7 @@ if strcmpi(AnalysisLevel,'2')
                 data{1,N} = con1_files{N};
                 data{2,N} = con2_files{N};
             end
-            limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',data, 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+            limo_random_select('paired t-test', AvgChanlocs, 'LIMOfiles', data, opts_limo_rs{:});
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % Param avg (use limo_add_plots to visualize)
             % we can also do double diff ERP if needed (do as above twice)
@@ -851,8 +838,7 @@ if strcmpi(AnalysisLevel,'2')
             labels = arrayfun(@(x) x.labels, AvgChanlocs.expected_chanlocs, 'UniformOutput', false);
             table_channels{1} = labels(1:12)'; table_channels{2} = labels([16 18 19 20 23:30])';
             channels = limo_pair_channels(AvgChanlocs.expected_chanlocs,'pairs',table_channels,'figure','off');
-            limo_ipsi_contra(con1_files, con2_files,...
-                'channellocs',AvgChanlocs,'channelpairs',channels,nboot,tfce)
+            limo_ipsi_contra(con1_files, con2_files, 'channellocs', AvgChanlocs, 'channelpairs', channels, nboot, tfce)
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             load LIMO.mat %#ok<LOAD>
             if ~isfield(LIMO.data,'timevect')
@@ -885,16 +871,11 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N2pc = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N400')
-            
-            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             for N=size(con1_files,2):-1:1
                 data{1,N} = con1_files{N};
                 data{2,N} = con2_files{N};
             end
-            limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',data, 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+            limo_random_select('paired t-test', AvgChanlocs, 'LIMOfiles', data, opts_limo_rs{:});
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % Param avg (use limo_add_plots to visualize)
             limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_related')
@@ -903,10 +884,8 @@ if strcmpi(AnalysisLevel,'2')
                 'Con_related_single_subjects_mean.mat',...
                 'type','paired','fig',0,'name','Con_diff');
             save('Parameter_difference','Diff')
-            limo_central_tendency_and_ci(limo_file,...
-                'con_1', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_related')
-            limo_central_tendency_and_ci(limo_file,...
-                'con_2', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_unrelated')
+            limo_central_tendency_and_ci(limo_file,  'con_1', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_related')
+            limo_central_tendency_and_ci(limo_file,  'con_2', AvgChanlocs, 'Weighted mean', 'Trimmed mean', [], 'ERPs_unrelated')
             Diff = limo_plot_difference('ERPs_unrelated_single_subjects_Weighted mean.mat',...
                 'ERPs_related_single_subjects_Weighted mean.mat',...
                 'type','paired','fig',0,'name','ERP_diff');
@@ -914,16 +893,11 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N400 = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'P3')
-                        
-            %[~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            %[~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
             for N=size(con1_files,2):-1:1
                 data{1,N} = con2_files{N};
                 data{2,N} = con1_files{N};
             end
-            limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',data, 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
+            limo_random_select('paired t-test', AvgChanlocs, 'LIMOfiles', data, opts_limo_rs{:});
             limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % Param avg (use limo_add_plots to visualize)
             limo_central_tendency_and_ci(con1_file, 1, AvgChanlocs, 'mean', 'Trimmed mean', [],'Con_distractors')
