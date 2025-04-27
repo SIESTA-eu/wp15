@@ -31,7 +31,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mkdir /opt/matlab
   wget https://www.mathworks.com/mpm/glnxa64/mpm -O /opt/matlab/mpm
   chmod +x /opt/matlab/mpm
-  /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB Signal_Processing_Toolbox Statistics_and_Machine_Learning_Toolbox
+  /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB Signal_Processing_Toolbox Statistics_and_Machine_Learning_Toolbox Image_Processing_Toolbox
   ln -s /opt/matlab/bin/matlab /usr/local/bin
   cd /work
   wget https://github.com/sccn/eeglab/archive/refs/tags/2024.2.1.zip
