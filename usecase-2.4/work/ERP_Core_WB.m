@@ -677,7 +677,7 @@ if strcmpi(AnalysisLevel,'2')
         end
 
         if ~contains(OutputLocation,TaskLabel{t})
-            outdir = fullfile(OutputLocation,TaskLabel{t});
+            outdir = fullfile(OutputLocation, 'derivatives', TaskLabel{t});
         else
             outdir = OutputLocation;
         end
