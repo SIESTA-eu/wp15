@@ -62,7 +62,7 @@ In WP15, we have not considered the network and storage aspect on the SIESTA pla
 
 ### For the scrambled data
 
-The scrambled data is needed for the data user to implement and test their analysis pipeline. It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identiiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the scrambled data prior to it being released.
+The scrambled data is needed for the data user to implement and test their analysis pipeline. It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identifiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the privacy level (in terms of different anonymization techniques) of the scrambled data prior to it being released.
 
 ### For the results from the pipeline
 
