@@ -264,7 +264,7 @@ if strcmpi(AnalysisLevel,'1')
     for t = 1:length(TaskLabel)
 
         %% IMPORT
-        outdir = fullfile(OutputLocation,TaskLabel{t});
+        outdir = fullfile(OutputLocation); % ,TaskLabel{t});
         if ~exist(outdir,'dir')
             mkdir(outdir)
         end
@@ -276,21 +276,49 @@ if strcmpi(AnalysisLevel,'1')
             [STUDY, ALLEEG] = pop_importbids(InputDataset, 'bidsevent','on','bidschanloc','on', ...
                 'bidstask',TaskLabel{t},'eventtype', 'value', 'outputdir' ,outdir, 'studyName',TaskLabel{t}, 'subjects', sublist);
         end
-        if length(ALLEEG) == 1
+        
+        if t == 1 % also export metadata
+            addpath([fileparts(which('pop_importbids.m')) filesep 'JSONio']);
+            json = jsonread([InputDataset filesep 'dataset_description.json']);
+            json.DatasetType = 'Derivative';
+            json.Authors = 'Cyril Pernet';
+            json.SourceDatasets = "https://osf.io/9f5w7/files/osfstorage";
+            jsonwrite(fullfile(outdir,'dataset_description.json'),json,'prettyprint','on');
+            % ignore extra files
+            lines = {'*.study', '*.mat'};
+            fid = fopen([outdir filesep '.bidsignore'], 'w');
+            if fid == -1
+                error('Cannot open .bidsignore for writing.');
+            else
+                for i = 1:length(lines)
+                    fprintf(fid, '%s\n', lines{i});
+                end
+                fclose(fid);
+            end
+        end
+
+        if length(ALLEEG) == 1 %#ok<ISCL>
             ALLEEG = eeg_checkset(ALLEEG, 'loaddata');
         end
         ALLEEG = pop_select( ALLEEG, 'nochannel',{'HEOG_left','HEOG_right','VEOG_lower'});
         STUDY = pop_statparams(STUDY, 'default');
-        [STUDY,~,AvgChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on');
+
+        % usually do this - but because it run one subject at a time 
+        % to create the differential privacy results, we just load one that
+        % was precomputed and reuse it all the time
+        % [STUDY,~,AvgChanlocs] = std_prepare_neighbors(STUDY, ALLEEG, 'force', 'on');
         % remove connections 8-9/3 ie P7-P9/F7, 26-27/19 ie P8-P10/F8 and 7-25/22 ie P3-P4/Cz
-        pairs(1,:) = [3 8];   pairs(2,:) = [3 9];
-        pairs(3,:) = [19 26]; pairs(4,:) = [19 27];
-        pairs(5,:) = [7 22];  pairs(6,:) = [25 22];
-        for p=1:6
-            AvgChanlocs.channeighbstructmat(pairs(p,1),pairs(p,2)) = 0;
-            AvgChanlocs.channeighbstructmat(pairs(p,2),pairs(p,1)) = 0;
-        end
-        save(fullfile(outdir, 'AvgChanlocs.mat'),'AvgChanlocs')
+        % pairs(1,:) = [3 8];   pairs(2,:) = [3 9];
+        % pairs(3,:) = [19 26]; pairs(4,:) = [19 27];
+        % pairs(5,:) = [7 22];  pairs(6,:) = [25 22];
+        % for p=1:6
+        %    AvgChanlocs.channeighbstructmat(pairs(p,1),pairs(p,2)) = 0;
+        %    AvgChanlocs.channeighbstructmat(pairs(p,2),pairs(p,1)) = 0;
+        % end
+        % save(fullfile(outdir, [TaskLabel{t} '-AvgChanlocs.mat']),'AvgChanlocs')
+        localdir    = fileparts(which('ERP_Core_WB.m'));
+        AvgChanlocs = load(fullfile(localdir, 'limo-AvgChanlocs.mat'));
+        AvgChanlocs = AvgChanlocs.AvgChanlocs; 
 
         %% Pre-processing
         % for each subject, downsample, clean 50Hz, remove bad channels,
@@ -320,7 +348,7 @@ if strcmpi(AnalysisLevel,'1')
                     EEGTMP = pop_interp(EEGTMP, AvgChanlocs.expected_chanlocs(idx), 'sphericalKang');
                 end
 
-                % ICA cleaning
+               % ICA cleaning
                 if strcmpi(ICAname,'picard')
                     EEGTMP = pop_runica(EEGTMP, 'icatype',ICAname,'maxiter',500,'mode','standard','concatcond','on', 'options',{'pca',EEGTMP.nbchan-1});
                 else 
@@ -339,7 +367,7 @@ if strcmpi(AnalysisLevel,'1')
                 % re-reference
                 EEGTMP = pop_reref(EEGTMP,[],'interpchan','off');
                 EEGTMP = pop_saveset(EEGTMP,'savemode','resave');
-                EEG = eeg_store(EEG, EEGTMP, s);
+                EEG = eeg_store(EEG, EEGTMP, s); % does EEG(s) = EEGTMP but with extra checks
             catch pipe_error
                 error_report{s} = pipe_error.message; %#ok<AGROW>
             end
@@ -400,6 +428,13 @@ if strcmpi(AnalysisLevel,'1')
 
         % output preprocessed files 
         for s=size(EEG,2):-1:1
+            old = fullfile(EEG(s).filepath,EEG(s).filename(1:end-4));
+            EEG(s).setname = 'preprocessed';
+            EEG(s).filename = [EEG(s).filename(1:end-7) 'desc-preprocessed_eeg.set'];
+            EEG(s) = pop_saveset(EEG(s), 'filename', [EEG(s).filename(1:end-7) 'desc-preprocessed_eeg.set'], 'filepath', EEG(s).filepath);
+            STUDY.datasetinfo(s).filename = EEG(s).filename;
+            delete([old '.set']);
+            delete([old '.fdt']);
             files  = dir(EEG(s).filepath);
             filter = arrayfun(@(x) x.isdir==0, files);
             fullfiles = arrayfun(@(x) fullfile(x.folder,x.name), files(filter), 'UniformOutput', false);
@@ -419,9 +454,12 @@ if strcmpi(AnalysisLevel,'1')
             'measure','daterp', 'chanloc',AvgChanlocs,...
             'timelim',analysis_window(t,:),'erase','on',...
             'splitreg','off','interaction','off');
+
         if isempty(STUDY.filepath) % this seems to happen no unknown reason
             STUDY.filepath = outdir;
         end
+        STUDY  = std_checkset(STUDY, EEG);
+        pop_savestudy(STUDY,EEG,'savemode','resave')
 
         % add contrasts - which is study specific
         if strcmpi(TaskLabel{t},'ERN')
@@ -448,13 +486,13 @@ if strcmpi(AnalysisLevel,'1')
                 name    = R{s}(index:index+6); % name
                 s_value = find(arrayfun(@(x) strcmpi(x.subject,name),STUDY.limo.subjects)); % ensure match
                 cond    = unique(STUDY.limo.subjects(s_value).cat_file);
-                limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, ERN(cond));
-                limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, CRN(cond));
-                con1_files{s,:} = fullfile(R{s},'con_1.mat');
-                con2_files{s,:} = fullfile(R{s},'con_2.mat');
+                limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, ERN(cond));
+                limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, CRN(cond));
+                % con1_files{s,:} = fullfile(R{s},'con_1.mat');
+                % con2_files{s,:} = fullfile(R{s},'con_2.mat');
             end
-            writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
-            writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
+            % writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
+            % writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
 
         elseif strcmpi(TaskLabel{t},'N170')
             % there are two analyses
@@ -468,13 +506,14 @@ if strcmpi(AnalysisLevel,'1')
                 fullfile(files.LIMO,'Beta_files_N170_N170_GLM_Channels_Time_WLS.txt'));
 
             for s=1:length(LFiles)
-                limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, CarDiff);
-                limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, FaceDiff);
-                con1_files{s,:} = fullfile(R{s},'con_1.mat');
-                con2_files{s,:} = fullfile(R{s},'con_2.mat');
+                name = R{s}(index:index+6); % name
+                limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, CarDiff);
+                limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, FaceDiff);
+                % con1_files{s,:} = fullfile(R{s},[name '_desc-con_1.mat']);
+                % con2_files{s,:} = fullfile(R{s},[name '_desc-con_2.mat']);
             end
-            writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
-            writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
+            % writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
+            % writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
 
         elseif strcmpi(TaskLabel{t},'N2pc')
            % "111": "Stimulus - target blue, target left, gap at top",
@@ -504,13 +543,13 @@ if strcmpi(AnalysisLevel,'1')
                name    = R{s}(index:index+6); % name
                s_value = find(arrayfun(@(x) strcmpi(x.subject,name),STUDY.limo.subjects)); % ensure match
                cond    = unique(STUDY.limo.subjects(s_value).cat_file);
-               limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, left(cond));
-               limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, right(cond));
-               con1_files{s,:} = fullfile(R{s},'con_1.mat');
-               con2_files{s,:} = fullfile(R{s},'con_2.mat');
+               limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, left(cond));
+               limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, right(cond));
+               % con1_files{s,:} = fullfile(R{s},[name '_desc-con_1.mat']);
+               % con2_files{s,:} = fullfile(R{s},[name '_desc-con_2.mat']);
            end
-           writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
-           writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
+           % writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
+           % writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
 
         elseif strcmpi(TaskLabel{t},'N400')
            % 111 prime word, related word pair, list 1
@@ -533,13 +572,13 @@ if strcmpi(AnalysisLevel,'1')
                name    = R{s}(index:index+6); % name
                s_value = find(arrayfun(@(x) strcmpi(x.subject,name),STUDY.limo.subjects)); % ensure match
                cond    = unique(STUDY.limo.subjects(s_value).cat_file);
-               limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, related(cond));
-               limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, unrelated(cond));
-               con1_files{s,:} = fullfile(R{s},'con_1.mat');
-               con2_files{s,:} = fullfile(R{s},'con_2.mat');
+               limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, related(cond));
+               limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, unrelated(cond));
+               % con1_files{s,:} = fullfile(R{s},[name '_desc-con_1.mat']);
+               % con2_files{s,:} = fullfile(R{s},[name '_desc-con_2.mat']);
            end
-         writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
-         writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
+         % writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
+         % writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
 
         elseif strcmpi(TaskLabel{t},'P3')
          % 11: Stimulus - block target A, trial stimulus A,
@@ -564,22 +603,31 @@ if strcmpi(AnalysisLevel,'1')
              name    = R{s}(index:index+6); % name
              s_value = find(arrayfun(@(x) strcmpi(x.subject,name),STUDY.limo.subjects)); % ensure match
              cond    = unique(STUDY.limo.subjects(s_value).cat_file);
-             limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, distractor(cond));
-             limo_contrast(fullfile(R{s},'Yr.mat'), BFiles{s}, LFiles{s}, 'T', 1, target(cond));
-             con1_files{s,:} = fullfile(R{s},'con_1.mat');
-             con2_files{s,:} = fullfile(R{s},'con_2.mat');
+             limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, distractor(cond));
+             limo_contrast(fullfile(R{s},[name '_desc-Yr.mat']), BFiles{s}, LFiles{s}, 'T', 1, target(cond));
+             % con1_files{s,:} = fullfile(R{s},[name '_desc-con_1.mat']);
+             % con2_files{s,:} = fullfile(R{s},[name '_desc-con_2.mat']);
          end
-         writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
-         writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
-        end
+         % writecell(con1_files,fullfile(files.LIMO,'con1_files.txt'))
+         % writecell(con2_files,fullfile(files.LIMO,'con2_files.txt'))
+        end 
 
+        %% clean-up to format at a BIDS derivatives dataset
+        % move directory up LIMO.mat, betas and con files
         for s=size(EEG,2):-1:1
-            LIMOfiles  = dir(fileparts(files.mat{1}));
-            filter = arrayfun(@(x) x.isdir==0, LIMOfiles);
-            fullfiles = arrayfun(@(x) fullfile(x.folder,x.name), LIMOfiles(filter), 'UniformOutput', false);
-            out.(TaskLabel{t}).participant{s}.glm_files = fullfiles;
-        end        
-        clear STUDY ALLEEG EEG
+            subfolder  = [extractBefore(files.mat{s},[filesep 'derivatives']) cell2mat(extractBetween(files.mat{s},'derivatives','eeg')) 'eeg'];
+            LIMOfiles  = dir(fileparts(files.mat{s}));
+            filter     = arrayfun(@(x) x.isdir==0, LIMOfiles);
+            fullfiles  = arrayfun(@(x) fullfile(x.folder,x.name), LIMOfiles(filter), 'UniformOutput', false);
+            files2move = find(contains(fullfiles,{'LIMO.mat','Betas.mat','con'}));
+            for f=1:length(files2move)
+                [~,filename,ext] = fileparts(fullfiles{files2move(f)});
+                movefile(fullfiles{files2move(f)},fullfile(subfolder,[filename,ext]),'f');                
+                out.(TaskLabel{t}).participant{s}.glm_files{f} = fullfile(subfolder,[filename,ext]);
+            end            
+        end  
+        
+        clear STUDY ALLEEG EEG error_report
         cd(current_folder)
     end
 end
@@ -591,92 +639,42 @@ end
 if strcmpi(AnalysisLevel,'2')
     out.AnalysisLevel = 2;
    
-    % if InputDataset is the root folder of all/some tasks - edit TaskLabel
-    if length(TaskLabel) == 6 % all tasks, ie not specified input
-        % find current folders
-        [~,OutputLocationName] = fileparts(OutputLocation);
-        taskfolders            = dir(InputDataset);
-        taskfolders(1:2)       = [];
-        OutputLocationFolder   = find(arrayfun(@(x) strcmpi(x.name,OutputLocationName), taskfolders));
-        if ~isempty(OutputLocationFolder)
-            taskfolders(OutputLocationFolder) = [];
-        end
-        % check if those are the task folders
-        for t = size(taskfolders,1):-1:1
-            tmp = find(cellfun(@(x) strcmpi(x,taskfolders(t).name), TaskLabel));
-            if ~isempty(tmp)
-                tasksubset(t) = tmp; clear tmp
+    % BIDS derivatives dataset is the input
+    % ---------------------------------------
+    if length(TaskLabel) == 6
+        subjects = dir(fullfile(indir,'sub-*'));
+        if isempty(subjects)
+            error('there are no subjects in the specified input folder')
+        else
+            for s= size(subjects,1):-1:1
+                ses_folders = dir(fullfile(subjects(s).folder,[subjects(s).name filesep 'ses-*']));
+                tasks = arrayfun(@(x) extractAfter(x.name,'ses-'), ses_folders,"UniformOutput",false);
+                checks(:,s) = cellfun(@(x) any(strcmpi(x,tasks)), TaskLabel);
             end
-        end
-        tasksubset(tasksubset==0)=[];
-        if ~isempty(tasksubset)
-            TaskLabel = TaskLabel(tasksubset);
+            TaskLabel(sum(checks,2)==0) = []; % remove missing tasks
         end
     end
 
+    % load neighbouring matrix
+    localdir    = fileparts(which('ERP_Core_WB.m'));
+    AvgChanlocs = load(fullfile(localdir, 'limo-AvgChanlocs.mat'));
+    AvgChanlocs = AvgChanlocs.AvgChanlocs; 
+
     for t = 1:length(TaskLabel)
 
-        % deal with folders
-        if exist(fullfile(InputDataset,TaskLabel{t}),'dir')
-            % default, data are in fileparts(InputDataset),
-            % InputDataset is derivatives folder/task name
-            indir      = fullfile(InputDataset,TaskLabel{t});
-        elseif contains(InputDataset,TaskLabel{t})
-            indir     = InputDataset;
-        else
-            error('Enter the name of a folder containing the task name(s)')
-        end
-
-        if isfile(fullfile(indir,'AvgChanlocs.mat'))
-            tmp = load(fullfile(indir,'AvgChanlocs.mat'));
-            AvgChanlocs = tmp.AvgChanlocs; clear tmp;
-        elseif isfile(fullfile(fileparts(indir),'AvgChanlocs.mat'))
-            tmp = load(fullfile(fileparts(indir),'AvgChanlocs.mat'));
-            AvgChanlocs = tmp.AvgChanlocs; clear tmp;
-        elseif isfile(fullfile(indir,'limo_chanlocs.mat'))
-            AvgChanlocs = load(fullfile(indir,'limo_chanlocs.mat'));
-        elseif isfile(fullfile(indir,'limo_gp_level_chanlocs.mat'))
-            AvgChanlocs = load(fullfile(indir,'limo_gp_level_chanlocs.mat'));
-        else
-            error('missing AvgChanlocs file')
-        end
-        
-        if isempty(AvgChanlocs.channeighbstructmat)
-            % bug found in std_limo to fix
-            AvgChanlocs = AvgChanlocs.expected_chanlocs;
-            if ~all(arrayfun(@(x) any(strcmp(x,{'expected_chanlocs','channeighbstructmat'})), fieldnames(AvgChanlocs)))
-                error('field information missing in channel locations')
-            end
-        end
-
-        % could be that we deal with the STUDY level, but we want LIMO level
-        if exist(fullfile(indir,['derivatives' filesep 'LIMO_' TaskLabel{t}]),"dir")
-            indir = fullfile(indir,'derivatives');
-        end
-
-        if ~contains(OutputLocation,TaskLabel{t})
-            outdir = fullfile(OutputLocation,TaskLabel{t});
+        % output
+        if ~contains(OutputLocation,'group')
+            outdir = fullfile(OutputLocation,'group');mkdir(outdir);
         else
             outdir = OutputLocation;
         end
 
-        if ~contains(outdir,TaskLabel{t}) && ~all(contains(outdir,{'2','level'}))
-            if contains(outdir,TaskLabel{t})
-                outdir = fullfile(outdir,'2nd_level');
-            elseif all(contains(outdir,{'2','level'}))
-                outdir = fullfile(outdir,TaskLabel{t});
-            else
-                outdir = fullfile(outdir,['2nd_level' filesep TaskLabel{t}]);
-            end            
-        end
-        mkdir(outdir);
-        cd(outdir);
-
         % start processing
         if strcmpi(TaskLabel{t},'ERN')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
-
+            
+            % make con_files list manually since 1st and 2nd level are disjointed
+            con1_files = getconfiles(indir,'ERN','1');
+            con2_files = getconfiles(indir,'ERN','2');
             for c = 1:3
                 if c == 1
                     mkdir(fullfile(outdir,'ERN'));
@@ -728,9 +726,9 @@ if strcmpi(AnalysisLevel,'2')
 
         elseif strcmpi(TaskLabel{t},'MMN')
 
+            Beta_files = getBetafiles(indir,'MMN');
             limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'Beta_files_MMN_MMN_GLM_Channels_Time_WLS.txt'), ...
-                'parameter',[1 2], 'analysis_type',...
+                'LIMOfiles',Beta_files, 'parameter',[1 2], 'analysis_type',...
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % ERPs (use limo_add_plots to visualize)
@@ -745,13 +743,12 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).MMN = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N170')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+
+            Beta_files = getBetafiles(indir,'N170');
             mkdir(fullfile(outdir,'Cars_vs_Faces'));
             cd(fullfile(outdir,'Cars_vs_Faces'));
             limo_random_select('paired t-test',AvgChanlocs,...
-                'LIMOfiles',fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'Beta_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
-                'parameter',[2 1], 'analysis_type',...
+                'LIMOfiles',Beta_files, 'parameter',[2 1], 'analysis_type',...
                 'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % ERPs (use limo_add_plots to visualize)
@@ -765,6 +762,8 @@ if strcmpi(AnalysisLevel,'2')
             save('ERP_difference','Diff')
             out.(TaskLabel{t}).N170.Cars_vs_Faces = get_rfxfiles(pwd);
 
+            con1_files = getconfiles(indir,'N170','1');
+            con2_files = getconfiles(indir,'N170','2');
             mkdir(fullfile(outdir,'Cars_vs_Faces_controlled'));
             cd(fullfile(outdir,'Cars_vs_Faces_controlled'));
             for N=size(con1_files,1):-1:1
@@ -810,11 +809,12 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N170.Cars_vs_Faces_Controlled = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N2pc')
+            con1_files = getconfiles(indir,'N2pc','1');
+            con2_files = getconfiles(indir,'N2pc','1');
             labels = arrayfun(@(x) x.labels, AvgChanlocs.expected_chanlocs, 'UniformOutput', false);
             table_channels{1} = labels(1:12)'; table_channels{2} = labels([16 18 19 20 23:30])';
             channels = limo_pair_channels(AvgChanlocs.expected_chanlocs,'pairs',table_channels,'figure','off');
-            limo_ipsi_contra(fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'),...
-                fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'),...
+            limo_ipsi_contra(con1_files,con2_files,...
                 'channellocs',AvgChanlocs,'channelpairs',channels,nboot,tfce)
             limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             load LIMO.mat %#ok<LOAD>
@@ -848,8 +848,8 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N2pc = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N400')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+            con1_files = getconfiles(indir,'N400','1');
+            con2_files = getconfiles(indir,'N400','1');
             for N=size(con1_files,2):-1:1
                 data{1,N} = con1_files{N};
                 data{2,N} = con2_files{N};
@@ -878,8 +878,8 @@ if strcmpi(AnalysisLevel,'2')
             out.(TaskLabel{t}).N400 = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'P3')
-            [~,~,con1_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con1_files.txt'));
-            [~,~,con2_files] = limo_get_files([],[],[],fullfile([indir filesep 'LIMO_' TaskLabel{t}],'con2_files.txt'));
+            con1_files = getconfiles(indir,'P3','1');
+            con2_files = getconfiles(indir,'P3','1');
             for N=size(con1_files,2):-1:1
                 data{1,N} = con2_files{N};
                 data{2,N} = con1_files{N};
@@ -909,6 +909,30 @@ if strcmpi(AnalysisLevel,'2')
         end
         clear STUDY ALLEEG EEG
         cd(current_folder)
+    end
+end
+
+% routine to list beta files
+function getBetafiles(indir,task)
+
+subjects = dir(fullfile(indir,'sub-*'));
+for s= size(subjects,1):-1:1
+    foundfile = dir(fullfile(subjects(s).folder,[subjects(s).name filesep 'ses-' task ...
+        filesep 'eeg' filesep 'sub*-Betas.mat']));
+    if ~isempty(foundfile)
+        Beta_file{s} = fullfile(foundfile.folder,foundfile.name);
+    end
+end
+
+% routine to list con files
+function getconfiles(indir,task,connumber)
+
+subjects = dir(fullfile(indir,'sub-*'));
+for s= size(subjects,1):-1:1
+    foundfile = dir(fullfile(subjects(s).folder,[subjects(s).name filesep 'ses-' task ...
+        filesep 'eeg' filesep 'sub*-con_' connumber '.mat']));
+    if ~isempty(foundfile)
+        con_file{s} = fullfile(foundfile.folder,foundfile.name);
     end
 end
 
