@@ -1,0 +1,42 @@
+{
+    "BA1": {
+        "Description": "Primary Somatosensory Cortex",
+        "Units": "mm2"
+    },
+    "BA2": {
+        "Description": "Somatosensory Cortex",
+        "Units": "mm2"
+    },
+    "BA3": {
+        "Description": "Primary Somatosensory Cortex",
+        "Units": "mm2"
+    },
+    "BA4": {
+        "Description": "Primary Motor Cortex",
+        "Units": "mm2"
+    },
+    "BA6": {
+        "Description": "Premotor Cortex",
+        "Units": "mm2"
+    },
+    "BA9": {
+        "Description": "Dorsolateral Prefrontal Cortex",
+        "Units": "mm2"
+    },
+    "BA17": {
+        "Description": "Primary Visual Cortex (V1)",
+        "Units": "mm2"
+    },
+    "BA22": {
+        "Description": "Superior Temporal Gyrus (Wernicke's)",
+        "Units": "mm2"
+    },
+    "BA44": {
+        "Description": "Pars Opercularis (Broca's)",
+        "Units": "mm2"
+    },
+    "BA46": {
+        "Description": "Dorsolateral Prefrontal Cortex",
+        "Units": "mm2"
+    }
+}

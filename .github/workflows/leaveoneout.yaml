@@ -1,0 +1,31 @@
+name: leaveoneout tests
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infrastructure/leaveoneout/**'
+      - '!**.md'
+  pull_request:
+    paths:
+      - 'infrastructure/leaveoneout/**'
+      - '!**.md'
+
+jobs:
+  tests:
+    name: Run pytests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure/leaveoneout
+
+    steps:
+      - name: Checkout v4
+        uses: actions/checkout@v4
+        
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest pandas
+          
+      - name: Run tests
+        run: pytest test_leaveoneout.py -v -s

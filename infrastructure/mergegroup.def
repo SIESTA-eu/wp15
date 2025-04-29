@@ -3,7 +3,7 @@ From: python:3-slim
 
 %help
 
-    The general form to run the mergesubjects command is:
+    The general form to run the mergegroup command is:
         apptainer run mergegroup.sif <input dir 1> <input dir 2> <input dir 3> ... <output dir> <whitelist.txt>"
 
 %labels
@@ -20,7 +20,7 @@ From: python:3-slim
     echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
     echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
     DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-    pip install more_itertools numpy nibabel h5py scipy --quiet
+    pip install more_itertools numpy nibabel h5py scipy tqdm --quiet
   
 %environment
     export LC_ALL=C

@@ -2,26 +2,40 @@
 
 _This contains the draft end-user documentation for the medical imaging use case. Eventually it should move elsewhere and be integrated with the other use cases._
 
-The 2nd use case in the SIESTA project is on medical imaging and restricts its focus to neuroimaging. In SIESTA it is dealt with in work package 15. Hence sometimes we refer to it as "wp15" and at other moments as "usecase-2".
+The 2nd use case in the [SIESTA](https://eosc-siesta.eu)  project is on medical imaging and restricts its focus to neuroimaging. In SIESTA it is dealt with in work package 15. Hence sometimes we refer to it as "wp15" and at other moments as "usecase-2".
+
+## Scope
+
+The [SIESTA](https://eosc-siesta.eu) project aims to develop and implement Secure Interactive Environments for SensiTive data Analytics. So it is about the **analysis** of **sensitive** data, not about straight-forward data sharing where one party uploads data and another party downloads that data. It is also not about a general-purpose data analysis platform for any type of data, but specifically for sensitive data.
+
+For straight-forward data sharing you should look into research data repositories, such as [OpenNeuro](https://openneuro.org), [EBRAINS](https://search.kg.ebrains.eu/?category=Dataset), the [Radboud Data Repository](https://data.ru.nl), [Public-nEUro](https://publicneuro.eu), [DataVerse](https://dataverse.org/installations), or [Zenodo](https://zenodo.org). [Re3data](https://www.re3data.org) is a registry with many research data repositories.
+
+For generic online platforms to analyze your own data or data that you have downloaded you can look at [Brainlife](https://brainlife.io/about/), the [NeuroScience Gateway](https://nsgprod.sdsc.edu:8443/portal2/login!input.action), or at local compute facilities offered at your institution.
 
 ## Data
 
-In this work package we distinguish four types of data:
+The GDPR defines anonymous or personal data. Personal data means any information relating to an identified or identifiable natural person (Art. 4). GDPR further specifies _direct_ and _indirect_ identifiable data. The difference between these lies in how easily the information can identify an individual. Direct personal data explicitly identifies a person (e.g., name, passport number, email, or phone number). Indirect personal data (such as a physiological measurement or a brain scan) does not identify someone on its own but can do so when combined with other information, especially when it is unique to the person, long-term stable, and if matching data can be accessed in other databases (like fingerprints).
 
-1. Source or input data. This type of data typically concerns original data that, alongside features of scienctific interest, contains a rich set of _indirect_ personal data (but no _direct_ personal data). When combined with other data sources, indirect personal data may allow for re-identification of direct personal data (such as a subject's name or birthdate), and hence makes the input data unfit for unrestricted public sharing.
-2. Scrambled or synthetic data. This type of data is derived from the input data, such that the indirect personal features have been removed (to a varying degree) from the data, while the scientific features of interest are preserved sufficiently to allow implementing and testing an analysis pipeline.
-3. Results from the pipeline. The results of the pipeline applied to the scrambled data are available to the data user, but the results of the pipeline applied to the input data are not directly accessible.
-4. Differentially private output data. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally.
+In this work package we deal with data that is acquired for research purposes, represented as digital datasets in which data from multiple individual participants is combined. Since the data is acquired for medical neuroimaging research purposes, we assume that it pertains to indirect personal data. Participants can be considered to represent individual records in the dataset. The data is assumed to be homogeneous, i.e., the same variables are collected for all participants.
+
+We distinguish two representations of the data that serves as the input of the analysis pipeline:
+
+1. Source or input data. This typically concerns unprocessed or minimally processed research data (such as EEG and MEG, MRI) and corresponds to the data of scienctific interest. This data contains a rich set of _indirect_ personal data (but no _direct_ personal data). When linked with other data sources, indirect personal data may allow for re-identification of direct personal data (such as a subject's name or birthdate), and hence makes the input data unfit for unrestricted public sharing.
+2. Scrambled or synthetic input data. This type of data is derived from the input data, such that the indirect personal features have been removed (to a varying degree) from the data, while the scientific features of interest are preserved sufficiently to allow implementing and testing an analysis pipeline.
+
+We distinguish three representations of the data that results as output from the analysis pipeline:
+
+1. Results from the scrambled data. This follows from the pipeline evaluated on the scrambled data. Devpending on the amount of scrambling, this data may or may not be complete nonsense. It can however be used to evaluate whether the pipeline computations were performed correctly and to organize and identify the desired output data. The results of the pipeline applied to the scrambled data are directly available to the data user.
+2. Actual results from the input data. The results of the pipeline applied to the input data are not directly accessible.
+3. Differentially private results. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private and to prevent any data leakage. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally.
 
 ## User roles
 
-Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles:
+Permission for accessing data is defined by the role of the user. In this work package we distinguish three roles. For each of the roles we have provided specific documentation (see links below). If you fall within one of the specific roles, please read the documentation aimed at your role first. It may contribute to your overall understanding to subsequently also go over the documentation for the other roles.
 
 1. [Data rights holder](data_rights_holder.md)
 2. [Data user](data_user.md)
 3. [Platform operator](platform_operator.md)
-
-Each of these roles has its own section in the documentation, please click on the respective links.
 
 ## Data flow
 

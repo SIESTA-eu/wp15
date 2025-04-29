@@ -2,13 +2,13 @@ function analyze_group(inputprefix, outputprefix)
 
     % This code is shared under the CC0 license
     %
-    % Copyright (C) 2024, SIESTA workpackage 15 team
+    % Copyright (C) 2024-2025, SIESTA workpackage 15 team
   
     if ~exist(outputprefix, 'dir')
         mkdir(outputprefix);
     end
 
-    grouppath = fullfile(outputprefix, 'group');
+    grouppath = fullfile(outputprefix, 'derivatives', 'group');
     mkdir(grouppath);
 
     warning off

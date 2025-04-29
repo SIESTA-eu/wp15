@@ -39,6 +39,9 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv fieldtrip-master fieldtrip
   rm master.zip
 
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
 %environment
   export LC_ALL=C
 

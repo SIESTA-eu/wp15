@@ -38,10 +38,15 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push ${GITHUB_WORKSPACE}/usecase-2.1/download.sif oras://ghcr.io/${NAMESPACE}/download-2.1.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/usecase-2.1/download.sif oras://ghcr.io/${NAMESPACE}/download-2.1.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/usecase-2.2/download.sif oras://ghcr.io/${NAMESPACE}/download-2.2.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/usecase-2.2/download.sif oras://ghcr.io/${NAMESPACE}/download-2.2.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/usecase-2.3/download.sif oras://ghcr.io/${NAMESPACE}/download-2.3.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/usecase-2.3/download.sif oras://ghcr.io/${NAMESPACE}/download-2.3.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/usecase-2.4/download.sif oras://ghcr.io/${NAMESPACE}/download-2.4.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/usecase-2.4/download.sif oras://ghcr.io/${NAMESPACE}/download-2.4.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/usecase-2.5/download.sif oras://ghcr.io/${NAMESPACE}/download-2.5.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/usecase-2.5/download.sif oras://ghcr.io/${NAMESPACE}/download-2.5.sif:latest
 
   build-pipeline-2-1:
     name: Pipeline 2.1
@@ -71,6 +76,7 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push usecase-2.1/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.1.sif:${GITHUB_REF_NAME}
+          apptainer push usecase-2.1/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.1.sif:latest
 
   build-pipeline-2-3:
     name: Pipeline 2.3
@@ -100,6 +106,7 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push usecase-2.3/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.3.sif:${GITHUB_REF_NAME}
+          apptainer push usecase-2.3/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.3.sif:latest
 
   build-pipeline-2-4:
     name: Pipeline 2.4
@@ -129,6 +136,7 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push usecase-2.4/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.4.sif:${GITHUB_REF_NAME}
+          apptainer push usecase-2.4/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.4.sif:latest
 
   build-pipeline-2-5:
     name: Pipeline 2.5
@@ -158,6 +166,7 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push usecase-2.5/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.5.sif:${GITHUB_REF_NAME}
+          apptainer push usecase-2.5/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.5.sif:latest
 
   build-infrastructure:
     name: Infrastructure containers
@@ -185,6 +194,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build privacy.sif          privacy.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build singlesubject.sif    singlesubject.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build leaveoneout.sif      leaveoneout.def
+          cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build cleanup.sif          cleanup.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build mergesubjects.sif    mergesubjects.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build mergegroup.sif       mergegroup.def
           cd ${GITHUB_WORKSPACE}/infrastructure && apptainer build calibratenoise.sif   calibratenoise.def
@@ -194,10 +204,20 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/scramble.sif         oras://ghcr.io/${NAMESPACE}/scramble.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/scramble.sif         oras://ghcr.io/${NAMESPACE}/scramble.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/privacy.sif          oras://ghcr.io/${NAMESPACE}/privacy.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/privacy.sif          oras://ghcr.io/${NAMESPACE}/privacy.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/singlesubject.sif    oras://ghcr.io/${NAMESPACE}/singlesubject.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/singlesubject.sif    oras://ghcr.io/${NAMESPACE}/singlesubject.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/leaveoneout.sif      oras://ghcr.io/${NAMESPACE}/leaveoneout.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/leaveoneout.sif      oras://ghcr.io/${NAMESPACE}/leaveoneout.sif:latest
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/cleanup.sif          oras://ghcr.io/${NAMESPACE}/cleanup.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/cleanup.sif          oras://ghcr.io/${NAMESPACE}/cleanup.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergesubjects.sif    oras://ghcr.io/${NAMESPACE}/mergesubjects.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergesubjects.sif    oras://ghcr.io/${NAMESPACE}/mergesubjects.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergegroup.sif       oras://ghcr.io/${NAMESPACE}/mergegroup.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/mergegroup.sif       oras://ghcr.io/${NAMESPACE}/mergegroup.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/calibratenoise.sif   oras://ghcr.io/${NAMESPACE}/calibratenoise.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/calibratenoise.sif   oras://ghcr.io/${NAMESPACE}/calibratenoise.sif:latest
           apptainer push ${GITHUB_WORKSPACE}/infrastructure/addnoise.sif         oras://ghcr.io/${NAMESPACE}/addnoise.sif:${GITHUB_REF_NAME}
+          apptainer push ${GITHUB_WORKSPACE}/infrastructure/addnoise.sif         oras://ghcr.io/${NAMESPACE}/addnoise.sif:latest

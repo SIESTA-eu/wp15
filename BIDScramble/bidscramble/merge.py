@@ -11,45 +11,51 @@ from typing import List
 from pathlib import Path
 
 
-def merge(outputdir: str, inputdirs: List[str]):
+def merge(inputdirs: List[str], outputdir: str):
 
     outputdir = Path(outputdir)
     inputdirs = [Path(inputdir) for inputdir in inputdirs]
-    table     = pd.DataFrame().rename_axis('participant_id')
-
-    # Copy all root files except the participants tsv-file
     outputdir.mkdir(exist_ok=True)
-    for item in inputdirs[0].iterdir():
-        if item.is_file() and item.name != 'participants.tsv':
-            shutil.copy(item, outputdir)
 
-    # Copy all root derivative files and recursively merge all derivative sub-folders
-    if (inputdirs[0]/'derivatives').is_dir():       # NB: It is assumed that all derivative data is identically present in all input directories
-        (outputdir/'derivatives').mkdir()
-        for derivative in (inputdirs[0]/'derivatives').iterdir():
-            if derivative.is_file():
-                print(f"WARNING: merging unexpected file: {derivative}")
-                shutil.copy(derivative, outputdir/'derivatives')
-            else:
-                merge(outputdir/'derivatives'/derivative.name, [inputdir/'derivatives'/derivative.name for inputdir in inputdirs])
+    if (outputdir/'participants.tsv').is_file():
+        table = pd.read_csv(outputdir/'participants.tsv', sep='\t', dtype=str, index_col='participant_id')
+    else:
+        table = pd.DataFrame().rename_axis('participant_id')
 
-    # Copy all participant folders
     for inputdir in inputdirs:
+        for item in inputdir.iterdir():
 
-        participants_tsv = inputdir/'participants.tsv'
-        if participants_tsv.is_file():
-            print(f"Merging: {participants_tsv}")
-            table      = pd.concat([table, pd.read_csv(participants_tsv, sep='\t', dtype=str, index_col='participant_id')])
-            duplicates = table.index[table.index.duplicated()].unique()
-            if not duplicates.empty:
-                raise Exception(f"ERROR: Got duplicate participant IDs {duplicates.tolist()} when merging: {inputdir}")
+            if item.name == 'derivatives':
+                (outputdir/'derivatives').mkdir(exist_ok=True)
+                for derivative in item.iterdir():
+                    if derivative.is_file():
+                        print(f"WARNING: merging unexpected file: {derivative}")
+                        shutil.copy(derivative, outputdir/'derivatives')
+                    else:
+                        merge([derivative], outputdir/'derivatives'/derivative.name)
 
-        for subdir in inputdir.glob('sub-*'):
-            print(f"Merging: {subdir.name} -> {outputdir}")
-            shutil.copytree(subdir, outputdir/subdir.name)
+            elif item.name == 'sourcedata':
+                (outputdir/'sourcedata').mkdir(exist_ok=True)
+                merge([item], outputdir/'sourcedata')
+
+            elif item.name == 'participants.tsv':
+                print(f"Merging: {item}")
+                table = pd.concat([table, pd.read_csv(item, sep='\t', dtype=str, index_col='participant_id')])
+                duplicates = table.index[table.index.duplicated()].unique()
+                if not duplicates.empty:
+                    raise Exception(f"ERROR: Got duplicate participant IDs {duplicates.tolist()} when merging: {inputdir}")
+
+            elif item.is_dir():
+                print(f"Merging: {item.name} -> {outputdir}")
+                shutil.copytree(item, outputdir/item.name, dirs_exist_ok=True)
+
+            elif not (outputdir/item.name).exists():
+                print(f"Merging: {item.name} -> {outputdir/item.name}")
+                shutil.copyfile(item, outputdir/item.name)
 
     # Save the merged participants table to disk
     if not table.empty:
+        print(f"Saving merged table: {outputdir}/participants.tsv")
         table.replace('', 'n/a').to_csv(outputdir/'participants.tsv', sep='\t', encoding='utf-8', na_rep='n/a')
 
 
@@ -58,9 +64,9 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__,
                                      epilog='examples:\n'
-                                            '  merge outputdir singlesubject-1  singlesubject-2  singlesubject-3\n ')
-    parser.add_argument('outputdir', help='The output directory with the merged data')
+                                            '  merge singlesubject-1  singlesubject-2  singlesubject-3 outputdir\n ')
     parser.add_argument('inputdirs', help='The list of BIDS (or BIDS-like) input directories with the partial (e.g. single-subject) data', nargs='+')
+    parser.add_argument('outputdir', help='The output directory with the merged data')
 
     # Parse the input arguments
     args = parser.parse_args()

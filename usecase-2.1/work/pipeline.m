@@ -15,7 +15,7 @@ function pipeline(varargin)
 
 % This code is shared under the CC0 license
 %
-% Copyright (C) 2024, SIESTA workpackage 15 team
+% Copyright (C) 2024-2025, SIESTA workpackage 15 team
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parse the command-line options
@@ -117,6 +117,44 @@ if options.verbose
   disp(options);
 end
 
+% Create the output directory and its parents if they don't exist
+if ~exist(options.outputdir, 'dir')
+  mkdir(options.outputdir);
+end
+
+% Write the metadata about the dataset to a JSON file in line with the BIDS standard
+% https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#dataset-description
+dataset_description = struct(...
+  'Name', 'SIESTA Use Case 2.1', ...
+  'BIDSVersion', '1.10.0', ...
+  'DatasetType', 'derivative', ...
+  'License', 'CC0', ... % same as input dataset
+  'Authors', {{'SIESTA workpackage 15 team'}}, ...
+  'Acknowledgements', {{'SIESTA workpackage 15 team'}}, ...
+  'HowToAcknowledge', {{'Please cite the SIESTA paper'}}, ...
+  'Funding', {{'Horizon Europe research and innovation programme grant agreement No. 101131957'}}, ...
+  'ReferencesAndLinks', {{'https://eosc-siesta.eu', 'https://github.com/SIESTA-eu/wp15'}}, ...
+  'SourceDatasets', {struct(...
+      'DOI', '10.18112/openneuro.ds004148.v1.0.1', ... % FIXME, the DOI of the input dataset should be inserted here
+      'Version', '1.0.1' ...
+  )}, ...
+  'GeneratedBy', {struct(...
+      'Name', 'MATLAB version of SIESTA use case 2.1', ...
+      'Description', 'This code computes averages from the participants.tsv file', ...
+      'Version', 'x.y.z', ... % FIXME, the tagged version number should be inserted here 
+      'Container', struct(...
+          'Type', 'apptainer', ...
+          'Tag', 'latest', ... % FIXME, the tagged version number should be inserted here
+          'URI', 'oras://ghcr.io/siesta-eu/pipeline-2.1.sif:latest' ...
+      ) ...
+  )} ...
+);
+
+dataset_description_json = fullfile(options.outputdir, 'dataset_description.json');
+fid = fopen(dataset_description_json, 'w', 'n', 'UTF-8');
+fprintf(fid, '%s', jsonencode(dataset_description, 'PrettyPrint', true));
+fclose(fid);
+
 inputfile = fullfile(options.inputdir, 'participants.tsv');
 participants = readtable(inputfile, 'FileType', 'text', 'Delimiter', '\t', 'VariableNamingRule', 'preserve');
 
@@ -154,10 +192,10 @@ if strcmp(options.level, 'participant')
   end
   
 elseif strcmp(options.level, 'group')
-  outputfile = fullfile(options.outputdir, 'group', 'results.tsv');
+  outputfile = fullfile(options.outputdir, 'derivatives', 'group', 'results.tsv');
   
   % create the group output directory and its parents if they don't exist
-  [success, message] = mkdir(fullfile(options.outputdir, 'group'));
+  [success, message] = mkdir(fullfile(options.outputdir, 'derivatives', 'group'));
   if ~success
     error(message);
   end

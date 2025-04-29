@@ -28,4 +28,4 @@ Stage: final
     pip install wp15/BIDScramble[fif]
 
 %runscript
-    exec scramble $@
+    exec scramble "$@"

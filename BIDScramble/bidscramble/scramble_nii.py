@@ -61,7 +61,7 @@ def scramble_nii(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
         inputimg: nib.ni1.Nifti1Image = nib.load(inputfile)
         data   = inputimg.get_fdata()
         voxdim = inputimg.header['pixdim'][1:4]
-        if data.ndim < 3 and method in ('diffuse', 'wobble'):
+        if data.ndim < 3 and method in ('scatter', 'wobble'):
             tqdm.write(f"WARNING: {inputfile} only has {data.ndim} image dimensions (must be 3 or more), aborting '{method}' scrambling...")
             continue
 
@@ -78,7 +78,7 @@ def scramble_nii(inputdir: str, outputdir: str, select: str, bidsvalidate: bool,
             sigma = list(abs(fwhm/voxdim/2.355)) + [0]*4         # No smoothing over any further dimensions such as time (Nifti supports up to 7 dimensions)
             data  = sp.ndimage.gaussian_filter(data, sigma[0:data.ndim], mode='nearest')
 
-        elif method == 'diffuse':
+        elif method == 'scatter':
             window = abs(np.int16(2 * radius / voxdim))                     # Size of the sliding window
             step   = [int(d/2) or 1 for d in window]                        # Sliding step (NB: int >= 1): e.g. 1/4 of the size of the sliding window (to speed up)
             tqdm.write(f"window: {window}\nstep: {step}")

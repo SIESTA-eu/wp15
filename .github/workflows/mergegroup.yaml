@@ -1,0 +1,32 @@
+name: mergegroup tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'infrastructure/mergegroup/**'
+      - '!**.md'
+  pull_request:
+    paths:
+      - 'infrastructure/mergegroup/**'
+      - '!**.md'
+
+jobs:
+  tests:
+    name: Run pytests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infrastructure/mergegroup
+
+    steps:
+      - name: Checkout v4
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pytest pandas h5py scipy nibabel more_itertools tqdm --quiet
+      
+      - name: Run tests
+        run: pytest test_mergegroup.py -v -s

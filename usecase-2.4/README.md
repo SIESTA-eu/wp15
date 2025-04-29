@@ -1,6 +1,6 @@
-# SIESTA - work package 15 - use case 2.4
+# SIESTA - work package 15 - use case 2.4 (Time series)
 
-This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](../docs/README.md). In short, it consists of these steps:
 
 1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
 2. the _data user_ implementing and testing the pipeline on the scrambled version
@@ -37,7 +37,7 @@ pip install osfclient
 mkdir data/usecase-2.4
 cd data/usecase-2.4
 
-osf -p 9f5w7 clone download                                 # this writes to a subdirectory contained in the directory "download" 
+osf -p 9f5w7 clone download                                 # this writes to a subdirectory contained in the directory "download"
 mv download/osfstorage/ERP_CORE_BIDS_Raw_Files ./input      # move and rename the subdirectory to "input"
 rm -rf download                                             # this is now empty
 ```
@@ -73,11 +73,21 @@ The data user's pipeline implements the [Event-Related Potential](https://en.wik
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes 3.3 GB of RAM, 1290 seconds per subject, and results in 220 MB of temporary data per subject.
+
+There are 39 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
 
-The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
+The `whitelist.txt` file contains a complete list of the output data that is to be shared.
 
 ```console
 cd wp15/usecase-2.4
@@ -102,23 +112,28 @@ rm 2024.2.1.zip
 git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
 mv limo_tools           eeglab/plugins/limo_tools
 
+# clone repo and checkout a version that is known to work
+git clone https://github.com/sccn/zapline-plus
+cd zapline-plus
+git checkout 18d4eec
+cd ../
+mv zapline-plus         eeglab/plugins/zapline-plus
+
 wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/bva-io1.73.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/firfilt2.8.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/ICLabel1.6.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/clean_rawdata2.91.zip
-wget https://sccn.ucsd.edu/eeglab/plugins/zapline-plus1.2.1.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/picard-matlab.zip
 wget https://sccn.ucsd.edu/eeglab/plugins/bids-matlab-tools8.0.zip
 
-unzip fieldtrip-lite-20240111.zip 
-unzip bva-io1.73.zip 
-unzip firfilt2.8.zip 
-unzip ICLabel1.6.zip 
-unzip clean_rawdata2.91.zip 
-unzip zapline-plus1.2.1.zip 
-unzip picard-matlab.zip 
-unzip bids-matlab-tools8.0.zip 
+unzip fieldtrip-lite-20240111.zip
+unzip bva-io1.73.zip
+unzip firfilt2.8.zip
+unzip ICLabel1.6.zip
+unzip clean_rawdata2.91.zip
+unzip picard-matlab.zip
+unzip bids-matlab-tools8.0.zip
 
 rm *.zip
 
@@ -127,7 +142,6 @@ mv bva-io               eeglab/plugins/bva-io1.73
 mv firfilt              eeglab/plugins/firfilt2.8
 mv ICLabel              eeglab/plugins/ICLabel1.6
 mv clean_rawdata        eeglab/plugins/clean_rawdata2.91
-mv zapline-plus-1.2.1   eeglab/plugins/apline-plus1.2.1
 mv picard-matlab        eeglab/plugins/PICARD1.0
 mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 ```
@@ -155,7 +169,7 @@ Once all is installed, it should look like this
 │   |   └── ICLabel1.6
 │   |   └── limo_tools
 │   |   └── PICARD1.0
-│   |   └── zapline-plus1.2.1
+│   |   └── zapline-plus
 │   │   └── [..]
 ├── input
 │   ├── CHANGES

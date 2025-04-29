@@ -4,7 +4,7 @@ from bidscramble.merge import merge
 
 def test_merge(tmp_path):
 
-    # Create 3 inputdirs with 1, 2 and 3 subjects, respectively
+    # Create 3 inputdirs + derivatives with 1, 2 and 3 subjects, respectively
     for idx in range(1, 4):
         table = pd.DataFrame().rename_axis('participant_id')
         inputdir = tmp_path/f"input-{idx}"
@@ -23,7 +23,7 @@ def test_merge(tmp_path):
         shutil.copytree(inputdir, derivative, ignore=shutil.ignore_patterns('derivatives'))
 
     # Merge the inputdirs
-    merge(merged := tmp_path/'merged', [tmp_path/f"input-{idx}" for idx in range(1, 4)])
+    merge([tmp_path/f"input-{idx}" for idx in range(1, 4)], merged := tmp_path/'merged')
 
     assert len(list(merged.iterdir()))                               == 9       # 6 subjects + derivatives + README + participants.tsv
     assert len(list(merged.glob('sub-*')))                           == 6       # 6 subjects

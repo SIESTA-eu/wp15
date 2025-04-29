@@ -1,4 +1,4 @@
-# SIESTA - work package 15 - use case 2.5
+# SIESTA - work package 15 - use case 2.5 (4D imaging space * time)
 
 This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
 
@@ -93,6 +93,16 @@ The data user's pipeline implements an SPM analysis on fMRI data that was record
 
 The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
 
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes 2.2 GB of RAM, about 900 seconds per subject, and results in 685 GB of temporary data per subject in the output folder + an unspecified amount of anatomical image segmentation related intermediate data written into the input folder.
+
+There are 44(?) subjects, 27 of which make it through the participant pipeline.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The to-be-shared data in the output folder has the following directory structure:
@@ -127,7 +137,7 @@ cd wp15/usecase-2.5
 wget https://github.com/spm/spm12/archive/refs/tags/r7771.zip
 unzip r7771.zip
 mv spm12-r7771 spm12
-rm r7771.zip 
+rm r7771.zip
 ```
 
 ### Testing the pipeline

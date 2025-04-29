@@ -1,6 +1,6 @@
-# SIESTA - work package 15 - use case 2.3
+# SIESTA - work package 15 - use case 2.3 (Time series)
 
-This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](../docs/README.md). In short, it consists of these steps:
 
 1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
 2. the _data user_ implementing and testing the pipeline on the scrambled version
@@ -16,7 +16,7 @@ In the following it is assumed that the wp15 repository with the code for all us
 
 The [input dataset](https://doi.org/10.18112/openneuro.ds000117.v1.0.6) is a multi-subject, multi-modal neuroimaging dataset that is described in detail in the accompanying [data publication](https://doi.org/10.1038/sdata.2015.1). It includes structural and functional MRI, MEG, and EEG data that was recorded during an experimental task on face processing.
 
-The input data consists of 1671 files with a combined size of 84.82GB and can be downloaded using [datalad](https://www.datalad.org). 
+The input data consists of 1671 files with a combined size of 84.82GB and can be downloaded using [datalad](https://www.datalad.org).
 
 ### Data transfer
 
@@ -79,11 +79,21 @@ The data user's pipeline implements an Event-Related Field (ERF) analysis on [Ma
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes 3.4 GB of RAM, 130 seconds per subject, and results in 2.2 GB of temporary data per subject.
+
+There are 16 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes 3.65 GB of RAM, 2500 seconds, and results in 33 GB of temporary data per leave-one-out sample.
+
 ### Output data
 
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
 
-The `whitelist.txt` file contains a complete list of the output data that is to be shared. 
+The `whitelist.txt` file contains a complete list of the output data that is to be shared.
 
 ```console
 cd wp15/usecase-2.3

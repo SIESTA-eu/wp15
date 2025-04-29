@@ -65,20 +65,23 @@ examples:
 #### Action: stub
 
 ```console
-usage: scramble inputdir outputdir stub [-h] [-d] [-b] [-s PATTERN]
+usage: scramble inputdir outputdir stub [-h] [-d] [-b] [-s PATTERN] [-a {yes,no}]
 
-Creates a copy of the input directory in which all files are empty stubs. Exceptions to this are the
-'dataset_description.json', 'README', 'CHANGES', 'LICENSE' and 'CITATION.cff' files, which are copied over and
-updated if possible.
+Creates a copy of the input directory in which all files are empty stubs. Optionally modality agnostic BIDS files
+are copied over (with content).
 
 options:
-  -h, --help            Show this help message and exit
+  -h, --help            show this help message and exit
   -d, --dryrun          Do not save anything, only print the output filenames in the terminal (default: False)
   -b, --bidsvalidate    If given, all input files are checked for BIDS compliance when first indexed, and
                         excluded when non-compliant (as in pybids.BIDSLayout) (default: False)
   -s PATTERN, --select PATTERN
                         A fullmatch regular expression pattern that is matched against the relative path of the
                         input data. Files that match are scrambled and saved in outputdir (default: (?!\.).*)
+  -a {yes,no}, --agnostics {yes,no}
+                        If yes, in addition to the included files (see `--select` for usage), add all modality
+                        agnostic files from the input directory (such as participants.tsv, code, etc.) (default:
+                        yes)
 
 examples:
   scramble inputdir outputdir stub
@@ -146,18 +149,18 @@ examples:
 
 ```console
 usage: scramble inputdir outputdir nii [-h] [-d] [-b] [-s PATTERN] [-c [SPECS]]
-                                       {null,blur,permute,diffuse,wobble} ...
+                                       {null,blur,permute,scatter,wobble} ...
 
 Adds scrambled versions of the NIfTI files in the input directory to the output directory. If no
 scrambling method is specified, the default behavior is to null all image values.
 
 positional arguments:
-  {null,blur,permute,diffuse,wobble}
+  {null,blur,permute,scatter,wobble}
                         Scrambling method (default: null). Add -h, --help for more information
     null                Replaces all values with zeros
     blur                Apply a 3D Gaussian smoothing filter
     permute             Perform random permutations along one or more image dimensions
-    diffuse             Perform random permutations using a sliding 3D permutation kernel
+    scatter             Perform random permutations using a sliding 3D permutation kernel
     wobble              Deform the images using 3D random waveforms
 
 options:
@@ -176,8 +179,8 @@ options:
 
 examples:
   scramble inputdir outputdir nii
-  scramble inputdir outputdir nii diffuse -h
-  scramble inputdir outputdir nii diffuse 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'
+  scramble inputdir outputdir nii scatter -h
+  scramble inputdir outputdir nii scatter 2 -s 'sub-.*_MP2RAGE.nii.gz' -c '--mem=5000 --time=0:20:00'
   scramble inputdir outputdir nii wobble -a 2 -f 1 8 -s 'sub-.*_T1w.nii'
 ```
 
@@ -266,7 +269,7 @@ examples:
 #### Action: pseudo
 
 ```console
-usage: scramble inputdir outputdir pseudo [-h] [-d] [-b] [-s PATTERN] [-p PATTERN] [-r {yes,no}]
+usage: scramble inputdir outputdir pseudo [-h] [-d] [-b] [-s PATTERN] [-p PATTERN] [-a {yes,no}]
                                           {random,permute,original}
 
 Adds pseudonymized versions of the input directory to the output directory, such that the subject label is
@@ -286,33 +289,34 @@ options:
                         input data. Files that match are scrambled and saved in outputdir (default: (?!\.).*)
   -p PATTERN, --participant PATTERN
                         The findall() regular expression pattern that is used to extract the subject label from
-                        the relative filepath. NB: Do not change this if the input data is in BIDS (default:
-                        ^sub-(.*?)(?:/|$).*
-  -r {yes,no}, --rootfiles {yes,no}
-                        In addition to the included files (see `--select` for usage), include all files in the
-                        root of the input directory (such as participants.tsv, etc) (default: yes)
+                        the relative filepath. NB: Do not change this if the input data is in BIDS format
+                        (default: ^sub-(.*?)(?:/|$).*)
+  -a {yes,no}, --agnostics {yes,no}
+                        If yes, in addition to the included files (see `--select` for usage), pseudomymize all
+                        modality agnostic files in the input directory (such as participants.tsv, code, etc.)
+                        (default: yes)
 
 examples:
-  scramble inputdir outputdir         pseudo
-  scramble inputdir outputdir_remove1 pseudo random   -s '(?!sub-003(/|$)).*' 
-  scramble inputdir outputdir_keep1   pseudo original -s 'sub-003/.*'
+  scramble inputdir outputdir pseudo
+  scramble inputdir outputdir_remove1 pseudo random  -s '(?!sub-003(/|$)).*'
+  scramble inputdir outputdir_keep1 pseudo original -s 'sub-003(/|$).*'
 ```
 
 ### merge
 
 ```console
-usage: merge [-h] outputdir inputdirs [inputdirs ...]
+usage: merge [-h] inputdirs [inputdirs ...] outputdir
 
 Merges non-overlapping/partial (e.g. single subject) BIDS datasets with identically processed derivative data
 
 positional arguments:
-  outputdir   The output directory with the merged data
   inputdirs   The list of BIDS (or BIDS-like) input directories with the partial (e.g. single- subject) data
+  outputdir   The output directory with the merged data
 
 options:
   -h, --help  show this help message and exit
 
-examples: merge outputdir singlesubject-1 singlesubject-2 singlesubject-3
+examples: merge singlesubject-1 singlesubject-2 singlesubject-3 outputdir
 ```
 
 ## Legal Aspects

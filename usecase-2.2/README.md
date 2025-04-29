@@ -1,6 +1,6 @@
-# SIESTA - work package 15 - use case 2.2
+# SIESTA - work package 15 - use case 2.2 (3D medical images)
 
-This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](../docs/README.md). In short, it consists of these steps:
 
 1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
 2. the _data user_ implementing and testing the pipeline on the scrambled version
@@ -69,6 +69,16 @@ The input dataset has been released under the [CC0](https://spdx.org/licenses/CC
 This implements the [MRIQC](https://mriqc.readthedocs.io/en/latest/) pipeline for obtaining standard QC measures from an MRI dataset.
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Computational requirements for the participant level
+
+The execution of the pipeline for each participant takes about 8 GB of RAM, 15 minutes per subject, and results in 250 MB of temporary data per subject.
+
+There are 136 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes less than 1 GB of RAM, 10 seconds, and results in less than 1 MB of temporary data per leave-one-out sample.
 
 ### Output data
 

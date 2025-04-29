@@ -1,6 +1,6 @@
-# SIESTA - work package 15 - use case 2.1
+# SIESTA - work package 15 - use case 2.1 (tabular data)
 
-This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](docs/README.md). In short, it consists of these steps:
+This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the [documentation](../docs/README.md). In short, it consists of these steps:
 
 1. the _data rights holder_ transferring the data onto the platform and making a scrambled version
 2. the _data user_ implementing and testing the pipeline on the scrambled version
@@ -56,21 +56,30 @@ Installing DatLeak is done by cloning its repository.
 ```console
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
+#### Usage 
 
-DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer.
+```
+python DatLeak.py <original_file> <scrambled_file> [ignore_value] [ignore_col]
+```
+DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer. You can see some practical usage down here:
+
 
 ```console
-python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999 
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999 0
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv None 0
+python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv
 ```
 
 This will print a report on screen with the percentage of rows with partial leakage, the percentage of rows with full leakage, the average matching cells per row, and the standard deviation of the matching cells per row.
 
 ```console
-Partial Leakage: 18.33%
-Full Leakage: 81.67%
-Average Matching Cells per Row: 254.03
-Standard Deviation of Matching Cells per Row: 10.15
+ - Full Leakage (identical row/participant): 0.00%
+ - Partial Leakage (rows/participants have data partially identical): 100.00%
+ - Average portion of row/participants that are identical: 46.73
+ - Standard Deviation of row/participants that are identical: 6.26
 ```
+
+Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable.
 
 ### Data citation
 
@@ -86,7 +95,17 @@ The data user's pipeline implements a very simple analysis of the tabular data t
 
 This specific use case implements the same pipeline based on R, MATLAB, Python and Julia. In the subsequent documentation we only describe the version based on R.
 
-The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows. 
+The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Computational requirements for the participant level
+
+There is no real computation done at the participant level, so this takes barely any time (except for data handling). The execution of the pipeline for each participant takes XX GB of RAM and XX seconds per subject.
+
+There are 60 subjects.
+
+### Computational requirements for the group level
+
+The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
 
 ### Output data
 
@@ -101,7 +120,7 @@ mkdir output
 
 ### Software installation
 
-The R-software can be installed on a Linux, MacOS or Windows computer, specifically including the `Rscript` binary. The `optparse` and `dplyr` packages are ideally installed and on the path. If these packages are not available, they will be downloaded and installed in a temporary directory. 
+The R-software can be installed on a Linux, MacOS or Windows computer, specifically including the `Rscript` binary. The `optparse` and `dplyr` packages are ideally installed and on the path. If these packages are not available, they will be downloaded and installed in a temporary directory.
 
 ### Testing the pipeline
 

@@ -15,6 +15,7 @@ function bidsapp(varargin)
 %
 % -h,--help       shows this help and exit
 % -v,--version    shows the eeglab and limo versions and exit
+%
 % The InputDataset must be a directory containing a BIDS dataset.
 % The OutputLocation must be a directory that will contain the result.
 % The AnalysisLevel must be 'participant' or 'group'.
@@ -135,6 +136,13 @@ end
 
 if ~exist(InputDataset, 'dir')
   error('input directory does not exist');
+else
+  % check whether it has been defined as an absolute path, if not: make it an absolute path, relative to the current location
+  [p, f, e] = fileparts(InputDataset);
+  if ~startsWith(p, filesep)
+    warning('converting InputDataset to absolute path, hoping for more robust execution of the pipeline');
+    InputDataset = fullfile(pwd, InputDataset);
+  end
 end
 
 if ~exist(OutputLocation, 'dir')
@@ -143,6 +151,13 @@ if ~exist(OutputLocation, 'dir')
   if ~success
     error(message);
   end
+end
+
+% check whether it has been defined as an absolute path, if not: make it an absolute path, relative to the current location
+[p, f, e] = fileparts(OutputLocation);
+if ~startsWith(p, filesep)
+  warning('converting OutputLocation to absolute path, hoping for more robust execution of the pipeline');
+  OutputLocation = fullfile(pwd, OutputLocation);
 end
 
 if ~all(isoption)
@@ -154,7 +169,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % call the actual code to execute the pipeline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if exist("options","var")
+if exist('options','var')
     ERP_Core_WB(InputDataset,OutputLocation,AnalysisLevel,options)
 else
     ERP_Core_WB(InputDataset,OutputLocation,AnalysisLevel)
