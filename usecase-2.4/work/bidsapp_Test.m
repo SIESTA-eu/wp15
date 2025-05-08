@@ -17,33 +17,33 @@ analysis_window = [-100 500];
 estimation      = 'OLS';
 nboot           = 655;
 tfce            = false;
-OutputLocation  = [fileparts(dataset_folder) filesep 'bidsapp_Test'];
+OutputLocation  = [fileparts(InputDataset) filesep 'bidsapp_Test'];
 
 % compute and assert
 bidsapp(InputDataset,OutputLocation,'participant','TaskLabel',tasks,'SubjectLabel',...
     Subjects, 'high_pass',high_pass,'ICAname',ICAname,'epoch_window',epoch_window,...
     'baseline_window',baseline_window,'analysis_window',analysis_window);
-% checks tasks are present
-taskD = dir(OutputLocation); taskD(1:2) = [];
-whichtasks = arrayfun(@(x) any(strcmpi(x.name,tasks)),taskD);
+% checks which subjects and tasks are present
+subD = dir([OutputLocation filesep 'sub*']); 
+assert(size(subD,1)==length(Subjects)-1,...
+    sprintf('the number of subjects in derivatives %g does match was it expsted %g',...
+    size(subD,1),length(Subjects)-1));
+for t = 1:size(subD,1)
+    taskD{t} = dir(fullfile(subD(t).folder,[subD(t).name])); taskD{t}(1:2) = [];
+end
+for t = 1:length(tasks)
+    names{t} = cell2mat(unique(cellfun(@(x) x(t).name, taskD, 'UniformOutput', false)));
+end
+whichtasks = arrayfun(@(x) any(contains(x,tasks)),names);
 assert(sum(whichtasks)==length(tasks),...
     sprintf('some tasks are missing: %s\n',tasks{whichtasks==0}))
-% which subjects
-for t = 1:size(taskD,1)
-    sub = dir(fullfile(taskD(t).folder,[taskD(t).name filesep 'derivatives' filesep 'sub-*']));
-    assert(size(sub,1)==length(Subjects)-1,...
-        sprintf('the number of subjects in derivatives %g does match was it expsted %g',...
-        size(sub,1),length(Subjects)-1));
-end
 
 % second level
-Outputfolder = fullfile(OutputLocation,'group_level');
+Outputfolder = fullfile([OutputLocation filesep 'derivatives'],'group_level');
 bidsapp(OutputLocation,Outputfolder,'group','nboot',nboot,'tfce',tfce)
-whichfolders = dir(Outputfolder); whichfolders(1:2) = []; 
-for t=1:length(tasks)
-    assert(sum(arrayfun(@(x) any(strcmpi(x.name,tasks(t))),whichfolders))==1,...
-        sprintf('2nd level error, task %s missing',tasks{t}))
-end
+whichfiles = dir([OutputLocation filesep 'derivatives' filesep 'group_level']); whichfiles(1:2) = []; 
+assert(sum(arrayfun(@(x) any(contains(x.name,tasks(t))),whichfiles))==1,...
+    sprintf('2nd level error, task %s missing',tasks{t}))
 
 % ----------
 % clean up
