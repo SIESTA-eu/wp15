@@ -46,7 +46,7 @@ rm -rf download                                             # this is now empty
 
 As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly.
 
- A scrambled version of the data can be generated using [BIDScramble](https://github.com/Donders-Institute/BIDScramble).
+ A scrambled version of the data can be generated using [BIDScramble](https://bidscramble.readthedocs.io).
 
 ```console
 cd data/usecase-2.4
