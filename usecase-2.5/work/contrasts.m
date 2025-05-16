@@ -10,9 +10,6 @@ function contrasts(path_output)
 	check_dots = startsWith(directory_name, 'DOTS');
 	check_motion = startsWith(directory_name, 'Motion');
 	check_spwm = startsWith(directory_name, 'spWM');
-
-	%list_runs = dir(path_output);
-	%szRuns = size(list_runs);
 	
 	path_spmmat = fullfile(path_output, 'SPM.mat');
 
