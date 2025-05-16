@@ -17,8 +17,6 @@ function contrasts(path_output)
 	path_spmmat = fullfile(path_output, 'SPM.mat');
 
 	SPM_loaded = load(path_spmmat);
-	disp('Nombre de régressors dans le modèle :');
-	disp(size(SPM_loaded.SPM.xX.X, 2));
 
 	matlabbatch{1}.spm.stats.con.spmmat = cellstr(path_spmmat);
 	%Reproduce across sessions: 'none' dont replicate; 'sess' create per session; 'repl' replicate; 'both' replicate and create
