@@ -34,7 +34,7 @@ switch level
     end
   case 'group'
     % second level analysis for the specified subjects
-    secondLevel_works(path_output, task_list, sub_list);
+    secondLevel_works(path_input, path_output, task_list, sub_list);
 end
 
 end
