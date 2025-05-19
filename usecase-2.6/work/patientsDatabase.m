@@ -12,55 +12,55 @@ function patientsDatabase(path_input, path_output, level, sub_list, task_list)
     task_list = {'DOTS_run-001' 'DOTS_run-002' 'Motion_run-001' 'Motion_run-002' 'spWM_run-001' 'spWM_run-002'}';
   end
 
-  % Initialiser le tableau "keep"
+  % Initialize the "keep" array
   keep = true(size(sub_list));
 
   switch level
     case 'participant'
 
       for p = 1:numel(sub_list)
-        % Chemin vers le fichier .tsv du patient
+        % Path to the patient's .tsv file
         path_patient_in = fullfile(path_input, sub_list{p});
         scansfile = fullfile(path_patient_in, [sub_list{p} '_scans.tsv']);
 
-        % Vérification d'existence du fichier
+        % Check if the file exists
         if ~exist(scansfile, 'file')
-          fprintf('Fichier manquant : %s\n', scansfile);
+          fprintf('Missing file: %s\n', scansfile);
           keep(p) = false;
           continue;
         end
 
-        % Ouvrir le fichier
+        % Open the file
         fid = fopen(scansfile);
         if fid == -1
-          fprintf('Erreur ouverture fichier : %s\n', scansfile);
+          fprintf('Error opening file: %s\n', scansfile);
           keep(p) = false;
           continue;
         end
 
-        % Lire l'en-tête (on peut l'ignorer ici)
+        % Read the header (can be ignored here)
         header_line = fgetl(fid);
 
-        % Initialiser la colonne
+        % Initialize the column
         column = {};
 
-        % Lecture ligne par ligne
+        % Read line by line
         while ~feof(fid)
           line = strtrim(fgetl(fid));
           if isempty(line)
             continue;
           end
-          parts = strsplit(line);  % coupe sur espaces et/ou tabulations
-          column{end+1,1} = parts{1};  % ne garde que la première colonne
+          parts = strsplit(line);  % split on spaces and/or tabs
+          column{end+1,1} = parts{1};  % only keep the first column
         end
 
         fclose(fid);
 
-        % Boucle sur les tâches à chercher
+        % Loop through the tasks to search for
         for t = 1:numel(task_list)
-          % Remplacement de contains par strfind + cellfun
+          % Replace contains with strfind + cellfun
           matches = ~cellfun(@isempty, strfind(column, task_list{t}));      
-        % Mise à jour du keep uniquement si on a au moins une correspondance
+        % Update the keep array only if there is at least one match
         keep(p) = keep(p) && any(matches);    
         end
       end
