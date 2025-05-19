@@ -5,7 +5,7 @@ From: ubuntu:24.04
     work/   /work
 %post
 
-    echo "=== Mise à jour du système et installation des dépendances ==="
+    echo "=== System update and dependency installation ==="
     export DEBIAN_FRONTEND=noninteractive
 
     apt-get update && apt-get upgrade -y
@@ -26,23 +26,23 @@ From: ubuntu:24.04
         octave \
         octave-dev
 
-    # Nettoyer les fichiers temporaires pour réduire la taille de l image
+    # Clean up temporary files to reduce image size
     apt-get clean
     rm -rf /var/lib/apt/lists/*
 
-    # Configurer le fuseau horaire
+    # Set the timezone
     echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
     echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 
-    # Assurez-vous que le répertoire work est exécutable
-    echo "Ajout de la permission exécutable et écriture pour les fichiers *.m dans /wp15/usecase-2.5/work/"
+    # Ensure that the work directory is executable
+    echo "Adding executable and write permission for *.m files in /wp15/usecase-2.5/work/"
     chmod +w /work/*.m
     chmod +x /work/*.m
 
-   # Téléchargement et extraction de SPM12 r7771
+   # Download and extract SPM12 r7771
    if [ ! -d "/spm12" ]; then
-        echo "Téléchargement de SPM12 r7771..."
+        echo "Downloading SPM12 r7771..."
         wget https://github.com/spm/spm12/archive/refs/tags/r7771.zip
         mv r7771.zip spm12.zip
         unzip spm12.zip
@@ -50,42 +50,42 @@ From: ubuntu:24.04
         rm *.zip
    fi
     
-    # Application du patch pour SPM12
-    echo "=== Application du patch pour SPM12 ==="
+    # Apply the patch for SPM12
+    echo "=== Applying patch for SPM12 ==="
     wget https://raw.githubusercontent.com/spm/spm-octave/main/spm12_r7771.patch -O /spm12/spm12_r7771.patch
     cd /spm12
     patch -p3 < spm12_r7771.patch
 
-    # Compilation des fichiers MEX pour Octave
-    echo "=== Compilation des fichiers MEX pour Octave ==="
+    # Compile MEX files for Octave
+    echo "=== Compiling MEX files for Octave ==="
     cd src
     make PLATFORM=octave
     make PLATFORM=octave install
 
-    # Ajouter SPM12 au chemin de recherche d Octave
+    # Add SPM12 to Octave's search path
     echo "addpath('/spm12')" >> ~/.octaverc
 
-    # Génération de la locale en_US.UTF-8
+    # Generate en_US.UTF-8 locale
     locale-gen en_US.UTF-8
     update-locale LANG=en_US.UTF-8
 
-    # Définir le répertoire temporaire pour sed
+    # Set the temporary directory for sed
     export TMPDIR=/tmp
 
 %environment
-    # Configuration de l environnement pour les locales
+    # Environment configuration for locales
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
     export LANGUAGE=en_US.UTF-8
 
 %runscript
-    echo "=== Début du script d exécution ==="
+    echo "=== Starting execution script ==="
     args=$(printf "'%s', " "$@")
-    args=${args%, }  # Supprimer la dernière virgule
-    echo "Ajouter spm12, spm12 config, spm12 matlabbatch et exécution de bidsapp avec Octave"
+    args=${args%, }  # Remove the last comma
+    echo "Adding spm12, spm12 config, spm12 matlabbatch and running bidsapp with Octave"
     #/usr/bin/octave --eval "addpath('/work'); hello($args);"
     pwd
     ls -l /work
     /usr/bin/octave --eval "addpath('/work','/spm12','/spm12/config','/spm12/matlabbatch'); bidsapp($args);"
 
-    echo "=== Fin du script d exécution ==="
+    echo "=== End of execution script ==="
