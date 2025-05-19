@@ -3,7 +3,6 @@ function realign(path_input)
 	list_files = dir(fullfile(path_input, 'sub*nii'));
 	szFiles = size(list_files);
 	
-	%path_file = '';
 	for f = 1:szFiles(1)
     	check_nifti = endsWith(list_files(f).name, '.nii');
 	
