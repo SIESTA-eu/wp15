@@ -2,7 +2,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
 
   % Créer le dossier de sortie global
   group_outputdir = fullfile(path_output, 'group');
-  if ~exist(group_outputdir, 'dir')
+  if ~isfolder(group_outputdir)
     mkdir(group_outputdir);
   end
 
@@ -11,12 +11,12 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
 
     run_name = list_runs{r};
     outputdir = fullfile(group_outputdir, run_name);
-    if ~exist(outputdir, 'dir')
+    if ~isfolder(outputdir)
       mkdir(outputdir);
     end
 
     % Supprimer ancien modèle si présent
-    if exist(fullfile(outputdir, 'SPM.mat'), 'file')
+    if isfile(fullfile(outputdir, 'SPM.mat'))
       delete(fullfile(outputdir, 'SPM.mat'));
     end
 
@@ -24,14 +24,14 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
     con_files = cell(numel(list_subjects), 1);
     def_files = cell(numel(list_subjects), 1);
 
-    path_leaveoneout_input = strrep(path_output, 'output', 'input');
-    struct_files = dir(path_leaveoneout_input);
+    %path_leaveoneout_input = strrep(path_output, 'output', 'input');
+    struct_files = dir(path_input);
     % Garder uniquement les dossiers (pas les fichiers)
-    is_folder = [struct_files.isdir];    
+    is_folder = [struct_files.isdir];
     % Exclure '.' et '..'
-    valid_names = ~ismember({struct_files.name}, {'.', '..'});   
+    valid_names = ~ismember({struct_files.name}, {'.', '..', 'derivatives'});
     % Combiner les deux conditions
-    keep = is_folder & valid_names;   
+    keep = is_folder & valid_names;
     % Extraire les noms dans une cellstr
     list_subjects = {struct_files(keep).name};
 
@@ -39,74 +39,72 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
       subj = list_subjects{s};
 
       % Chemin vers con_0001.nii
-      con_files{s} = fullfile(strrep(path_output, 'output', 'input'), subj, run_name, 'con_0001.nii');
+      con_files{s} = fullfile(path_input, subj, run_name, 'con_0001.nii');
+
+      %con_files{s} = fullfile(strrep(path_output, 'output', 'input'), subj, run_name, 'con_0001.nii');
+
+      %number_input = split(path_input, '-');  
+      %number_input = number_input{2};     
 
       % Identifier le numéro
       if subj(end) == 'b'
-        number = subj(end-3:end-1);
+        number_subject = subj(end-3:end-1);
       else
-        number = subj(end-2:end);
+        number_subject = subj(end-2:end);
       end
 
-      % Cas particuliers pour SAXNES
+      tmp_anat = '';
+     % Cas particuliers pour SAXNES
       if strfind(subj, 'SAXNES2s')
-        if str2double(number) < 13
-          new_number = number;
-          final_number = num2str(str2double(new_number));
-          path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
-        end 
-
-        if str2double(number) > 13 && str2double(number) < 16
-          new_number = num2str(str2double(number) - 1);
-          final_number = num2str(str2double(new_number));
-          path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
-        end 
-
-        if str2double(number) > 16 && str2double(number) < 23
-          new_number = num2str(str2double(number) - 2);
-          final_number = num2str(str2double(new_number));
-          path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);        
+        if str2double(number_subject) <= 13
+          final_number = num2str(str2double(number_subject));
+          path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+          tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
         end
 
-        if str2double(number) > 23 && str2double(number) < 33
-          new_number = num2str(str2double(number) - 3);
-          final_number = num2str(str2double(new_number));
-          path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
+        if str2double(number_subject) >= 14 && str2double(number_subject) <= 15
+          number_input = num2str(str2double(number_subject) - 1);
+          final_number = num2str(str2double(number_input));
+          path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+          tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
+        end
+
+        if str2double(number_subject) >= 17 && str2double(number_subject) <= 22
+          number_input = num2str(str2double(number_subject) - 2);
+          final_number = num2str(str2double(number_input));
+          path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+          tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
+        end
+
+        if str2double(number_subject) >= 24 && str2double(number_subject) <= 32
+          number_input = num2str(str2double(number_subject) - 3);
+          final_number = num2str(str2double(number_input));
+          path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+          tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
         end
 
       else
         if strfind(subj, 'SAXNESs')
-          if str2double(number) < 8
-            new_number = num2str(str2double(number) + 26); % 29 - 3
-            final_number = num2str(str2double(new_number));
-            path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
-          end 
+          if str2double(number_subject) < 8
+            number_input = num2str(str2double(number_subject) + 26); % 29 - 3
+            final_number = num2str(str2double(number_input));
+            path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+            tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
+          end
 
-          if str2double(new_number) > 8
-            new_number = num2str(str2double(number) + 25); %29 - 4
-            final_number = num2str(str2double(new_number));
-            path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
+          if str2double(number_subject) > 8
+            number_input = num2str(str2double(number_subject) + 25); %29 - 4
+            final_number = num2str(str2double(number_input));
+            path_subject = regexprep(path_input, '-\d+$', ['-' final_number]);
+            tmp_anat = strrep(path_subject, 'leaveoneout', 'singlesubject');
           end
         end
       end
 
-      %tokens = regexp(path_input, '-(\d+)-', 'tokens');
+      path_anat = fullfile(tmp_anat, subj, 'anat');
 
-      %if ~isempty(tokens)
-        %input_number = tokens{1}{1};
-      %else
-        %input_number = NaN;  % ou gérer l'erreur
-      %end
-
-      %if str2double(new_number) ~= str2double(input_number)
-        %final_number = str2double(new_number);
-        %final_number = num2str(final_number);
-        %path_input = regexprep(path_input, '-\d+-', ['-' final_number '-']);
-      %end
-
-      path_anat = fullfile(strrep(path_input, 'output', 'input'), subj, 'anat');
       % Construire chemin vers le fichier de deformation
-      yfile_struct = dir(fullfile(path_anat, 'y*.nii'));
+      yfile_struct = files(startsWith({files.name}, 'y') & endsWith({files.name}, '.nii'));
 
       if isempty(yfile_struct)
         error('Fichier de déformation manquant pour le sujet %s', subj);
@@ -132,7 +130,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
     ncon_files = cell(numel(list_subjects), 1);
 
     for s = 1:numel(list_subjects)
-      norm_file = fullfile(strrep(path_output, 'output', 'input'), list_subjects{s}, run_name, 'wcon_0001.nii');
+      norm_file = fullfile(path_input, list_subjects{s}, run_name, 'wcon_0001.nii');
       if exist(norm_file, 'file')
         ncon_files{s} = norm_file;
       else
