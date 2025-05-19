@@ -1,0 +1,31 @@
+BootStrap: docker
+From: node:23
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+  Author Robert Oostenveld
+
+%files
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update -y
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  apt install -y wget
+  npm install -g @openneuro/cli # this installs it for all users
+  echo '{"url":"https://openneuro.org/","apikey":"","errorReporting":false}' > /.openneuro
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  # the openneuro cli requires the settings file to be in the home directory
+  [ -f ${HOME}/.openneuro ] || cp /.openneuro ${HOME}
+  echo Creating directory ${1}
+  mkdir -p ${1} || exit 
+  echo Downloading into directory ${1} ...
+  openneuro download ds003826 -s 3.0.1 ${1}

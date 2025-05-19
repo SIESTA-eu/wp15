@@ -4,15 +4,14 @@
 *.asv
 *.sif
 **/__pycache__/**
-
-BIDScramble/venv/*
-BIDScramble/build/*
-BIDScramble/*.egg-info/*
-/BIDScramble/.tox/
+.DS_Store
 
 usecase-*/input*
 usecase-*/scrambled*
 usecase-*/output*
 usecase-*/venv
 
-usecase-2.4/eeglab2024.0
+usecase-2.3/fieldtrip
+usecase-2.4/eeglab
+usecase-2.5/spm12
+.vscode/settings.json

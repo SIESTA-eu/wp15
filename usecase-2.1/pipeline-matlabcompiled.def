@@ -1,0 +1,30 @@
+BootStrap: docker
+From: containers.mathworks.com/matlab-runtime:r2024b
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+  work/pipeline_compiled/pipeline  /work/pipeline_compiled/pipeline
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration
+  apt install -y ca-certificates
+
+%environment
+  export LC_ALL=C
+  export AGREE_TO_MATLAB_RUNTIME_LICENSE=yes
+  export MCRROOT=/opt/matlabruntime/R2024b
+  export LD_LIBRARY_PATH=${MCRROOT}/runtime/glnxa64:${MCRROOT}/bin/glnxa64:${MCRROOT}/sys/os/glnxa64:${MCRROOT}/extern/bin/glnxa64:$LD_LIBRARY_PATH
+
+%runscript
+  # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
+  /work/pipeline_compiled/pipeline $*
+

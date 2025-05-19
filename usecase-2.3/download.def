@@ -1,0 +1,39 @@
+BootStrap: docker
+From: python:3-slim
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+  Author Robert Oostenveld
+
+%files
+
+%post
+  apt update && apt install -y git && apt install -y binutils
+  python3 -m venv /venv
+  . /venv/bin/activate
+  python -m pip install datalad
+  python -m pip install datalad-installer
+ 
+  datalad-installer git-annex -m datalad/git-annex:release --install-dir venv
+  mv /venv/usr/lib/* /venv/lib/.
+  mv /venv/usr/bin/* /venv/bin/. 
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  . /venv/bin/activate
+  echo Downloading OpenNeuro dataset as DataLad repository to ${1}
+  git clone https://github.com/OpenNeuroDatasets/ds000117.git ${1}
+  cd ${1}
+
+  echo Downloading the MEG data for all subjects ...
+  datalad get sub-*/ses-meg/meg/*run-01*
+  datalad get sub-*/ses-meg/meg/*run-02*
+
+  echo Downloading the MaxFiltered MEG data for all subjects ...
+  datalad get derivatives/meg_derivatives/sub-*/ses-meg/meg/*run-01*
+  datalad get derivatives/meg_derivatives/sub-*/ses-meg/meg/*run-02*
+
+  echo Downloading the anatomical MRI data for all subjects ...
+  datalad get sub-*/ses-mri/anat/*mprage_T1w.nii.gz

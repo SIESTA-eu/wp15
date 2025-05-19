@@ -1,0 +1,30 @@
+BootStrap: docker
+From: python:3-slim
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+  work/pipeline.py /work/pipeline.py
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update -y
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+
+  ################################################################################
+  # post installation of dependencies
+  ################################################################################
+  pip install pandas
+  chmod +x /work/pipeline.py
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
+  python /work/pipeline.py "$@"

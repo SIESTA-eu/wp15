@@ -1,0 +1,20 @@
+{
+    "Name": "Example Dataset",
+    "BIDSVersion": "1.6.0",
+    "License": "CC0",
+    "Authors": [
+        "Author One",
+        "Author Two"
+    ],
+    "Acknowledgements": "We thank all contributors.",
+    "HowToAcknowledge": "Please cite this dataset using the following DOI: 10.1234/example-doi",
+    "Funding": [
+        "Grant ABC123 from Example Funding Agency",
+        "Grant XYZ789 from Another Funding Agency"
+    ],
+    "ReferencesAndLinks": [
+        "https://example.com",
+        "https://another-example.com"
+    ],
+    "DatasetDOI": "10.1234/example-doi"
+}

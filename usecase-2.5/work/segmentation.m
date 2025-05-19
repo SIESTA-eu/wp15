@@ -3,7 +3,7 @@ function segmentation(path_input)
  	list_files = dir(path_input);
 	szFiles = size(list_files);
 	
-	%path_file = '';
+	path_file = '';
 	
 	for f = 3:szFiles(1)
 		check_sub = startsWith(list_files(f).name, 'sub');

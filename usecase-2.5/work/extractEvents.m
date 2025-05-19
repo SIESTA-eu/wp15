@@ -23,4 +23,4 @@ function localizer = extractEvents(filename)
     for r = real_begin:real_end
         localizer = append(localizer, filename(r));
     end
-end
+end 

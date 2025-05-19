@@ -1,12 +1,16 @@
 BootStrap: docker
-From: ubuntu:24.04    # Alternatively use a ready-made Matlab base image: https://hub.docker.com/r/mathworks/matlab
+From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https://hub.docker.com/r/mathworks/matlab
+
+%labels
+  Author Robert Oostenveld
 
 %environment
   MLM_LICENSE_FILE="" # should point to the license server as port@server
 
 %files
-  analyze_participant.m /work/analyze_participant.m
-  analyze_group.m       /work/analyze_group.m
+  work/bidsapp.m             /work/bidsapp.m
+  work/analyze_participant.m /work/analyze_participant.m
+  work/analyze_group.m       /work/analyze_group.m
 
 %post
   ################################################################################
@@ -35,23 +39,14 @@ From: ubuntu:24.04    # Alternatively use a ready-made Matlab base image: https:
   mv fieldtrip-master fieldtrip
   rm master.zip
 
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
 %environment
   export LC_ALL=C
 
 %runscript
-  # parse command line arguments
   # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
-  if [ -z "${1}" ] ; then echo Error: input directory must be specified && exit 1 ; fi
-  if [ -z "${2}" ] ; then echo Error: output directory must be specified && exit 1 ; fi
-  if [ -z "${3}" ] ; then echo Error: analysis level must be specified as participant or group && exit 1 ; fi
-  INPUTDIR="'${1}'"
-  OUTPUTDIR="'${2}'"
-  LEVEL="${3}"
+  # pass all the input options, the bidsapp wrapper parses them
+  /opt/matlab/bin/matlab -batch "restoredefaultpath; addpath /work /work/fieldtrip; ft_defaults; bidsapp $*"
 
-  if [ ${LEVEL} = "participant" ] ; then
-    /opt/matlab/bin/matlab -batch "restoredefaultpath; addpath /work /work/fieldtrip; ft_defaults; analyze_participant(${INPUTDIR}, ${OUTPUTDIR})"
-  elif [ ${LEVEL} = "group" ] ; then
-    /opt/matlab/bin/matlab -batch "restoredefaultpath; addpath /work /work/fieldtrip; ft_defaults; analyze_group(${INPUTDIR}, ${OUTPUTDIR})"
-  else
-    echo Error: analysis level must be specified as participant or group && exit 1
-  fi 

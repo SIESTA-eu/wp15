@@ -1,0 +1,43 @@
+BootStrap: docker
+From: ubuntu:24.04
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+  work/pipeline.m  /work/pipeline.m
+
+%environment
+  MLM_LICENSE_FILE="" # should point to the license server as port@server
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration
+  apt install -y ca-certificates
+  apt install -y wget xvfb xorg libgtk2.0-dev python3 python3-venv vim unzip
+
+  ################################################################################
+  # install MATLAB and toolboxes
+  # see https://github.com/mathworks-ref-arch/matlab-dockerfile 
+  ################################################################################
+  mkdir /opt/matlab
+  wget https://www.mathworks.com/mpm/glnxa64/mpm -O /opt/matlab/mpm
+  chmod +x /opt/matlab/mpm
+  /opt/matlab/mpm install --release R2024a --destination /opt/matlab --products MATLAB
+  ln -s /opt/matlab/bin/matlab /usr/local/bin
+
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
+  matlab -batch "restoredefaultpath; addpath /work; pipeline $*"

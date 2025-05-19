@@ -1,0 +1,34 @@
+Bootstrap: docker
+From: julia:latest
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%files
+  work/pipeline.jl /work/pipeline.jl
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update -y
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+
+  ################################################################################
+  # post installation of dependencies
+  ################################################################################
+  echo 'import Pkg; Pkg.add("ArgParse")'      | julia
+  echo 'import Pkg; Pkg.add("CSV")'           | julia
+  echo 'import Pkg; Pkg.add("DataFrames")'    | julia
+  echo 'import Pkg; Pkg.add("Statistics")'    | julia
+  echo 'import Pkg; Pkg.add("JSON3")'         | julia
+  echo 'import Pkg; Pkg.add("FilePathsBase")' | julia
+  chmod +x /work/pipeline.jl
+
+%environment
+
+%runscript
+  # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
+  julia /work/pipeline.jl "$@"

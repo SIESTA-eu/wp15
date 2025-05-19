@@ -1,0 +1,36 @@
+Bootstrap: docker
+From: python:3.13-slim
+Stage: final
+
+%help
+    This Apptainer image includes:
+
+    * Debian stable,
+    * The latest BIDScramble version at the time of creation
+
+    The general form to run the leaveoneout commands is:
+
+        apptainer run leaveoneout.sif <input> <output> <participant_nr>
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+
+%environment
+    export PIP_NO_CACHE_DIR=off
+
+%post
+    # Install git
+    apt update && apt -y install git
+
+    # Install BIDScramble (update the repo source later)
+    # pip install bidscramble
+    git clone https://github.com/Donders-Institute/bidscramble.git
+    pip install ./bidscramble
+
+%runscript
+    PID=$(ls -d $1/sub-*/ | sed -n "${3}p" | xargs basename)
+    if [ -z "$PID" ]; then
+        echo "Error: No data found for participant_nr $3" >&2
+        exit 1
+    fi
+    exec scramble $1 $2 pseudo original -s "(?!(.*/)*$PID([\._-].+)*(/|$)).*"

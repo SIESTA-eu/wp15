@@ -1,0 +1,34 @@
+BootStrap: docker
+From: ubuntu:24.04
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+  Author Robert Oostenveld
+
+%files
+
+%post
+  ################################################################################
+  # general updates to the base image
+  ################################################################################
+  apt update -y
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  apt install -y wget
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  echo Creating directory ${1}
+  mkdir -p ${1} || exit 
+  cd ${1} || exit 
+  echo Downloading into directory ${1} ...
+  wget https://s3.amazonaws.com/openneuro.org/ds004148/participants.tsv
+  wget https://s3.amazonaws.com/openneuro.org/ds004148/participants.json
+  wget https://s3.amazonaws.com/openneuro.org/ds004148/dataset_description.json
+  wget https://s3.amazonaws.com/openneuro.org/ds004148/README
+  wget https://s3.amazonaws.com/openneuro.org/ds004148/CHANGES
+  for SUBJ in `seq -w 60`; do mkdir sub-${SUBJ} ; done
+

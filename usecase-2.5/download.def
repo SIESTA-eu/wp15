@@ -1,0 +1,30 @@
+BootStrap: docker
+From: ubuntu:24.04
+
+%labels
+  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+  Author Robert Oostenveld
+
+%files
+
+%post
+  apt update -y
+  echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+  echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+  DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+  apt install -y curl zip
+
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  ./aws/install
+
+  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
+%environment
+  export LC_ALL=C
+
+%runscript
+  echo Downloading to ${1}
+  mkdir -p ${1}
+  aws s3 sync --no-sign-request s3://openneuro.org/ds004934/ ${1}
