@@ -2,9 +2,6 @@
 function output = dataEvents(path_file, info) 
 	
 	output = [''];
-
-	%arrayOnset = zeros(1,1);
-	%arrayDuration = zeros(1,1);
 					
 	T = readtable(path_file, 'filetype', 'text', 'delimiter', '\t');
 	onset = T.onset;
