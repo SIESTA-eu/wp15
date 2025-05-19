@@ -1,7 +1,5 @@
 function bidsapp(varargin)
 
-  addpath('/work');
-
   % BIDSAPP is a wrapper for a MATLAB-based BIDS application.
   %
   % It is implemented for the MATLAB-based pipelines in SIESTA and follows
@@ -30,6 +28,8 @@ function bidsapp(varargin)
   % parse the command-line options
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  addpath('/work');
+  
   % the last three arguments must be inputdir, outputdir and level
   if nargin<3
     error('not enough input arguments')
