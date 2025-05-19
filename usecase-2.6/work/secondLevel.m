@@ -1,12 +1,12 @@
 function secondLevel(path_input, path_output, list_runs, list_subjects)
 
-  % Créer le dossier de sortie global
+  % Create the global output folder
   group_outputdir = fullfile(path_output, 'group');
   if ~isfolder(group_outputdir)
     mkdir(group_outputdir);
   end
 
-  % Pour chaque run
+  % For each run
   for r = 1:numel(list_runs)
 
     run_name = list_runs{r};
@@ -15,30 +15,30 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
       mkdir(outputdir);
     end
 
-    % Supprimer ancien modèle si présent
+    % Delete the old model if present
     if isfile(fullfile(outputdir, 'SPM.mat'))
       delete(fullfile(outputdir, 'SPM.mat'));
     end
 
-    % Préparation des chemins pour chaque sujet
+    % Prepare paths for each subject
     con_files = cell(numel(list_subjects), 1);
     def_files = cell(numel(list_subjects), 1);
 
     %path_leaveoneout_input = strrep(path_output, 'output', 'input');
     struct_files = dir(path_input);
-    % Garder uniquement les dossiers (pas les fichiers)
+    % Keep only folders (not files)
     is_folder = [struct_files.isdir];
-    % Exclure '.' et '..'
+    % Exclude '.' and '..'
     valid_names = ~ismember({struct_files.name}, {'.', '..', 'derivatives'});
-    % Combiner les deux conditions
+    % Combine both conditions
     keep = is_folder & valid_names;
-    % Extraire les noms dans une cellstr
+    % Extract the names in a cell array
     list_subjects = {struct_files(keep).name};
 
     for s = 1:numel(list_subjects)
       subj = list_subjects{s};
 
-      % Chemin vers con_0001.nii
+      % Path to con_0001.nii
       con_files{s} = fullfile(path_input, subj, run_name, 'con_0001.nii');
 
       %con_files{s} = fullfile(strrep(path_output, 'output', 'input'), subj, run_name, 'con_0001.nii');
@@ -46,7 +46,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
       %number_input = split(path_input, '-');  
       %number_input = number_input{2};     
 
-      % Identifier le numéro
+      % Identify the number
       if subj(end) == 'b'
         number_subject = subj(end-3:end-1);
       else
@@ -54,7 +54,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
       end
 
       tmp_anat = '';
-     % Cas particuliers pour SAXNES
+     % Special cases for SAXNES
       if strfind(subj, 'SAXNES2s')
         if str2double(number_subject) <= 13
           final_number = num2str(str2double(number_subject));
@@ -103,17 +103,17 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
 
       path_anat = fullfile(tmp_anat, subj, 'anat');
 
-      % Construire chemin vers le fichier de deformation
+      % Build the path to the deformation file
       yfile_struct = files(startsWith({files.name}, 'y') & endsWith({files.name}, '.nii'));
 
       if isempty(yfile_struct)
-        error('Fichier de déformation manquant pour le sujet %s', subj);
+        error('Deformation file missing for subject %s', subj);
       end
 
       def_files{s} = fullfile(path_anat, yfile_struct(1).name);
     end
 
-    %% Étape 1 : Normalisation
+    %% Step 1: Normalization
     matlabbatch = {};
     for s = 1:numel(list_subjects)
       matlabbatch{s}.spm.spatial.normalise.write.subj.def = {def_files{s}};
@@ -125,8 +125,8 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
 
     spm_jobman('run', matlabbatch);
 
-    %% Étape 2 : Analyse de second niveau (One-sample t-test)
-    matlabbatch = {};  % Réinitialiser le batch
+    %% Step 2: Second-level analysis (One-sample t-test)
+    matlabbatch = {};  % Reset the batch
     ncon_files = cell(numel(list_subjects), 1);
 
     for s = 1:numel(list_subjects)
@@ -134,7 +134,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
       if exist(norm_file, 'file')
         ncon_files{s} = norm_file;
       else
-        error('Fichier normalisé introuvable : %s', norm_file);
+        error('Normalized file not found: %s', norm_file);
       end
     end
 
@@ -156,6 +156,5 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
 
   end
 end
-
 
 
