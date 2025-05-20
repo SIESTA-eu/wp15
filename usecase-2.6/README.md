@@ -26,8 +26,8 @@ The input data consists of about 1548 files with a combined size of 18.63G.
 The data can be downloaded using the Amazon [AWS command-line interface](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) or using [datalad](https://www.datalad.org/).
 
 ```console
-mkdir data/usecase-2.5
-cd data/usecase-2.5
+mkdir data/usecase-2.6
+cd data/usecase-2.6
 
 aws s3 cp --recursive --no-sign-request s3://openneuro.org/ds004934/ input
 ```
@@ -50,8 +50,8 @@ If your node installation is up-to-date and working then make sure you have an o
 ```console
 npm install -g @openneuro/cli
 
-mkdir data/usecase-2.5
-cd data/usecase-2.5
+mkdir data/usecase-2.6
+cd data/usecase-2.6
 
 openneuro login
 openneuro download ds004934 -s 1.0.0 input
@@ -66,7 +66,7 @@ As in SIESTA the data is assumed to be sensitive, the analysis is conceived to b
  A scrambled version of the data can be generated using [BIDScramble](https://bidscramble.readthedocs.io).
 
 ```console
-cd data/usecase-2.5
+cd data/usecase-2.6
 scramble input scrambled stub
 scramble input scrambled json -p '(?!AcquisitionTime).*'
 scramble input scrambled nii permute y -i
