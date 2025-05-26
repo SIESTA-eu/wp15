@@ -1,47 +1,6 @@
-derivatives/ERN/CRN/
-derivatives/ERN/CRN/FCz_ERP_Trimmed_mean_of_mean.mat
-derivatives/ERN/CRN/H0/
-derivatives/ERN/CRN/H0/boot_table.mat
-derivatives/ERN/CRN/H0/H0_one_sample_ttest_parameter_1.mat
-derivatives/ERN/CRN/H0/tfce_H0_one_sample_ttest_parameter_1.mat
-derivatives/ERN/CRN/LIMO.mat
-derivatives/ERN/CRN/one_sample_ttest_parameter_1_Cohensd.mat
-derivatives/ERN/CRN/one_sample_ttest_parameter_1.mat
-derivatives/ERN/CRN/tfce/tfce_one_sample_ttest_parameter_1.mat
-derivatives/ERN/CRN/Yr.mat
-derivatives/ERN/Difference_wave/ERP_difference.mat
-derivatives/ERN/Difference_wave/ERP_diff.mat
-derivatives/ERN/Difference_wave/ERPs_correct_Trimmed_mean_of_Weighted mean.mat
-derivatives/ERN/Difference_wave/ERPs_errors_Trimmed_mean_of_Weighted mean.mat
-derivatives/ERN/Difference_wave/H0/boot_table.mat
-derivatives/ERN/Difference_wave/H0/H0_paired_samples_ttest_parameter_1_2.mat
-derivatives/ERN/Difference_wave/H0/tfce_H0_paired_samples_ttest_parameter_1_2.mat
-derivatives/ERN/Difference_wave/LIMO.mat
-derivatives/ERN/Difference_wave/paired_samples_ttest_parameter_1_2_Cohensd.mat
-derivatives/ERN/Difference_wave/paired_samples_ttest_parameter_1_2.mat
-derivatives/ERN/Difference_wave/tfce/tfce_paired_samples_ttest_parameter_1_2.mat
-derivatives/ERN/Difference_wave/Y1r.mat
-derivatives/ERN/Difference_wave/Y2r.mat
-derivatives/ERN/ERN/FCz_ERP_Trimmed_mean_of_mean.mat
-derivatives/ERN/ERN/H0/boot_table.mat
-derivatives/ERN/ERN/H0/H0_one_sample_ttest_parameter_1.mat
-derivatives/ERN/ERN/H0/tfce_H0_one_sample_ttest_parameter_1.mat
-derivatives/ERN/ERN/LIMO.mat
-derivatives/ERN/ERN/one_sample_ttest_parameter_1_Cohensd.mat
-derivatives/ERN/ERN/one_sample_ttest_parameter_1.mat
-derivatives/ERN/ERN/tfce/tfce_one_sample_ttest_parameter_1.mat
-derivatives/ERN/ERN/Yr.mat
-derivatives/MMN/ERP_difference.mat
-derivatives/MMN/ERP_MMN.mat
-derivatives/MMN/ERPs_deviant_Trimmed_mean_of_Weighted mean.mat
-derivatives/MMN/ERPs_standard_Trimmed_mean_of_Weighted mean.mat
-derivatives/MMN/H0/boot_table.mat
-derivatives/MMN/H0/H0_paired_samples_ttest_parameter_1_2.mat
-derivatives/MMN/H0/tfce_H0_paired_samples_ttest_parameter_1_2.mat
-derivatives/MMN/LIMO.mat
-derivatives/MMN/paired_samples_ttest_parameter_1_2_Cohensd.mat
-derivatives/MMN/paired_samples_ttest_parameter_1_2.mat
-derivatives/MMN/tfce/tfce_paired_samples_ttest_parameter_1_2.mat
-derivatives/MMN/Y1r.mat
-derivatives/MMN/Y2r.mat
-
+derivatives/group/task-ERN_desc-OneSampleTTtestERN.mat
+derivatives/group/task-MMN_desc-PairedSamplesTTest.mat
+derivatives/group/task-N2pc_desc-ERP_difference.mat
+derivatives/group/task-N170_desc-PairedSamplesTTestEffectSizeCarsFaces.mat
+derivatives/group/task-N400_desc-ERP_difference.mat
+derivatives/group/task-P3_desc-signitifcant_values.mat
