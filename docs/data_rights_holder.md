@@ -48,7 +48,7 @@ The data rights holder can provide the platform operator with instructions and a
 
 ## Providing scrambled data
 
-The data rights holder is responsible for providing a scrambled (locally differentially private) version of the dataset to the data user, so that the data user knows what the dataset contains, how it is organized, and that they can implement the analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
+The data rights holder is responsible for providing a scrambled (locally differentially private) version of the dataset to the data user, so that the data user knows what the dataset contains, how it is organized, and that they can implement the analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://bidscramble.readthedocs.io) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
 
 ## Privacy considerations
 
