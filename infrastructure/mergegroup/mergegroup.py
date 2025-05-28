@@ -328,7 +328,7 @@ def main(args=None):
                 except Exception as e:
                     print(f"Error merging data: {str(e)}", file=sys.stderr)
                     
-                mat_values, ctsv_values, merged_lists = list(), list(), list()
+                nii_values, txt_values, mat_values, ctsv_values, merged_lists = list(), list(), list(), list(), list()
                 
             except Exception as e:
                 print(f"Error processing directory {item}: {str(e)}", file=sys.stderr)
