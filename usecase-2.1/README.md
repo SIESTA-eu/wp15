@@ -79,7 +79,7 @@ This will print a report on screen with the percentage of rows with partial leak
  - Standard Deviation of row/participants that are identical: 6.26
 ```
 
-Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable.
+Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable. This, however, depends on the dataset. If for instance you only have 2 variables with binary values, no permutation would allow to reach a low threshold.
 
 ### Data citation
 
