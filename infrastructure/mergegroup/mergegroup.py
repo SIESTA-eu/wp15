@@ -28,6 +28,60 @@ def filetype(filename):
         print(f"Error determining file type for {filename}: {str(e)}", file=sys.stderr)
         return "error"
 
+def is_numeric_array(obj):
+    return isinstance(obj, np.ndarray) and np.issubdtype(obj.dtype, np.number)
+
+
+def is_mat_struct(obj):
+    return hasattr(obj, '__dict__') and not isinstance(obj, np.ndarray)
+
+
+def extract_numeric_data(data, prefix=''):
+    numeric_data = {}
+
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key.startswith('__'):
+                continue
+            sub_prefix = f"{prefix}.{key}" if prefix else key
+            numeric_data.update(extract_numeric_data(value, sub_prefix))
+
+    elif is_mat_struct(data):
+        for field, value in vars(data).items():
+            sub_prefix = f"{prefix}.{field}" if prefix else field
+            numeric_data.update(extract_numeric_data(value, sub_prefix))
+
+    elif isinstance(data, np.ndarray):
+        if is_numeric_array(data):
+            numeric_data[prefix] = data
+        elif data.dtype.names:
+            # structured numpy array (e.g., MATLAB struct array)
+            for i in range(data.shape[0] if data.ndim > 0 else 1):
+                item = data[i] if data.ndim > 0 else data
+                for field_name in data.dtype.names:
+                    try:
+                        value = item[field_name]
+                        sub_prefix = f"{prefix}.{field_name}"
+                        numeric_data.update(extract_numeric_data(value, sub_prefix))
+                    except Exception:
+                        continue
+        else:
+            # General ndarray (could be an array of structs)
+            for i, item in np.ndenumerate(data):
+                sub_prefix = f"{prefix}[{i}]"
+                numeric_data.update(extract_numeric_data(item, sub_prefix))
+
+    return numeric_data
+
+
+def read_mat_file(filepath):
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"File not found: {filepath}")
+    mat_data = scipy.io.loadmat(filepath, struct_as_record=False, squeeze_me=True)
+    return extract_numeric_data(mat_data)
+
+
+
 def parse_ctsv(filepath, delimiter):
     data = []
     try:
@@ -119,17 +173,9 @@ def parse_mat(filepath):
             raise ValueError(f"{filepath} is not a regular file")
             
         try:
-            val = scipy.io.loadmat(filepath)
-            val = {k: v for k, v in val.items() if k not in meta_keys and not k.startswith('__')}
-            val = [list(collapse(val[k])) for k in list(val.keys())][0]
-            f_val = []
-            #print(set([type(i) for i in val]))
-            for v in val:
-                if isinstance(v, np.str_) or v is None:
-                    pass
-                else:
-                    f_val.append(v)
-            return f_val
+            mat_data = scipy.io.loadmat(filepath, struct_as_record=False, squeeze_me=True)
+            return extract_numeric_data(mat_data)
+
         except NotImplementedError:
             try:
                 with h5py.File(filepath, 'r') as file:
@@ -314,16 +360,17 @@ def main(args=None):
             if mat_aux:
                 mat_values[key] = mat_aux
 
-            merged_lists = [list(filter(lambda x: x is not None, sublist))
-                                  for sublist in zip_longest(
-                                      [[list(pair)] for pair in zip(*[sublist for sublist in txt_values])],
-                                      [[list(pair)] for pair in zip(*[sublist for sublist in ctsv_values])],
-                                      [[list(pair)] for pair in zip(*[sublist for sublist in nii_values])],
-                                      [[list(pair)] for pair in zip(*[sublist for sublist in mat_values])],
-                                      fillvalue=None)]
-                    
-            if merged_lists:
-                        save_(output_file, list(collapse(sum(merged_lists, []))))
+            #merged_lists = [list(filter(lambda x: x is not None, sublist))
+            #                      for sublist in zip_longest(
+            #                          [[list(pair)] for pair in zip(*[sublist for sublist in txt_values])],
+            #                          [[list(pair)] for pair in zip(*[sublist for sublist in ctsv_values])],
+            #                          [[list(pair)] for pair in zip(*[sublist for sublist in nii_values])],
+            #                          [[list(pair)] for pair in zip(*[sublist for sublist in mat_values])],
+            #                          fillvalue=None)]
+            #
+            #if merged_lists:
+            #            save_(output_file, list(collapse(sum(merged_lists, []))))
+
 
     finally:
         total_time = time.time() - start_time
