@@ -245,76 +245,76 @@ def main(args=None):
         input_dirs = args[1:-2]
         if not input_dirs:
             raise ValueError("No input directories provided")
-            
-        for item in tqdm(input_dirs, desc=f"Processing: "):
-            try:
-                if not os.path.exists(item):
-                    print(f"Warning: Input directory {item} does not exist", file=sys.stderr)
-                    continue
-                    
-                if not os.path.isdir(item):
-                    print(f"Warning: {item} is not a directory", file=sys.stderr)
-                    continue
-                    
-                txt_aux, ctsv_aux, mat_aux, nii_aux = list(), list(), list(), list()
-                print()
-                for key in whitelist:
-                    try:
-                        input_dir = os.path.join(item, key)
-                        if not os.path.exists(input_dir):
-                            print(f"Warning: File '{os.path.basename(input_dir)}' not found in {os.path.dirname(input_dir)}", file=sys.stderr)
-                            continue
-                            
-                        file_type = file_types[key]
-                        
-                        if file_type == "txt":
-                            data = parse_txt(input_dir)
-                            if data:
-                                txt_aux.append(list(collapse(data)))
-                                print(f"Merging: {input_dir} -> {output_file}")
-                            
-                        elif file_type in ["csv", "tsv"]:
-                            delimiter = "," if file_type == "csv" else "\t"
-                            data = parse_ctsv(input_dir, delimiter)
-                            if data:
-                                ctsv_aux.append(list(collapse(data)))
-                                print(f"Merging: {input_dir} -> {output_file}")
-                            
-                        elif file_type == "nii":
-                            data = parse_nii(input_dir)
-                            if data is not None:
-                                nii_aux.append(data.flatten())
-                                print(f"Merging: {input_dir} -> {output_file}")
-                            
-                        elif file_type == "mat":
-                            data = parse_mat(input_dir)
-                            if data is not None:
-                                mat_aux.append(data)
-                                print(f"Merging: {input_dir} -> {output_file}")
-                            
-                        else:
-                            print(f"Warning: Unsupported file type {file_type} for {input_dir}", file=sys.stderr)
-                            
-                    except Exception as e:
-                        print(f"Error processing file {input_dir}: {str(e)}", file=sys.stderr)
+
+        txt_values, ctsv_values, mat_values, nii_values = {}, {}, {}, {}
+
+        # loop across files in the whitelist in the outer-loop, so that we can do diagnostics per file type
+        for key in whitelist:
+            txt_aux, ctsv_aux, mat_aux, nii_aux = {}, {}, {}, {}
+
+            # loop across the input directories
+            for item in tqdm(input_dirs, desc=f"Processing key '{key}': "):
+                try:
+                    if not os.path.exists(item):
+                        print(f"Warning: Input directory {item} does not exist", file=sys.stderr)
                         continue
 
-                if txt_aux:
-                    txt_values.append(txt_aux)
-                if ctsv_aux:
-                    ctsv_values.append(ctsv_aux)
-                if nii_aux:
-                    nii_values.append(nii_aux)
-                if mat_aux:
-                    mat_values.append(list(collapse([i for i in mat_aux])))
-                
-                try:
-                    if ctsv_values:
-                        ctsv_values = list(np.array(ctsv_values).T)
-                    if mat_values:
-                        mat_values = list(np.array(mat_values).T)
+                    if not os.path.isdir(item):
+                        print(f"Warning: {item} is not a directory", file=sys.stderr)
+                        continue
 
-                    merged_lists = [list(filter(lambda x: x is not None, sublist)) 
+                    input_path = os.path.join(item, key)
+                    if not os.path.exists(input_path):
+                        print(
+                            f"Warning: File '{os.path.basename(input_path)}' not found in {os.path.dirname(input_path)}",
+                            file=sys.stderr)
+                        continue
+
+                    file_type = file_types[key]
+
+                    if file_type == "txt":
+                        data = parse_txt(input_path)
+                        if data:
+                            txt_aux[item] = list(collapse(data))
+                            print(f"Merging: {input_path} -> {output_file}")
+
+                    elif file_type in ["csv", "tsv"]:
+                        delimiter = "," if file_type == "csv" else "\t"
+                        data = parse_ctsv(input_path, delimiter)
+                        if data:
+                            ctsv_aux[item] = list(collapse(data))
+                            print(f"Merging: {input_path} -> {output_file}")
+
+                    elif file_type == "nii":
+                        data = parse_nii(input_path)
+                        if data is not None:
+                            nii_aux[item] = data.flatten()
+                            print(f"Merging: {input_path} -> {output_file}")
+
+                    elif file_type == "mat":
+                        data = parse_mat(input_path)
+                        if data is not None:
+                            mat_aux[item] = data
+                            print(f"Merging: {input_path} -> {output_file}")
+
+                    else:
+                        print(f"Warning: Unsupported file type {file_type} for {input_path}", file=sys.stderr)
+
+                except Exception as e:
+                    print(f"Error processing file {input_path}: {str(e)}", file=sys.stderr)
+                    continue
+
+            # Store per-key values in outer dictionaries, keyed by 'key'
+            if txt_aux:
+                txt_values[key] = txt_aux
+            if ctsv_aux:
+                ctsv_values[key] = ctsv_aux
+            if nii_aux:
+                nii_values[key] = nii_aux
+            if mat_aux:
+                mat_values[key] = mat_aux
+
+            merged_lists = [list(filter(lambda x: x is not None, sublist))
                                   for sublist in zip_longest(
                                       [[list(pair)] for pair in zip(*[sublist for sublist in txt_values])],
                                       [[list(pair)] for pair in zip(*[sublist for sublist in ctsv_values])],
@@ -322,22 +322,9 @@ def main(args=None):
                                       [[list(pair)] for pair in zip(*[sublist for sublist in mat_values])],
                                       fillvalue=None)]
                     
-                    if merged_lists:
+            if merged_lists:
                         save_(output_file, list(collapse(sum(merged_lists, []))))
-                        
-                except Exception as e:
-                    print(f"Error merging data: {str(e)}", file=sys.stderr)
-                    
-                nii_values, txt_values, mat_values, ctsv_values, merged_lists = list(), list(), list(), list(), list()
-                
-            except Exception as e:
-                print(f"Error processing directory {item}: {str(e)}", file=sys.stderr)
-                continue
-                
-    except Exception as e:
-        print(f"Fatal error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
-        
+
     finally:
         total_time = time.time() - start_time
         total_time = f"{time.strftime('%H:%M:%S', time.gmtime(int(total_time)))}.{int((total_time - int(total_time)) * 1000):03d}"
