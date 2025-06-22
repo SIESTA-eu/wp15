@@ -5,6 +5,8 @@ import numpy as np
 import nibabel as nib
 from more_itertools import collapse
 from itertools import zip_longest
+
+from nibabel.filebasedimages import FileBasedImage
 from tqdm import tqdm
 
 
@@ -40,10 +42,10 @@ def extract_numeric_data(data, prefix=''):
     numeric_data = {}
 
     if isinstance(data, dict):
-        for key, value in data.items():
-            if key.startswith('__'):
+        for wl_file, value in data.items():
+            if wl_file.startswith('__'):
                 continue
-            sub_prefix = f"{prefix}.{key}" if prefix else key
+            sub_prefix = f"{prefix}.{wl_file}" if prefix else wl_file
             numeric_data.update(extract_numeric_data(value, sub_prefix))
 
     elif is_mat_struct(data):
@@ -80,6 +82,28 @@ def read_mat_file(filepath):
     mat_data = scipy.io.loadmat(filepath, struct_as_record=False, squeeze_me=True)
     return extract_numeric_data(mat_data)
 
+import numpy as np
+
+def concatenate_common_fields(dicts):
+    if not dicts:
+        return {}
+
+    # Step 1: Find keys that are common to all dictionaries
+    common_keys = set(dicts[0].keys())
+    for d in dicts[1:]:
+        common_keys &= d.keys()
+
+    result = {}
+    for key in common_keys:
+        lengths = [len(d[key]) for d in dicts]
+        if all(length == lengths[0] for length in lengths):
+            try:
+                concatenated = np.stack([np.ravel(np.asarray(d[key])) for d in dicts])
+            except Exception as e:
+                print(f"Error concatenating {key}: {str(e)}", file=sys.stderr)
+            result[key] = concatenated
+
+    return result
 
 
 def parse_ctsv(filepath, delimiter):
@@ -150,7 +174,7 @@ def parse_nii(filepath):
         if not os.path.isfile(filepath):
             raise ValueError(f"{filepath} is not a regular file")
             
-        img = nib.load(filepath)
+        img: FileBasedImage = nib.load(filepath)
         if img is None:
             raise ValueError("Failed to load NIfTI image")
             
@@ -164,7 +188,7 @@ def parse_nii(filepath):
         return None
 
 def parse_mat(filepath):   
-    meta_keys = {'__header__', '__version__', '__globals__', '#refs#'}
+    meta_wl_files = {'__header__', '__version__', '__globals__', '#refs#'}
     try:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"File {filepath} does not exist")
@@ -180,16 +204,16 @@ def parse_mat(filepath):
             try:
                 with h5py.File(filepath, 'r') as file:
                     result = {}
-                    for key, dataset in file.items():
-                        if key == "#refs#":
+                    for wl_file, dataset in file.items():
+                        if wl_file == "#refs#":
                             continue
                         try:
                             if isinstance(dataset, h5py.Dataset):
-                                result[key] = dataset[()]
+                                result[wl_file] = dataset[()]
                             else:
-                                result[key] = {subkey: dataset[subkey][()] for subkey in dataset.keys()}
+                                result[wl_file] = {subwl_file: dataset[subwl_file][()] for subwl_file in dataset.wl_files()}
                         except Exception as e:
-                            print(f"Error processing dataset {key} in MAT file {filepath}: {str(e)}", file=sys.stderr)
+                            print(f"Error processing dataset {wl_file} in MAT file {filepath}: {str(e)}", file=sys.stderr)
                     return result
             except Exception as e:
                 print(f"Error reading MAT file {filepath}: {str(e)}", file=sys.stderr)
@@ -276,8 +300,8 @@ def main(args=None):
             print(f"Error creating output directory {output_dir}: {str(e)}", file=sys.stderr)
             sys.exit(1)
 
-        data_dict = {key: list() for key in whitelist}
-        file_types = {key: filetype(key) for key in whitelist}
+        data_dict = {wl_file: list() for wl_file in whitelist}
+        file_types = {wl_file: filetype(wl_file) for wl_file in whitelist}
         txt_values, ctsv_values, mat_values, nii_values = list(), list(), list(), list()
         
         output_file = f"{output_dir}/group-merged.tsv"
@@ -295,11 +319,11 @@ def main(args=None):
         txt_values, ctsv_values, mat_values, nii_values = {}, {}, {}, {}
 
         # loop across files in the whitelist in the outer-loop, so that we can do diagnostics per file type
-        for key in whitelist:
-            txt_aux, ctsv_aux, mat_aux, nii_aux = {}, {}, {}, {}
+        for wl_file in whitelist:
+            txt_aux, ctsv_aux, mat_aux, nii_aux = {}, {}, [], {}
 
             # loop across the input directories
-            for item in tqdm(input_dirs, desc=f"Processing key '{key}': "):
+            for i, item in tqdm(enumerate(input_dirs), desc=f"Processing wl_file '{wl_file}': "):
                 try:
                     if not os.path.exists(item):
                         print(f"Warning: Input directory {item} does not exist", file=sys.stderr)
@@ -309,38 +333,39 @@ def main(args=None):
                         print(f"Warning: {item} is not a directory", file=sys.stderr)
                         continue
 
-                    input_path = os.path.join(item, key)
+                    input_path = os.path.join(item, wl_file)
                     if not os.path.exists(input_path):
                         print(
                             f"Warning: File '{os.path.basename(input_path)}' not found in {os.path.dirname(input_path)}",
                             file=sys.stderr)
                         continue
 
-                    file_type = file_types[key]
+                    file_type = file_types[wl_file]
 
                     if file_type == "txt":
                         data = parse_txt(input_path)
                         if data:
-                            txt_aux[item] = list(collapse(data))
+                            txt_aux[i] = list(collapse(data))
                             print(f"Merging: {input_path} -> {output_file}")
 
                     elif file_type in ["csv", "tsv"]:
                         delimiter = "," if file_type == "csv" else "\t"
                         data = parse_ctsv(input_path, delimiter)
                         if data:
-                            ctsv_aux[item] = list(collapse(data))
+                            ctsv_aux[i] = list(collapse(data))
                             print(f"Merging: {input_path} -> {output_file}")
 
                     elif file_type == "nii":
                         data = parse_nii(input_path)
                         if data is not None:
-                            nii_aux[item] = data.flatten()
+                            #nii_aux[i] = data.flatten()
+                            nii_aux.append(data)
                             print(f"Merging: {input_path} -> {output_file}")
 
                     elif file_type == "mat":
                         data = parse_mat(input_path)
                         if data is not None:
-                            mat_aux[item] = data
+                            mat_aux.append(data)
                             print(f"Merging: {input_path} -> {output_file}")
 
                     else:
@@ -350,15 +375,37 @@ def main(args=None):
                     print(f"Error processing file {input_path}: {str(e)}", file=sys.stderr)
                     continue
 
-            # Store per-key values in outer dictionaries, keyed by 'key'
+            # temporarily store the data in outer dictionaries => TODO for bookkeeping?
             if txt_aux:
-                txt_values[key] = txt_aux
+                txt_values[wl_file] = txt_aux
             if ctsv_aux:
-                ctsv_values[key] = ctsv_aux
+                ctsv_values[wl_file] = ctsv_aux
             if nii_aux:
-                nii_values[key] = nii_aux
+                nii_values[wl_file] = nii_aux
             if mat_aux:
-                mat_values[key] = mat_aux
+                mat_concat = concatenate_common_fields(mat_aux)
+                mat_values[wl_file] = mat_concat
+
+        # Collect all arrays from the nested dicts
+        mat_data = []
+        for outer_dict in mat_values.values():
+            for arr in outer_dict.values():
+                arr = np.asarray(arr)
+                if arr.shape[0] != 3:
+                    raise ValueError(f"Expected shape (3, N), got {arr.shape}")
+                mat_data.append(arr)
+
+        # Concatenate all arrays horizontally
+        result = np.concatenate(mat_data, axis=1)
+
+
+    finally:
+        total_time = time.time() - start_time
+        total_time = f"{time.strftime('%H:%M:%S', time.gmtime(int(total_time)))}.{int((total_time - int(total_time)) * 1000):03d}"
+        print(f"\nTotal time taken: {total_time}")
+
+
+
 
             #merged_lists = [list(filter(lambda x: x is not None, sublist))
             #                      for sublist in zip_longest(
@@ -372,10 +419,7 @@ def main(args=None):
             #            save_(output_file, list(collapse(sum(merged_lists, []))))
 
 
-    finally:
-        total_time = time.time() - start_time
-        total_time = f"{time.strftime('%H:%M:%S', time.gmtime(int(total_time)))}.{int((total_time - int(total_time)) * 1000):03d}"
-        print(f"\nTotal time taken: {total_time}")
+
 
 if __name__ == "__main__":
     main()
