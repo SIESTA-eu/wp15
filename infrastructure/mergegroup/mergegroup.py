@@ -338,7 +338,7 @@ def main(args=None):
                     print(f"Error processing file {input_path}: {str(e)}", file=sys.stderr)
                     continue
 
-            # store the data per whitelisted file in dictionaries => TODO for bookkeeping, we may want to create a list of nested keys, so that we can put back noise-calibrated data where it belongs eventually?
+            # store the data per whitelisted file in dictionaries => perhapsß for bookkeeping, we may want to create a list of nested keys, so that we can put back noise-calibrated data where it belongs eventually?
             # keeping only the fields that are shared across files, and that have the same size
             data_values[wl_file] = concatenate_common_fields(temp_aux)
 
