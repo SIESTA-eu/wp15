@@ -208,7 +208,7 @@ def parse_nii(filepath):
         return None
 
 def parse_mat(filepath):   
-    meta_wl_files = {'__header__', '__version__', '__globals__', '#refs#'}
+    meta_keys = {'__header__', '__version__', '__globals__', '#refs#'}
     try:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"File {filepath} does not exist")
