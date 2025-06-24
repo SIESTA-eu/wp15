@@ -156,7 +156,7 @@ The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
 
 ### Pipeline results
 
-The analysis results in ...
+The analysis results in a timecourse of the activity of the whole brain that survives statistical t-test threshold value for a specific task. The activity is based on the averaging for all subjects of the parameter estimates and contrast estimates from the 1st-level analyses. The output will be several nifti files corresponding to the final result of the statistical test. One nifti file for the spmT results superimposed on a T1 template. And as many nifti files superimposed on a T1 template as contrast files generated in the analyses.
 
 ### Computational requirements for the participant level
 
