@@ -118,8 +118,12 @@ The output will be:
 - All subjects are expected to be right in **base dir original/scrambled** folders.
 ```
 original/scrambled
-├── sub-02
-├── sub-03
+├── sub-SAXNES2s001
+│    ├── anat
+│    └── func
+├── sub-SAXNES2s002
+│    ├── anat
+│    └── func
 ├── ...
 ├── ...
 ```
