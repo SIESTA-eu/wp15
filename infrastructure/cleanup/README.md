@@ -37,13 +37,13 @@ Create an exclusion file (whitelist.txt):
 Run the cleaner:
 
 ```bash
-./clean_directory.py /path/to/clean whitelist.txt
+python cleanup.py /path/to/clean whitelist.txt
 ```
 
 For a dry run (preview only):
 
 ```bash
-./clean_directory.py /path/to/clean whitelist.txt --dry-run
+python cleanup.py /path/to/clean whitelist.txt --dry-run
 ```
 
 ## Exclusion File Format
