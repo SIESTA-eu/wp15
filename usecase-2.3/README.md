@@ -65,26 +65,31 @@ scramble input scrambled fif -s 'sub-../.*_meg\.fif'
 
 For the scrambled data you can ensure to what degree intended patterns or information are leaked from the original dataset. You can use [DatLeak](https://github.com/SIESTA-eu/DatLeak) to test for potential data leakage, checking whether the scrambled variables still contain any identifiable patterns that could be traced back to the original participants. DatLeak detects data leakage in anonymized datasets by comparing the original data with the scrambled version. It calculates **full leakage** (where all voxels are identical in an array) and **partial leakage** (where some, but not all, variables match). These calculation help assess the effectiveness of the anonymization process. Running DatLeak on scrambled datasets helps confirm that the anonymization process is robust and protects participant privacy.
 
-#### Installing DatLeak is done by cloning its repository.
+#### Installing DatLeak is done by cloning its repository
 
 ```console
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
-#### Usage 
 
-```
+#### Usage
+
+```console
 python run.py <base dir original> <base dir scrambled> [report]
 # example
 python run.py usecase-2.3/input usecase-2.3/scrambled True/False
 ```
+
 #### Output
+
 The output will be:
+
 - A brief information of the subject
 - Full/Partial leakage in time dimension
 - Total full/partial leakage of the image
    - Partial leakage will be assessed by numerical values where the maximum value  [0.999]  indicates the maximum information leaked
    - Full leakage will be assessed by True/False indicating whether or not the image needs to be re-scrambled
-```
+
+```console
 ########################################
  - Subject ID: sub-01
  - Task: facerecognition
@@ -94,22 +99,20 @@ The output will be:
 	 - Temporal: 	Full Leakage: 0/395 channels 	Average Partial Leakage 0.0011
  - Partial Leakage: 0.0011
  - Full Leakage: False
-
 ```
 
+**NOTE:**
 
-**NOTE:** 
 - DatLeak is divided into two branches of **Tabular** and **NeuroImaging** folders, where anything related to BIDS dataset are stored in NeuroImaging folders.
 - All subjects are expected to be right in **base dir original/scrambled** folders.
-```
+
+```console
 original/scrambled
 ├── sub-01
 ├── sub-02
 ├── ...
 ├── ...
 ```
-
-
 
 ### Data citation
 
@@ -124,6 +127,10 @@ The input dataset has been released under the [CC0](https://spdx.org/licenses/CC
 The data user's pipeline implements an Event-Related Field (ERF) analysis on [Magnetoencephalography](https://en.wikipedia.org/wiki/Magnetoencephalography) (MEG) data.
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Pipeline results
+
+The analysis results in a timecourse of the activity in the (occipital) cluster that survives multiple-comparison correction. The activity is the grand average over all participants. This is a vector of scalar values that, together with the corresponding latencies, are represented as two columns in a TSV file.
 
 ### Computational requirements for the participant level
 

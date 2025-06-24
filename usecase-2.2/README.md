@@ -56,26 +56,31 @@ scramble input scrambled nii permute y -i
 
 For the scrambled data you can ensure to what degree intended patterns or information are leaked from the original dataset. You can use [DatLeak](https://github.com/SIESTA-eu/DatLeak) to test for potential data leakage, checking whether the scrambled variables still contain any identifiable patterns that could be traced back to the original participants. DatLeak detects data leakage in anonymized datasets by comparing the original data with the scrambled version. It calculates **full leakage** (where all voxels are identical in an array) and **partial leakage** (where some, but not all, variables match). These calculation help assess the effectiveness of the anonymization process. Running DatLeak on scrambled datasets helps confirm that the anonymization process is robust and protects participant privacy.
 
-#### Installing DatLeak is done by cloning its repository.
+#### Installing DatLeak is done by cloning its repository
 
 ```console
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
-#### Usage 
 
-```
+#### Usage
+
+```console
 python run.py <base dir original> <base dir scrambled> [report]
 # example
 python run.py usecase-2.2/input usecase-2.2/scrambled True/False
 ```
+
 #### Output
+
 The output will be:
+
 - A brief information of the subject
 - Full/Partial leakage in different axis
 - Total full/partial leakage of the image
-   - Partial leakage will be assessed by numerical values where the maximum value  [0.999]  indicates the maximum information leaked
-   - Full leakage will be assessed by True/False indicating whether or not the image needs to be re-scrambled
-```
+  - Partial leakage will be assessed by numerical values where the maximum value  [0.999]  indicates the maximum information leaked
+  - Full leakage will be assessed by True/False indicating whether or not the image needs to be re-scrambled
+
+```console
 ########################################
  - Subject ID: sub-02
  - Shape: (176, 248, 256)
@@ -86,14 +91,14 @@ The output will be:
 	 - Dimension[Z]: 	Full Leakage: 0/256 slices	Average Partial Leakage: 0.535
  - Partial Leakage: 0.6614
  - Full Leakage: False
-
 ```
 
+**NOTE:**
 
-**NOTE:** 
 - DatLeak is divided into two branches of **Tabular** and **NeuroImaging** folders, where anything related to BIDS dataset are stored in NeuroImaging folders.
 - All subjects are expected to be right in **base dir original/scrambled** folders.
-```
+
+```console
 original/scrambled
 ├── sub-02
 ├── sub-03
@@ -114,6 +119,10 @@ The input dataset has been released under the [CC0](https://spdx.org/licenses/CC
 This implements the [MRIQC](https://mriqc.readthedocs.io/en/latest/) pipeline for obtaining standard QC measures from an MRI dataset.
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Pipeline results
+
+The analysis results in ...
 
 ### Computational requirements for the participant level
 
