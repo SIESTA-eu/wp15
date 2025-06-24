@@ -79,7 +79,7 @@ For the scrambled data you can ensure to what degree intended patterns or inform
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
 
-#### Usage
+#### DatLeak usage
 
 ```console
 python run.py <base dir original> <base dir scrambled> [report]
@@ -87,7 +87,7 @@ python run.py <base dir original> <base dir scrambled> [report]
 python run.py usecase-2.5/input usecase-2.5/scrambled True/False
 ```
 
-#### Output
+#### DatLeak output
 
 The output will be:
 

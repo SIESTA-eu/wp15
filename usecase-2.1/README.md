@@ -57,7 +57,7 @@ For the scrambled data you can ensure to what degree intended patterns or inform
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
 
-#### Usage
+#### DatLeak usage
 
 ```console
 python DatLeak.py <original_file> <scrambled_file> [ignore_value] [ignore_col]
