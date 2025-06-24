@@ -89,7 +89,7 @@ python run.py usecase-2.5/input usecase-2.5/scrambled True/False
 The output will be:
 - A brief information of the subject
 - Spatial analysis full/partial leakage in different axis [x, y, z]
-- Temporal analysis full/parital leakage in time [t]
+- Temporal analysis full/partial leakage in time [t]
 - Total full/partial leakage of the image
    - Partial leakage will be assessed by numerical values where the maximum value  [0.999]  indicates the maximum information leaked
    - Full leakage will be assessed by True/False indicating whether or not the image needs to be re-scrambled
