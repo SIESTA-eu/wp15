@@ -18,7 +18,9 @@ Python 3.x
 
 ## Usage
 
-    ./clean_directory.py <directory> [whitelist_file] [--dry-run]
+```bash
+python cleanup.py <directory> [whitelist_file] [--dry-run]
+```
 
 ## Arguments
 
@@ -28,7 +30,7 @@ Python 3.x
 
 ## Example
 
-Create an exclusion file (whitelist.txt):
+Create an exclusion file that is named `whitelist.txt`:
 
     # Keep these files/directories
     important_file.txt
