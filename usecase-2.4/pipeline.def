@@ -11,6 +11,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   work/bidsapp.m             /work/bidsapp.m
   work/ERP_Core_WB.m         /work/ERP_Core_WB.m
   work/ERP_Core_WB_install.m /work/ERP_Core_WB_install.m
+  work/limo-AvgChanlocs.mat  /work/limo-AvgChanlocs.mat
 
 %post
   ################################################################################
