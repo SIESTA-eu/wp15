@@ -1,10 +1,16 @@
 BootStrap: docker
-From: ubuntu:24.04
+From: python:3-slim
+
+%help
+
+    The general form to run the calibratenoise command is:
+        apptainer run calibratenoise.sif <input.tsv> <output.tsv>
 
 %labels
   org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
 %files
+  calibratenoise/calibratenoise.py /opt/calibratenoise.py
 
 %post
   ################################################################################
@@ -15,17 +21,9 @@ From: ubuntu:24.04
   echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
   DEBIAN_FRONTEND=noninteractive apt install -y tzdata
 
-  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
-  apt-get clean && rm -rf /var/lib/apt/lists/*
-
 %environment
   export LC_ALL=C
 
 %runscript
-  if [ ! -d "$1" ]; then
-    echo Error: the directory "$1" does not exist
-    exit 1
-  fi
-  echo Creating output directory "$2"
-  mkdir -p "$2"
-  echo The noise calibration is not yet implemented ...
+    python3 /opt/calibratenoise.py "$@"
+
