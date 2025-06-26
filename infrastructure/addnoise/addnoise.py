@@ -1,71 +1,102 @@
-import csv
-import sys
+import sys, os
+from pathlib import Path
+from more_itertools import collapse
 
-# FIXME FIXME FIXME FIXME FIXME FIXME FIXME 
-# This should start with the whitelist file, which is not implemented yet.
-# FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+# Ensure the script can find the mergegroup/lib directory
+current_dir = Path(__file__).resolve().parent
+shared_dir = current_dir.parent / 'mergegroup'
+if shared_dir not in sys.path:
+    sys.path.append(str(shared_dir))
 
-def addnoise(result_file, noise_file, output_file):
-    """
-    Reads two TSV files, one with the results of the pipeline and the other with the calibrated noise_file, 
-    adds the corresponding numeric values (noise_file to result_file), and writes the result_file to an output TSV file.
-    """
-    try:
-        # Read the first file
-        with open(result_file, 'r', newline='') as f1:
-            reader1 = csv.reader(f1, delimiter='\t')
-            result = [row for row in reader1]
+# Importing necessary modules from the mergegroup/lib directory
+from lib.filetype import filetype as filetype
+from lib import txt, csv, tsv, nii, mat
+
+
+def addnoise(input_dir, output_dir, whitelist_path, noise_path):
+    if not os.path.exists(whitelist_path):
+        raise FileNotFoundError("Whitelist file not found")
         
-        # Read the second file
-        with open(noise_file, 'r', newline='') as f2:
-            reader2 = csv.reader(f2, delimiter='\t')
-            noise = [row for row in reader2]
+    if not os.path.isfile(whitelist_path):
+        raise ValueError(f"Whitelist file is not a regular file_name")
         
-        # Check if files have the same dimensions
-        if len(result) != len(noise):
-            raise ValueError("Files have different number of rows")
+    with open(whitelist_path, "r") as file_name:
+        whitelist = [line.strip() for line in file_name if line.strip() and not line.startswith("#")]
+    
+    if not whitelist:
+        raise ValueError("Whitelist file is empty or contains no valid entries")
+
+    # Check if the output directory exists, if not create it
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Read the noise file_name, this is expected to be a TSV file_name
+    file_type = filetype(noise_path)
+    if file_type == "txt":
+        noise, structure = txt.read(noise_path)
+    elif file_type == "tsv":
+        noise, structure = tsv.read(noise_path)
+    elif file_type == "csv":
+        noise, structure = csv.read(noise_path)
+    elif file_type == "nii":
+        noise, structure = nii.read(noise_path)
+    elif file_type == "mat":
+        noise, structure = mat.read(noise_path)
+
+    offset = 0
+    for file_name in whitelist:
+        input_file  = os.path.join(input_dir, file_name)
+        output_file = os.path.join(output_dir, file_name)
         
-        result_file = []
-        for row1, row2 in zip(result, noise):
-            if len(row1) != len(row2):
-                raise ValueError("Rows have different number of columns")
+        if not os.path.exists(input_file):
+            raise FileExistsError("file_name not found: " + input_file)
             
-            new_row = []
-            for val1, val2 in zip(row1, row2):
-                # Try to convert to float and add if both are numeric
-                try:
-                    num1 = float(val1)
-                    num2 = float(val2)
-                    new_val = num1 + num2
-                    # Keep as integer if possible for cleaner output
-                    if new_val.is_integer():
-                        new_row.append(str(int(new_val)))
-                    else:
-                        new_row.append(str(new_val))
-                except ValueError:
-                    # If not numeric, keep the value from result_file
-                    new_row.append(val1)
-            
-            result_file.append(new_row)
+        file_type = filetype(input_file)
         
-        # Write the result_file to output file
-        with open(output_file, 'w', newline='') as out_file:
-            writer = csv.writer(out_file, delimiter='\t')
-            writer.writerows(result_file)
+        if file_type == "txt":
+            content, structure = txt.read(input_file)
+        elif file_type == "tsv":
+            content, structure = tsv.read(input_file)
+        elif file_type == "csv":
+            content, structure = csv.read(input_file)
+        elif file_type == "nii":
+            content, structure = nii.read(input_file)
+        elif file_type == "mat":
+            content, structure = mat.read(input_file)
+        else:
+            print(f"Warning: Unsupported file type {file_type} for {input_file}", file=sys.stderr)
+            continue
+
+        # Add the noise to the results
+        for i in range(len(content)):
+            content[i] += noise[i]
+        offset += len(content)
+
+        # Write the noisy result to the output file        
+        if file_type == "txt":
+            txt.write(output_file, content, structure)
+        elif file_type == "tsv":
+            tsv.write(output_file, content, structure)
+        elif file_type == "csv":
+            csv.write(output_file, content, structure)
+        elif file_type == "nii":
+            nii.write(output_file, content, structure)
+        elif file_type == "mat":
+            mat.write(output_file, content, structure)  
+        else:
+            print(f"Warning: Unsupported file type {file_type} for {output_file}", file_name=sys.stderr)
+            continue
         
         print(f"Successfully added the noise to the results and wrote {output_file}")
     
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        sys.exit(1)
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Usage: python addnoise.py <result_file.tsv> <noise_file.tsv> <output_file.tsv>")
+        print("Usage: python addnoise.py <inputdir> <outputdir> <whitelist.txt>  <noise.tsv>")
         sys.exit(1)
     
-    result_file = sys.argv[1]
-    noise_file = sys.argv[2]
-    output_file = sys.argv[3]
-    
-    addnoise(result_file, noise_file, output_file)
+    input_dir      = sys.argv[1]
+    output_dir     = sys.argv[2]
+    whitelist_path = sys.argv[3]
+    noise_path     = sys.argv[4]
+
+    addnoise(input_dir, output_dir, whitelist_path, noise_path)

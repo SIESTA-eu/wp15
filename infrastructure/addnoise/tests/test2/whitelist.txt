@@ -1,1 +1,1 @@
-result.mat
+results.tsv
