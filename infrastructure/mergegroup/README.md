@@ -4,12 +4,10 @@ The results of the group analysis pipeline executed on the [leave-one-out](https
 
 The `mergegroup` step is responsible to collect the results of all these leave-one-out samples, to represent each leave-one-out sample as a row vector, concatenated over all files that comprise the result, and to concatenate those vertically over all leave-one-out samples and store the resulting matrix in a tabular formatted file `results.tsv` that allows to calibrate the noise.
 
-The `mergegroup.sif` container is built by `infrastructure/mergegroup.def` which runs `infrastructure/mergegroup/mergegroup.py`.
-
 ## Usage
 
-```console
-mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>
+```bash
+python mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>
 ```
 
 ## Directory with tests
@@ -62,7 +60,7 @@ test10/
 
 The Python script can be executed on one of the test datasets as follows:
 
-```console
+```bash
 cd tests/test0
 mergegroup.py group-1 group-2 group-3 group-merged whitelist.txt
 ```

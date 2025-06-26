@@ -1,5 +1,6 @@
-import pytest, mergegroup
+import pytest
 from pathlib import Path
+import mergegroup
 
 test_path = Path('tests')
 test_dirs = [d for d in test_path.iterdir() if d.is_dir() and d.name.startswith('test')]

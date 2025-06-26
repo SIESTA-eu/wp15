@@ -2,7 +2,8 @@
 
 This is a Python script that reads the list of input files from a whitelist file.
 For each of those files it adds the corresponding noise values and writes the noisy
-results to a file with the same format as the input file format.
+results to a file in the output directory with the same file name and format as
+the input file.
 
 ## Features
 
@@ -20,5 +21,5 @@ Python 3.x
 ## Usage
 
 ```bash
-python addnoise.py <whitelist.txt> <noise.tsv> <outputdir>
+python addnoise.py <inputdir> <outputdir> <whitelist.txt> <noise.tsv>
 ```
