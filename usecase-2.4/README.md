@@ -166,10 +166,7 @@ git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
 mv limo_tools           eeglab/plugins/limo_tools
 
 # clone repo and checkout a version that is known to work
-git clone https://github.com/sccn/zapline-plus
-cd zapline-plus
-git checkout 18d4eec
-cd ../
+git clone https://github.com/MariusKlug/zapline-plus
 mv zapline-plus         eeglab/plugins/zapline-plus
 
 wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
