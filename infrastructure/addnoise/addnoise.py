@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys, os
 from pathlib import Path
 from more_itertools import collapse
@@ -13,7 +15,19 @@ from lib.filetype import filetype as filetype
 from lib import txt, csv, tsv, nii, mat
 
 
-def addnoise(input_dir, output_dir, whitelist_path, noise_path):
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    
+    if len(args) != 5:
+        print("Usage: python addnoise.py <inputdir> <outputdir> <whitelist.txt>  <noise.tsv>")
+        sys.exit(1)
+    
+    input_dir      = args[1]
+    output_dir     = args[2]
+    whitelist_path = args[3]
+    noise_path     = args[4]
+
     if not os.path.exists(whitelist_path):
         raise FileNotFoundError("Whitelist file not found")
         
@@ -90,13 +104,4 @@ def addnoise(input_dir, output_dir, whitelist_path, noise_path):
     
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python addnoise.py <inputdir> <outputdir> <whitelist.txt>  <noise.tsv>")
-        sys.exit(1)
-    
-    input_dir      = sys.argv[1]
-    output_dir     = sys.argv[2]
-    whitelist_path = sys.argv[3]
-    noise_path     = sys.argv[4]
-
-    addnoise(input_dir, output_dir, whitelist_path, noise_path)
+    main()
