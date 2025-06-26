@@ -129,7 +129,7 @@ end
 sublist = find(ismember({all_sub.name}', SubjectLabel))'; % labels to num
 
 if ~exist('TaskLabel','var')
-        TaskLabel = {'ERN','MMN','N170','N2pc','N400','P3'};
+        TaskLabel = {'ERN','MMN'};%,'N170','N2pc','N400','P3'};
 end
 
 if any(cellfun(@(x) contains(x,'high_pass'),options))
@@ -333,7 +333,9 @@ if strcmpi(AnalysisLevel,'1')
                 if EEGTMP.srate ~= 250
                     EEGTMP = pop_resample(EEGTMP, 250);
                 end
-                % line freq removal
+                % line freq removal -> NOTE THE BELOW SYNTAX REQUIRES
+                % MARIUSKLUG'S VERSION OF THE PLUGIN, THE ONE ON THE SCCN
+                % REPO IS OUTDATED
                 EEGTMP = pop_zapline_plus(EEGTMP,'noisefreqs','line',...
                     'coarseFreqDetectPowerDiff',4,'chunkLength',30,...
                     'adaptiveNremove',1,'fixedNremove',1,'plotResults',0);
@@ -377,7 +379,7 @@ if strcmpi(AnalysisLevel,'1')
         if exist('error_report','var')
             mask = cellfun(@(x) ~isempty(x), error_report); % which subject/session
             if all(mask)
-                save(fullfile(OutputLocation,'error_report_preprocessing'),error_report);
+                save(fullfile(OutputLocation,'error_report_preprocessing'), 'error_report'); %NOTE PLEASE DON'T DUMP OLD BUGGY CODE BACK, THERE WAS A FIXED BUG HERE WHICH RESURFACED
                 error('there has been a preprocessing issue with all included datasets, cannot proceed');
             else
                 STUDY = std_rmdat(STUDY, EEG, 'datinds', find(mask));
@@ -449,7 +451,10 @@ if strcmpi(AnalysisLevel,'1')
             end
         end
 
-        % 1st AnalysisLevel analysis
+        % 1st AnalysisLevel analysis -> NOTE THE LIMO CODE USED SHOULD NOT
+        % BE THE V4.0 BRANCH, BECAUSE THE CURRENT VERSION OF THE CODE
+        % ASSUMES SPECIFIC FILENAMING ETC WHICH IS NOT SUPPORTED IN THE
+        % OLDER CODE
         [STUDY, files] = std_limo(STUDY, EEG, 'method',estimation,...
             'measure','daterp', 'chanloc',AvgChanlocs,...
             'timelim',analysis_window(t,:),'erase','on',...
