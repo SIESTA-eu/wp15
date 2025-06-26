@@ -87,5 +87,6 @@ def read(filepath):
     return content, structure
 
 def write(filepath, content, structure):
-    raise NotImplementedError("Writing to .mat files is not implemented yet.")
+    print("ERROR: Writing to .mat files is not implemented yet.")
+    # FIXME: Implement the write function for .mat files
     return
