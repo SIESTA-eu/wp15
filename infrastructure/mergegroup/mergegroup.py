@@ -23,7 +23,10 @@ def main(args=None):
         print("Usage: mergegroup.py <input dir 1> <input dir 2> ... <output dir> <whitelist.txt>", file=sys.stderr)
         sys.exit(1)
 
+    input_dirs     = args[1:-2]
+    output_dir     = args[-2]
     whitelist_path = args[-1]
+
     if not os.path.exists(whitelist_path):
         raise FileNotFoundError(f"Whitelist file not found at {whitelist_path}")
         
@@ -36,7 +39,6 @@ def main(args=None):
     if not whitelist:
         raise ValueError("Whitelist file is empty or contains no valid entries")
 
-    output_dir = args[-2]
     os.makedirs(output_dir, exist_ok=True)
     if not os.path.isdir(output_dir):
         raise NotADirectoryError(f"{output_dir} is not a valid directory")
@@ -45,7 +47,6 @@ def main(args=None):
     if os.path.exists(output_file):
         os.remove(output_file)
     
-    input_dirs = args[1:-2]
     if not input_dirs:
         raise ValueError("No input directories provided")
 
