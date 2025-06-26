@@ -33,7 +33,7 @@ def read(filepath, delimiter='\t'):
 def write(filepath, content, structure, delimiter='\t'):
     # FIXME the structure should contain information about the number of rows and columns, and about the header
     with open(filepath, 'w', newline='') as file:
-        writer = csv.writer(file, delimiter=',')
+        writer = csv.writer(file, delimiter=delimiter)
         if isinstance(content, list) and all(isinstance(row, list) for row in content):
             # If content is a list of lists, write each row
             for row in content:
