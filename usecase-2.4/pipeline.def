@@ -42,7 +42,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
 
   git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
   mv limo_tools eeglab/plugins/limo_tools
-
+  cp eeglab/plugins/limo_tools/std_limo.m eeglab/functions/studyfunc/std_limo.m
   
   # also use the original github-repo for zapline
   git clone https://github.com/MariusKlug/zapline-plus.git
