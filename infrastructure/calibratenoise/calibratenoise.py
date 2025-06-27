@@ -2,11 +2,21 @@ import csv
 import math
 import sys
 
-def calibratenoise(input_file, output_file):
+def main(args=None):
     """
-    Reads a TSV file, computes standard deviation for each column,
+    Reads a TSV file, computes the standard deviation for each column,
     and writes the results to another TSV file.
     """
+    if args is None:
+        args = sys.argv
+    
+    if len(args) != 3:
+        print("Usage: python calibratenoise.py <input.tsv> <output.tsv>")
+        sys.exit(1)
+    
+    input_file  = args[1]
+    output_file = args[2]
+
     # Initialize variables
     columns = []
     column_sums = []
@@ -76,11 +86,4 @@ def calibratenoise(input_file, output_file):
     print(f"Standard deviations written to {output_file}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python calibratenoise.py <input.tsv> <output.tsv>")
-        sys.exit(1)
-    
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
-    
-    calibratenoise(input_file, output_file)
+    main()
