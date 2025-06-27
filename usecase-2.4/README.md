@@ -162,7 +162,7 @@ unzip 2024.2.1.zip
 mv eeglab-2024.2.1 eeglab
 rm 2024.2.1.zip
 
-git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
+git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
 mv limo_tools           eeglab/plugins/limo_tools
 
 # clone repo and checkout a version that is known to work
