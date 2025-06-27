@@ -5,7 +5,7 @@ This script recursively removes files and directories from a specified directory
 except those listed in an exclusion file. The exclusion file can contain files or directories to be kept.
 The script can be run in dry-run mode to show what would be removed without actually deleting anything.
 Usage:
-    python cleanup.py <directory> [<exclusion_file>] [--dry-run]
+    cleanup.py <directory> [<exclusion_file>] [--dry-run]
 """
 
 import os
@@ -82,6 +82,7 @@ def clean_directory(directory, exclusions):
             else:
                 print(f"Keeping directory: {dir_path}")
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Recursively remove files and directories except those listed in exclusion file."
@@ -116,6 +117,7 @@ def main():
                     print(f"[Dry run] Would keep directory: {dir_path}")
     else:
         clean_directory(args.directory, exclusions)
+
 
 if __name__ == "__main__":
     main()

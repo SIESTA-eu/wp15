@@ -1,7 +1,7 @@
-# Directory Cleaner
+# Cleanup
 
-A Python script that recursively removes files and directories while 
-preserving whitelisted items that are listed in an exclusion file.
+This is a Python script that recursively removes files and directories, while
+preserving the files that are listed in the whitelist file.
 
 ## Features
 
@@ -19,7 +19,7 @@ Python 3.x
 ## Usage
 
 ```bash
-python cleanup.py <directory> [whitelist_file] [--dry-run]
+cleanup.py <directory> [whitelist_file] [--dry-run]
 ```
 
 ## Arguments
@@ -32,20 +32,20 @@ python cleanup.py <directory> [whitelist_file] [--dry-run]
 
 Create an exclusion file that is named `whitelist.txt`:
 
-    # Keep these files/directories
+    # Keep these files/directories, comments are ignored
     important_file.txt
     protected_dir/
 
 Run the cleaner:
 
 ```bash
-python cleanup.py /path/to/clean whitelist.txt
+cleanup.py /path/to/clean whitelist.txt
 ```
 
 For a dry run (preview only):
 
 ```bash
-python cleanup.py /path/to/clean whitelist.txt --dry-run
+cleanup.py /path/to/clean whitelist.txt --dry-run
 ```
 
 ## Exclusion File Format

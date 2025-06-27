@@ -1,3 +1,1 @@
-a.mat
-b.mat
-c.mat
+results.mat
