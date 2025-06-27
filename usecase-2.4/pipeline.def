@@ -40,10 +40,6 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv eeglab-2024.2.1 eeglab
   rm 2024.2.1.zip
 
-  git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
-  mv limo_tools eeglab/plugins/limo_tools
-  cp eeglab/plugins/limo_tools/std_limo.m eeglab/functions/studyfunc/std_limo.m
-  
   # also use the original github-repo for zapline
   git clone https://github.com/MariusKlug/zapline-plus.git
   mv zapline-plus eeglab/plugins/zapline-plus
@@ -77,6 +73,10 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv picard-matlab        eeglab/plugins/PICARD1.0
   mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 
+  git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
+  mv limo_tools eeglab/plugins/limo_tools
+  cp eeglab/plugins/limo_tools/std_limo.m eeglab/functions/studyfunc/std_limo.m
+  
   # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
