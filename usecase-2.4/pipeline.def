@@ -40,15 +40,12 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv eeglab-2024.2.1 eeglab
   rm 2024.2.1.zip
 
-  git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
+  git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
   mv limo_tools eeglab/plugins/limo_tools
 
   
-  # also use the github-repo for zapline, the v1.2.1 zip-file is buggy
-  git clone https://github.com/sccn/zapline-plus.git
-  cd zapline-plus
-  git checkout 18d4eec
-  cd ../
+  # also use the original github-repo for zapline
+  git clone https://github.com/MariusKlug/zapline-plus.git
   mv zapline-plus eeglab/plugins/zapline-plus
   
   wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
