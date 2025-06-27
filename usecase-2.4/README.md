@@ -70,7 +70,7 @@ git clone https://github.com/SIESTA-eu/DatLeak.git
 ```console
 python run.py <base dir original> <base dir scrambled> [report]
 # example
-python run.py usecase-2.3/input usecase-2.3/scrambled True/False
+python run.py usecase-2.4/input usecase-2.4/scrambled True/False
 ```
 
 #### DatLeak output
