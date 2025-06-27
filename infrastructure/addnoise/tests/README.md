@@ -13,3 +13,5 @@ Test 4 has pipeline results as a NII file with a 1x2x3 array.
 Test 5 has pipeline results in three different MAT files.
 
 Test 6 has pipeline results in two MAT files, both containing a structure, one in v6 and the other in v73 format.
+
+Test 7 has pipeline results in two NII files.
