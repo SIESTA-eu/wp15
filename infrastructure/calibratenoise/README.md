@@ -1,6 +1,8 @@
 # Calibratenoise
 
-This is a Python script that computes the standard deviation over each column in a `.tsv` file.
+This is a Python script that computes the standard deviation over the rows of the
+input `.tsv` file. Each row is a LOO sample, and each column is one of the variables
+that results from the group-level pipeline. 
 
 ## Features
 
@@ -19,5 +21,5 @@ Python 3.x
 ## Usage
 
 ```bash
-python calibratenoise.py <input.tsv> <output.tsv>
+calibratenoise.py <input.tsv> <output.tsv>
 ```

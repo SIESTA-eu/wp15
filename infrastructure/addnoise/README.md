@@ -11,6 +11,7 @@ Supported input file formats are:
 
 - tsv
 - csv
+- txt
 - nii
 - mat
 
@@ -21,5 +22,5 @@ Python 3.x
 ## Usage
 
 ```bash
-python addnoise.py <inputdir> <outputdir> <whitelist.txt> <noise.tsv>
+addnoise.py <inputdir> <outputdir> <whitelist.txt> <noise.tsv>
 ```

@@ -20,7 +20,7 @@ def main(args=None):
         args = sys.argv
     
     if len(args) != 5:
-        print("Usage: python addnoise.py <inputdir> <outputdir> <whitelist.txt>  <noise.tsv>")
+        print("Usage: addnoise.py <inputdir> <outputdir> <whitelist.txt>  <noise.tsv>")
         sys.exit(1)
     
     input_dir      = args[1]

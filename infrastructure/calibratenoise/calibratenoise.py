@@ -11,7 +11,7 @@ def main(args=None):
         args = sys.argv
     
     if len(args) != 3:
-        print("Usage: python calibratenoise.py <input.tsv> <output.tsv>")
+        print("Usage: calibratenoise.py <input.tsv> <output.tsv>")
         sys.exit(1)
     
     input_file  = args[1]
