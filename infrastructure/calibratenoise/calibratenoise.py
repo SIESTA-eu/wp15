@@ -1,8 +1,7 @@
 import csv
 import math
 import sys
-import numpy as np
-from src.utils import * 
+
 
 def main(args=None):
     """
