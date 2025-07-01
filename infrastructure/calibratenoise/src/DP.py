@@ -1,6 +1,6 @@
 import numpy as np
 
-def sensetivity(data):
+def sensitivity(data):
 
     return np.abs(np.max(data) - np.min(data))
     
