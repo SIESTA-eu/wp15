@@ -10,3 +10,11 @@ group/spWM_run-001/con_0001.nii
 group/spWM_run-001/spmT_0001.nii
 group/spWM_run-002/con_0001.nii
 group/spWM_run-002/spmT_0001.nii
+group/VOE_run-001/con_0001.nii
+group/VOE_run-001/spmT_0001.nii
+group/VOE_run-002/con_0001.nii
+group/VOE_run-002/spmT_0001.nii
+group/VOE_run-003/con_0001.nii
+group/VOE_run-003/spmT_0001.nii
+group/VOE_run-004/con_0001.nii
+group/VOE_run-004/spmT_0001.nii
