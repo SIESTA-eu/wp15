@@ -1,6 +1,8 @@
 import csv
 import math
 import sys
+import numpy as np
+from src.utils import * 
 
 def main(args=None):
     """
@@ -82,8 +84,27 @@ def main(args=None):
         
         # Write standard deviations
         writer.writerow(std_devs)
-    
     print(f"Standard deviations written to {output_file}")
 
 if __name__ == "__main__":
-    main()
+    #main()
+    if len(sys.argv) != 3:
+        print("Usage: python calibratenoise.py <input.tsv> <output.tsv>")
+        sys.exit(1)
+    
+    data_in = sys.argv[1]
+    data_out = sys.argv[2]
+    
+    tsv                = TSVHandler()
+    data               = tsv.load(data_in)
+    
+    all_noise          = np.full(data.shape[1], np.nan)
+    for col in range(data.shape[1]):
+        data_          = data[:, col]
+        loo_mean       = [np.delete(data_, i).mean() for i in range(data_.shape[0])]
+        data_mean      = np.mean(data_)
+        noise          = np.max(np.abs(loo_mean - data_mean)) 
+        noisy_mean     = np.random.laplace(loc=data_mean, scale=noise)
+        all_noise[col] = noisy_mean
+
+    tsv.save(data_out, all_noise)
