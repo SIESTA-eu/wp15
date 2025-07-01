@@ -87,7 +87,7 @@ def main(args=None):
     print(f"Standard deviations written to {output_file}")
 
 if __name__ == "__main__":
-    #main()
+    
     if len(sys.argv) != 3:
         print("Usage: python calibratenoise.py <input.tsv> <output.tsv>")
         sys.exit(1)
@@ -108,3 +108,4 @@ if __name__ == "__main__":
         all_noise[col] = noisy_mean
 
     tsv.save(data_out, all_noise)
+    main()
