@@ -20,9 +20,10 @@ leaveoneout.py <inputdir> <outputdir> <participant_nr>
 ```
 Where:
 
-  - **<inputdir>**: Path to the input directory containing participant data
-  - **<outputdir>**: Name of the output directory (will be created in current working directory)
+  - **<input_dir>**: Path to the input directory containing participant data
+  - **<output_dir>**: Name of the output directory (will be created in current working directory)
   - **<participant_nr>**: Either the participant ID (e.g., sub-01) or numerical index (e.g., 1)
+
 ## Behaviour
 1. Scans the input directory for participant folders (starting with sub-)
 2. Creates an output directory structure mirroring the input
@@ -32,6 +33,7 @@ Where:
 4. For other files:
    - Copies them unchanged to the output directory
 5. Skips directories containing the participant ID to be excluded
+
 ## Notes
 - Handles BIDS-like structure (participant folders prefixed with sub-)
 - Output directory created in current working directory
