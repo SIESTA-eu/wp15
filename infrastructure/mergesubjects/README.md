@@ -19,8 +19,8 @@ This tool merges multiple BIDS-like datasets into a single output directory, com
 mergesubjects.py <inputdir1> <inputdir2> ... <inputdirN> <outputdir>
 ```
 Where:
-- **<inputdir1>**, **<inputdir2>**, ... , **<inputdirN>**: Paths to input directories containing participant data
-- **<outputdir>**: Path for the output directory (will be created if it doesn't exist)
+- **<inputdir_1>**, **<inputdir_2>**, ... , **<inputdir_N>**: Paths to input directories containing participant data
+- **<output_dir>**: Path for the output directory (will be created if it doesn't exist)
 
 ## Behavior
 1. Creates the specified output directory structure
