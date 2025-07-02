@@ -2,12 +2,12 @@
 
 This script facilitates the creation of a **Leave-one-out** dataset by excluding a specified participant from a BIDS-like directory structure while preserving all other data.
 ## Features
--     Excludes a specified participant from a directory structure
--     Handles both TSV files (removing participant rows) and other file types (copying as-is)
--     Maintains the original directory structure in the output
--     Supports participant specification by either:
-  -     Direct participant ID (e.g., sub-01)
-  -     Numerical index (e.g., 1 for the first participant)
+- Excludes a specified participant from a directory structure
+- Handles both TSV files (removing participant rows) and other file types (copying as-is)
+- Maintains the original directory structure in the output
+- Supports participant specification by either:
+  - Direct participant ID (e.g., sub-01)
+  - Numerical index (e.g., 1 for the first participant)
 ## Requirements
 
 - Python 3.x
