@@ -26,7 +26,6 @@ Where:
 1. Creates the specified output directory structure
 2. For each input directory:
    - Copies all non-TSV files to output directory
-   - Identifies TSV files for later merging
 3. Merges TSV files with matching relative paths:
    - Concatenates rows while preserving headers
    - Saves merged versions to output directory
