@@ -1,7 +1,8 @@
 import csv
 import math
 import sys
-
+import numpy as np
+from src.utils import * 
 
 def main(args=None):
     """
@@ -76,7 +77,23 @@ def main(args=None):
             # Scale the noise with the number of columns
             std_dev *= math.sqrt(num_columns)
         std_devs.append(std_dev)
-    
+    ############# ADDED BY VINCENT #############
+    tsv = TSVHandler()
+    participants = tsv.load(input_file)
+    all_noise = np.full(participants.shape[1], np.nan)
+
+    for participant in range(participants.shape[1]):
+        loo_estimate = participants[:, participant]
+        
+        true_mean = np.mean(loo_estimate)
+        aprx_mean = loo_estimate
+
+        sensitivity = np.max(np.abs(true_mean - aprx_mean)) 
+        noise = np.random.laplace(loc=0.0, scale=sensitivity)
+        all_noise[participant] = noise
+        
+    tsv.save(output_file, all_noise, transpose=True) # if transpose = False, then each value in a new line
+    ############################################
     # Write results to output file
     with open(output_file, 'w', newline='') as tsv_out:
         writer = csv.writer(tsv_out, delimiter='\t')
