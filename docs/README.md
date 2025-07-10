@@ -14,9 +14,11 @@ For generic online platforms to analyze your own data or data that you have down
 
 ## Data
 
-The GDPR defines anonymous or personal data. Personal data means any information relating to an identified or identifiable natural person (Art. 4). GDPR further specifies _direct_ and _indirect_ identifiable data. The difference between these lies in how easily the information can identify an individual. Direct personal data explicitly identifies a person (e.g., name, passport number, email, or phone number). Indirect personal data (such as a physiological measurement or a brain scan) does not identify someone on its own but can do so when combined with other information, especially when it is unique to the person, long-term stable, and if matching data can be accessed in other databases (like fingerprints).
+The [GDPR](http://data.europa.eu/eli/reg/2016/679/oj) defines personal data as any information relating to an identified or identifiable natural person. Furthermore, the concepts of anonymous data are defined in the GDPR, where the difference with pseudonymised data is also established. Specifically, anonymized data are _outside_ the scope of the GDPR because they are not associated with identified or identifiable natural persons. However, pseudonymized data _are_ under the scope of this regulation.
 
-In this work package we deal with data that is acquired for research purposes, represented as digital datasets in which data from multiple individual participants is combined. Since the data is acquired for medical neuroimaging research purposes, we assume that it pertains to indirect personal data. Participants can be considered to represent individual records in the dataset. The data is assumed to be homogeneous, i.e., the same variables are collected for all participants.
+GDPR further specifies _direct_ and _indirect_ identifiable data. The difference between these lies in how easily the information can identify an individual. Direct personal data explicitly identifies a person (e.g., name, passport number, email, or phone number). Indirect personal data (such as a physiological measurement or a brain scan) does not identify someone on its own but can do so when combined with other information, especially when it is unique to the person, long-term stable, and if matching data can be accessed in other databases (like fingerprints).
+
+In this work package we deal with personal data that is acquired for research purposes, represented as digital datasets in which data from multiple individual participants is combined. Since the data is acquired for medical neuroimaging research purposes, we assume that it pertains to indirect personal data. Participants can be considered to represent individual records in the dataset. The data is assumed to be homogeneous, i.e., the same variables are collected for all participants.
 
 We distinguish two representations of the data that serves as the input of the analysis pipeline:
 
@@ -26,8 +28,8 @@ We distinguish two representations of the data that serves as the input of the a
 We distinguish three representations of the data that results as output from the analysis pipeline:
 
 1. Results from the scrambled data. This follows from the pipeline evaluated on the scrambled data. Devpending on the amount of scrambling, this data may or may not be complete nonsense. It can however be used to evaluate whether the pipeline computations were performed correctly and to organize and identify the desired output data. The results of the pipeline applied to the scrambled data are directly available to the data user.
-2. Actual results from the input data. The results of the pipeline applied to the input data are not directly accessible.
-3. Differentially private results. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private and to prevent any data leakage. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally.
+2. Actual results from the input data. The results of the pipeline applied to the input data are not guarateed to be anonymous or differentially private and hence are not to be made directly accessible.
+3. Differentially private results. This type of data results from applying the pipeline to the input data and adding enough noise to be differentially private and to prevent any data leakage. This data no longer contains any direct or indirect personal data and is therefore always fit for sharing externally. The noise that is needed for differential privacy is determined using a resampling strategy.
 
 ## User roles
 

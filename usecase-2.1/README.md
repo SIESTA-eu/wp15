@@ -38,7 +38,7 @@ for SUBJ in `seq -w 60`; do mkdir sub-${SUBJ} ; done
 
 As in SIESTA the data is assumed to be sensitive, the analysis is conceived to be designed and implemented on a scrambled version of the dataset. Note that that is not needed here, as the original input and output data can be accessed directly.
 
- A scrambled version of the data can be generated using [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble).
+ A scrambled version of the data can be generated using [BIDScramble](https://bidscramble.readthedocs.io).
 
 ```console
 cd data/usecase-2.1
@@ -51,18 +51,19 @@ scramble input scrambled json -p '.*' -s participants.json
 
 For the scrambled data you can ensure to what degree intended patterns or information are leaked from the original dataset. You can use [DatLeak](https://github.com/SIESTA-eu/DatLeak) to test for potential data leakage, checking whether the scrambled variables still contain any identifiable patterns that could be traced back to the original participants. DatLeak detects data leakage in anonymized datasets by comparing the original data with the scrambled version. It calculates percentage of full leakage (where all variables in a row match) and partial leakage (where some, but not all, variables match). These calculation help assess the effectiveness of the anonymization process. Running DatLeak on scrambled datasets helps confirm that the anonymization process is robust and protects participant privacy.
 
-Installing DatLeak is done by cloning its repository.
+#### Installing DatLeak is done by cloning its repository
 
 ```console
 git clone https://github.com/SIESTA-eu/DatLeak.git
 ```
-#### Usage 
 
-```
+#### DatLeak usage
+
+```console
 python DatLeak.py <original_file> <scrambled_file> [ignore_value] [ignore_col]
 ```
-DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer. You can see some practical usage down here:
 
+DatLeak is executed using the following, where you should make sure that the `input` and `scrambled` directory correspond to the actual path for them on your computer. You can see some practical usage down here:
 
 ```console
 python ./DatLeak/DatLeak.py input/participants.tsv scrambled/participants.tsv -999 0
@@ -79,7 +80,7 @@ This will print a report on screen with the percentage of rows with partial leak
  - Standard Deviation of row/participants that are identical: 6.26
 ```
 
-Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable.
+Full leakage must be 0, otherwise the BIDS scrambler must be re-ran. Partial leakage is left to the user appreciation. As arbitrary threshold, one can use 50% and below as acceptable. This, however, depends on the dataset. If for instance you only have 2 variables with binary values, no permutation would allow to reach a low threshold.
 
 ### Data citation
 
@@ -96,6 +97,10 @@ The data user's pipeline implements a very simple analysis of the tabular data t
 This specific use case implements the same pipeline based on R, MATLAB, Python and Julia. In the subsequent documentation we only describe the version based on R.
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Pipeline results
+
+The analysis results in the average age, height and weight of the participants. These are three scalar values that are represented in a TSV file.
 
 ### Computational requirements for the participant level
 

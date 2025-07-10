@@ -48,7 +48,7 @@ The data rights holder can provide the platform operator with instructions and a
 
 ## Providing scrambled data
 
-The data rights holder is responsible for providing a scrambled (locally differentially private) version of the dataset to the data user, so that the data user knows what the dataset contains, how it is organized, and that they can implement the analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://github.com/SIESTA-eu/wp15/tree/main/BIDScramble) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
+The data rights holder is responsible for providing a scrambled (locally differentially private) version of the dataset to the data user, so that the data user knows what the dataset contains, how it is organized, and that they can implement the analysis pipeline. The scrambling of the data is done using tools such as [BIDScramble](https://bidscramble.readthedocs.io) and [anjana-app](https://github.com/SIESTA-eu/anjana-app).
 
 ## Privacy considerations
 
@@ -62,7 +62,7 @@ In WP15, we have not considered the network and storage aspect on the SIESTA pla
 
 ### For the scrambled data
 
-The scrambled data is needed for the data user to implement and test their analysis pipeline. It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identiiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the scrambled data prior to it being released.
+The scrambled data is needed for the data user to implement and test their analysis pipeline. It is the responsibility of the data rights holder to ensure that data following scrambling does not contain identifiable information. The data rights holder can use tools such as [DatLeak](https://github.com/SIESTA-eu/DatLeak) and [pycanon](https://github.com/IFCA-Advanced-Computing/pycanon) to review the privacy level (in terms of different anonymization techniques) of the scrambled data prior to it being released.
 
 ### For the results from the pipeline
 
