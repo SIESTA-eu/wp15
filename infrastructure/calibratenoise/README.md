@@ -2,7 +2,6 @@ Differential Privacy and NeuroImaging
 
 ## Table of Contents
 - [Overview](#overview)
-- [Methods](#methods)
 - [Simulation](#simulations)
 - [Usage](#usage)
 - [Dependencies](#dependencies)
@@ -15,20 +14,12 @@ $$Exploratory Analysis → DP Methods → Results → Verification$$
 
 This project explores the impact of global differential privacy (GDP) on neuroimaging and tabular data. At the end we validate correctness of DP noise injection for our method. The core principle of GDP is ensuring that no single data point can significantly influence the results, preventing individual identification from aggregate outputs. We highlight the need for careful calibration of privacy mechanisms to balance data utility and confidentiality in statistical analyses.
 
-## Methods
- - Noisy Mean: Adds Gaussian/Laplace noise to the sample mean.
- - Noisy Mean + Std: Adds Gaussian/Laplace into both mean and standard deviation.
-
 ## Simulation
-In the test folder, we have prepared a number of simulation. This simulation examines the impact of DP on neuroimaging and tabular data in hypothesis testing. We evaluate how adding noise to data as well as summary statistics (mean, standard deviation and t-values) affects type I error rates and power in a one-sample t-test. 
+In the test folder, we have prepared a number of simulation. This simulation examines the impact of DP on neuroimaging and tabular data in hypothesis testing. We evaluate how adding noise to user output (1) ensures privacy and (2) affects statistical properies of the requested outputs.
 
-- Null Hypothesis Testing:
-    - Type I error rates simulation for original and DP-adjusted
-    - Evaluates type I error rates under DP
-    - Error rate estimates
-- Test Efficiency:
-    - Statistical Power[$1 - \beta $] to tests DP impact data
-    - Tests power for effect sizes
+*Notebook 1*: 
+
+*Notebook 2*: Assuming a user wants to perform a one-sample t-test on data, we test the type I error rates and power of the noisy outputs, either directly from a t-test or from noisy means and standard deviations (recomputing t-test).
 
 ## Usage
 
