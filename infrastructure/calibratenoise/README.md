@@ -20,7 +20,7 @@ This project explores the impact of global differential privacy (GDP) on neuroim
  - Noisy Mean + Std: Adds Gaussian/Laplace into both mean and standard deviation.
 
 ## Simulation
-In the test folder, we have prepared a number of simulation. This simulation examines the impact of DP on neuroimaging and tabular data in hypothesis testing. We evaluate how adding noise to data as well as summary statistics (mean, standard deviation, or t-values) affects type I error rates and power in a one-sample t-test. 
+In the test folder, we have prepared a number of simulation. This simulation examines the impact of DP on neuroimaging and tabular data in hypothesis testing. We evaluate how adding noise to data as well as summary statistics (mean, standard deviation and t-values) affects type I error rates and power in a one-sample t-test. 
 
 - Null Hypothesis Testing:
     - Type I error rates simulation for original and DP-adjusted
@@ -49,7 +49,6 @@ python run.py <input.tsv>
 - Add noise to both mean and std
 - Add noise directly to t-values to perturb the t-statistic directly.
 	- Ensure t-test implementations produce expected type I error rates under the null.
-- Exploratory Data Analysis: Visualize the relationship between, effect size, and statistical power
-	- Replicate Monte Carlo experiments for varying effect sizes
-- DP Methods Comparison: Compares the DP noise-injection methods
-- Results Interpretation: Analyze simulation outputs and summarize key trade-offs between privacy
+- Exploratory Data Analysis: Visualize the relationship between different dimensions, effect size, and statistical power
+	- Replicate Monte Carlo experiments
+- Results Interpretation: Maybe analyze simulation outputs and summarize key trade-offs between privacy and utility.
