@@ -1,7 +1,5 @@
 Differential Privacy and NeuroImaging
 
-Author: ###
-Date: ###
 ## Table of Contents
 - [Overview](#overview)
 - [Methods](#methods)
@@ -14,6 +12,7 @@ Date: ###
 
 # Overview
 $$Exploratory Analysis → DP Methods → Results → Verification$$
+
 This project explores the impact of global differential privacy (GDP) on neuroimaging and tabular data. At the end we validate correctness of DP noise injection for our method. The core principle of GDP is ensuring that no single data point can significantly influence the results, preventing individual identification from aggregate outputs. We highlight the need for careful calibration of privacy mechanisms to balance data utility and confidentiality in statistical analyses.
 
 ## Methods
