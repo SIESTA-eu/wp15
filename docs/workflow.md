@@ -16,9 +16,9 @@ The following workflow includes a number of steps that are not needed for the fi
 
 ## Data rights holder
 
-Transfer the data to the platform, construct a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user.
+Transfer the data into the platform, construct a scrambled version, and do a privacy review. The approved scrambled input will be made available to the data user.
 
-    ./download.sif  input
+    ./transfer.sif  input
     ./scramble.sif  input scrambled-input
     ./privacy.sif   input scrambled-input
 
@@ -77,7 +77,7 @@ Review the group-level results with the calibrated noise and release them to the
 
 # Required applications or containers
 
-- download.sif
+- transfer.sif
 - scramble.sif
 - privacy.sif
 - pipeline.sif
