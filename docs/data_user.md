@@ -20,7 +20,7 @@ The data analysis can be implemented on the basis of any analysis tool and/or an
 
 By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global diofferential private execution on the original data, they may work again.
 
-As with any real data, there might be participants whose original data is not of sufficient quality for all steps in the analysis. Since the original sensitive data is not shared, you cannot do interactive individual-subject quality assesments.
+As with any real data, there might be participants whose original data is not of sufficient quality for all steps in the analysis. Since the original sensitive data is not shared, you cannot do interactive individual-subject quality assessments.
 
 The analysis pipeline needs to run without (graphical) user interaction, as it will be executed in batch-mode with a resampling approach.
 
@@ -30,7 +30,7 @@ The storage and directory on the computer used for local interactive development
 
 We recommend against changing the present working directory during the analysis, it is commonly better to specify filenames and directories relative to the absolute "inputdir" and "outputdir".
 
-The analysis pipeline will be executed inside a container based on Linux, hence you shoudl avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you shoudl use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
+The analysis pipeline will be executed inside a container based on Linux, hence you should avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you should use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
 
 For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second=level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
 
