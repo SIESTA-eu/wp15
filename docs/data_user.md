@@ -14,7 +14,35 @@ SIESTA wp15 makes use of the [BIDS](https://bids.neuroimaging.io) (Brain Imaging
 
 A scrambled version of the data is provided by the data rights holder that shows what the dataset contains and how it is organized, so that the data user can implement the analysis pipeline. The scrambled version has been reviewed by the data rights holder and is anonymous, hence it can also be downloaded and used outside of the SIESTA platform for pipeline development.
 
-The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
+The data analysis can be implemented on the basis of any analysis tool and/or analysis environment, given that it is only possible to run the analysis in batch mode without user input. Graphical user interface dialogs that ask a question are not possible during batch execution.
+
+### General recommendations
+
+By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global diofferential private execution on the original data, they may work again.
+
+As with any real data, there might be participants whose original data is not of sufficient quality for all steps in the analysis. Since the original sensitive data is not shared, you cannot do interactive individual-subject quality assesments.
+
+The analysis pipeline needs to run without (graphical) user interaction, as it will be executed in batch-mode with a resampling approach.
+
+The only two directories that are shared with the analysis pipeline are directory with the input and the output data. The input directory is to be assumed to be read-only, you cannot write in it. The output directory can be used in any way you like, but only the files in the `whitelist.txt` with group-level aggregate data will be shared with the data user.
+
+The storage and directory on the computer used for local interactive development of the analysis will be different from that where the container will be executed. For example, on your own computer you may have the data in your home directory, which will not exist in the same way inside the container when executed in the cloud. Your application will receive the "inputdir" and "outputdir" arguments, and all other specification of files and directories should be _relative_ to those.
+
+We recommend against changing the present working directory during the analysis, it is commonly better to specify filenames and directories relative to the absolute "inputdir" and "outputdir".
+
+The analysis pipeline will be executed inside a container based on Linux, hence you shoudl avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you shoudl use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
+
+For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second=level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
+
+You should install all software and all dependencies from the command line, as that will facilitate containerizing the pipeline.
+
+All software and all dependencies need to be version controlled. At the moment of building the container (by the platform operator) the software is pulled from GitHub, GitLab, PyPi, CRAN, and/or from other code and software repositoiries.
+
+The interactive local software development should start with a clean environment with no software preinstalled, to ensure that the installation and execution of the software with the interactive development is identical to that within the container. For Python we recommend to use a [virtual environment](https://docs.python.org/3/library/venv.html), for MATLAB we recommend to start with [restoredefaultpath](https://nl.mathworks.com/help/matlab/ref/restoredefaultpath.html).
+
+Once the container is built, it will be read only and always run without internet connectivity. Installing additional software dependencies from within the analysis environment (for example downloading and installing "plug-ins" on the fly) will not work. If software dependencies need to be installed from within the analysis environment, this must be done in the container definition file, not in the analysis pipeline. See for an example the usecase-2.1 container with `r-base` and the call to `install.packages` for the dependencies.
+
+To facilitate debugging, the data user's analysis scripts should give explicit error messages. Rather than try-catch or try-except statements that print that "something went wrong", the analysis script should show _where_ in the analysis it went wrong (i.e., in which step, and on which subject) and _what_ went wrong. When possible, show a full stack trace of the error.
 
 ### Implementing the container
 
@@ -29,19 +57,7 @@ The motivation for containerizing the analysis pipeline is:
 In general the sharing of an analysis pipeline with other researchers would not require to contanerise it, you only have to share your code, a specification of its requirements, and documentation how to execute it. However, containerizing a data analysis pipeline ensures **reproducibility** (same environment everywhere), **portability** (runs on any system), and **scalability** (easy cloud deployment). It isolates dependencies, avoids setup conflicts, and simplifies sharing with others. Plus, it integrates with continuous-integration, continuous-deployment and **orchestration** tools for automation and scaling (like Docker Swarm or Kubernetes).
 
 > [!IMPORTANT]  
-> It is as of yet unclear whether it is the data use or the platform operator (or both) that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.
-
-### General recommendations
-
-Install all software and all dependencies from the command line, as that will facilitate the implementation of the container.
-
-Once the container is built, it will be read only and always run without internet connectivity. Installing additional software dependencies from within the analysis environment (for example downloading and installing "plug-ins" on the fly) will not work. If software dependencies need to be installed from within the analysis environment, this must be done in the container definition file, not in the analysis pipeline. See for an example the usecase-2.1 container with `r-base` and the call to `install.packages` for the dependencies.
-
-The only two directories that are shared with the analysis pipeline are directory with the input and the output data. The input directory is to be assumed to be read-only. The output directory can be used in any way you like, but only the files in the `whitelist.txt` with group-level aggregate data will be shared with the data user.
-
-During development and testing, the data user has access to an anonymous scrambled version of the original dataset. This scrambled dataset has all the technical features of the original data, but the results of the analysis on this data should be assumed to be meaningless.
-
-To facilitate debugging, the data user's analysis scripts should give explicit error messages. Rather than a try-except statement that print that "something went wrong", the analysis script should show _where_ in the analysis it went wrong (i.e., in which step, and on which subject) and _what_ went wrong. When possible, show a full stack trace of the error.
+> It is as of yet unclear whether it is the data use or the platform operator that writes the container definition file to encapsulate the analysis pipeline. The container definition is stored in the SIESTA [container registry](https://goharbor.io) and the building of the container image is the responsibility of the platform operator.
 
 ### Input data handling
 
