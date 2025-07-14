@@ -17,7 +17,11 @@ This project explores the impact of global differential privacy (GDP) on neuroim
 ## Simulation
 In the test folder, we have prepared a number of simulation. This simulation examines the impact of DP on neuroimaging and tabular data in hypothesis testing. We evaluate how adding noise to user output (1) ensures privacy and (2) affects statistical properties of the requested outputs.
 
-*Notebook 1*: 
+*Notebook 1: This illustrates how an attacker can gain information about a subject from group results and how golbal privacy works*  
+- simple exemple with an outlier, and how asking for the mean of the group can be used to gain information
+- explain the loo approach to derive parameters for a Gaussian or Laplace distribution and the L1-norm as lower limnit to add noise
+- perform the operation and show that results are private
+- run a monte carlo 1000 times to show this is always globally private
 
 *Notebook 2*: Assuming a user wants to perform a one-sample t-test on data, we test the type I error rates and power of the noisy outputs, either directly from a t-test or from noisy means and standard deviations (recomputing t-test).
 
