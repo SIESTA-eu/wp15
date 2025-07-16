@@ -129,7 +129,7 @@ end
 sublist = find(ismember({all_sub.name}', SubjectLabel))'; % labels to num
 
 if ~exist('TaskLabel','var')
-        TaskLabel = {'ERN','MMN','N170','N2pc','N400','P3'};
+        TaskLabel = {'ERN','MMN'};%,'N170','N2pc','N400','P3'};
 end
 
 if any(cellfun(@(x) contains(x,'high_pass'),options))
@@ -207,7 +207,7 @@ if any(cellfun(@(x) contains(x,'tfce'),options))
         error('tfce value must be set to 1 or 0 (currently %g\n)',tfce)
     end
 else
-    tfce = 1;
+    tfce = 0;
 end
 
 % -----------------------------------------------------------------
@@ -333,7 +333,9 @@ if strcmpi(AnalysisLevel,'1')
                 if EEGTMP.srate ~= 250
                     EEGTMP = pop_resample(EEGTMP, 250);
                 end
-                % line freq removal
+                % line freq removal -> NOTE THE BELOW SYNTAX REQUIRES
+                % MARIUSKLUG'S VERSION OF THE PLUGIN, THE ONE ON THE SCCN
+                % REPO IS OUTDATED
                 EEGTMP = pop_zapline_plus(EEGTMP,'noisefreqs','line',...
                     'coarseFreqDetectPowerDiff',4,'chunkLength',30,...
                     'adaptiveNremove',1,'fixedNremove',1,'plotResults',0);
@@ -377,7 +379,7 @@ if strcmpi(AnalysisLevel,'1')
         if exist('error_report','var')
             mask = cellfun(@(x) ~isempty(x), error_report); % which subject/session
             if all(mask)
-                save(fullfile(OutputLocation,'error_report_preprocessing'),error_report);
+                save(fullfile(OutputLocation,'error_report_preprocessing'), 'error_report'); %NOTE PLEASE DON'T DUMP OLD BUGGY CODE BACK, THERE WAS A FIXED BUG HERE WHICH RESURFACED
                 error('there has been a preprocessing issue with all included datasets, cannot proceed');
             else
                 STUDY = std_rmdat(STUDY, EEG, 'datinds', find(mask));
@@ -449,11 +451,14 @@ if strcmpi(AnalysisLevel,'1')
             end
         end
 
-        % 1st AnalysisLevel analysis
+        % 1st AnalysisLevel analysis -> NOTE THE LIMO CODE USED SHOULD NOT
+        % BE THE V4.0 BRANCH, BECAUSE THE CURRENT VERSION OF THE CODE
+        % ASSUMES SPECIFIC FILENAMING ETC WHICH IS NOT SUPPORTED IN THE
+        % OLDER CODE
         [STUDY, files] = std_limo(STUDY, EEG, 'method',estimation,...
             'measure','daterp', 'chanloc',AvgChanlocs,...
             'timelim',analysis_window(t,:),'erase','on',...
-            'splitreg','off','interaction','off');
+            'splitreg','off','interaction','off','verbose','noGUI');
 
         if isempty(STUDY.filepath) % this seems to happen no unknown reason
             STUDY.filepath = outdir;
@@ -685,14 +690,15 @@ if strcmpi(AnalysisLevel,'2')
                     cd(resultdir);
                     limo_random_select('one sample t-test',AvgChanlocs,...
                         'LIMOfiles',con1_files,'parameter',1, 'analysis_type',...
-                        'Full scalp analysis', 'type','Channels','nboot',0,'tfce',0);
+                        'Full scalp analysis', 'type','Channels','nboot',0,'tfce',tfce);
             %         % limo_get_effect_size('One_Sample_Ttest_parameter_1.mat')
             %         % mean contrast values
             %         % limo_central_tendency_and_ci(con1_files,...
             %         %     1, AvgChanlocs.expected_chanlocs, 'mean', 'Trimmed mean', 21,'FCz_ERP')                    
-                    copyfile(fullfile(resultdir,'One_Sample_Ttest_parameter_1.mat'),...
-                        fullfile(outdir,'task-ERN_desc-OneSampleTTtestERN.mat'));
-                    out.(TaskLabel{t}).ERN = get_rfxfiles(pwd);
+            results = load(fullfile(resultdir,'One_Sample_Ttest_parameter_1.mat'));       
+            tvalues = squeeze(results.one_sample(:,:,4)); % t values
+            save(fullfile(outdir,'task-ERN_desc-OneSampleTTtestERN.mat'),'tvalues');
+            out.(TaskLabel{t}).ERN = get_rfxfiles(pwd);
             %     elseif c == 2
             %         resultdir = fullfile(taskdir,'CRN');
             %         mkdir(resultdir);
@@ -746,7 +752,7 @@ if strcmpi(AnalysisLevel,'2')
             writecell(Beta_files', 'allBetas.txt', 'Delimiter', ' ');
             limo_random_select('paired t-test',AvgChanlocs,...
                 'LIMOfiles','allBetas.txt', 'parameter',[1 2], 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',0,'tfce',0);
+                'Full scalp analysis', 'type','Channels','nboot',0,'tfce',tfce);
             % limo_get_effect_size('paired_samples_ttest_parameter_1_2.mat')
             % ERPs (use limo_add_plots to visualize)
             % limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_MMN_MMN_GLM_Channels_Time_WLS.txt'), ...
@@ -757,8 +763,9 @@ if strcmpi(AnalysisLevel,'2')
             %     'ERPs_standard_single_subjects_Weighted mean.mat',...
             %     'type','paired','fig',0,'name','ERP_MMN');
             % save('ERP_difference','Diff')
-            copyfile(fullfile(resultdir,'Paired_Samples_Ttest_parameter_1_2.mat'),...
-                fullfile(outdir,'task-MMN_desc-PairedSamplesTTest.mat'));
+            results = load(fullfile(resultdir,'Paired_Samples_Ttest_parameter_1_2.mat'));
+            tvalues = squeeze(results.paired_samples(:,:,4)); % t values
+            save(fullfile(outdir,'task-MMN_desc-PairedSamplesTTest.mat'),'tvalues');
             out.(TaskLabel{t}).MMN = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'N170')
@@ -773,7 +780,7 @@ if strcmpi(AnalysisLevel,'2')
             cd(fullfile(resultdir,'Cars_vs_Faces'));
             limo_random_select('paired t-test',AvgChanlocs,...
                 'LIMOfiles',fullfile(resultdir,'allBetas.txt'), 'parameter',[2 1], 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',0,'tfce',0);
+                'Full scalp analysis', 'type','Channels','nboot',0,'tfce',tfce);
             limo_get_effect_size('Paired_Samples_Ttest_parameter_2_1.mat')
             % ERPs (use limo_add_plots to visualize)
             % limo_central_tendency_and_ci(fullfile(fullfile(indir,['LIMO_' TaskLabel{t}]),'LIMO_files_N170_N170_GLM_Channels_Time_WLS.txt'), ...
@@ -853,8 +860,8 @@ if strcmpi(AnalysisLevel,'2')
                 LIMO.data.timevect = LIMO.data.start:(1/LIMO.data.sampling_rate*1000):LIMO.data.end;
                 save(fullfile(LIMO.dir,'LIMO.mat'),'LIMO');
             end
-            load('ipsilateral.mat'); TM1  = limo_trimmed_mean(ipsilateral,20,.05); %#ok<LOAD>
-            load('contralateral.mat'); TM2  = limo_trimmed_mean(contralateral,20,.05); %#ok<LOAD>
+            load('ipsilateral.mat'); %#ok<LOAD> % TM1  = limo_trimmed_mean(ipsilateral,20,.05); %#ok<LOAD>
+            load('contralateral.mat'); %#ok<LOAD> % TM2  = limo_trimmed_mean(contralateral,20,.05); %#ok<LOAD>
             Diff = limo_trimmed_mean(contralateral-ipsilateral,20,.05);
             save('ERP_difference','Diff')
 
@@ -876,7 +883,6 @@ if strcmpi(AnalysisLevel,'2')
             % set(fillhandle,'EdgeColor',[1 0 0],'FaceAlpha',0.2,'EdgeAlpha',0.8);%set edge color
             % grid on; axis tight; box on; title('contra minus ipsi for channels PO7/PO8')
             % saveas(gcf, 'PO7_PO8_difference.fig','fig'); close(gcf)
-            
             copyfile(fullfile(resultdir,'ERP_difference.mat'),...
                 fullfile(outdir,'task-N2pc_desc-ERP_difference.mat'));            
             out.(TaskLabel{t}).N2pc = get_rfxfiles(pwd);
@@ -915,8 +921,9 @@ if strcmpi(AnalysisLevel,'2')
             limo_plot_difference('ERPs_unrelated_single_subjects_Weighted mean.mat',...
                 'ERPs_related_single_subjects_Weighted mean.mat',...
                 'type','paired','fig',0,'name','ERP_difference');
-            copyfile(fullfile(resultdir,'ERP_difference.mat'),...
-                fullfile(outdir,'task-N400_desc-ERP_difference.mat'));            
+            results = load(fullfile(resultdir,'ERP_difference.mat'));
+            Diff = results.Data.Diff;
+            save(fullfile(outdir,'task-N400_desc-ERP_difference.mat'),'Diff');            
             out.(TaskLabel{t}).N400 = get_rfxfiles(pwd);
 
         elseif strcmpi(TaskLabel{t},'P3')
@@ -934,7 +941,7 @@ if strcmpi(AnalysisLevel,'2')
             end
             limo_random_select('paired t-test',AvgChanlocs,...
                 'LIMOfiles',data, 'analysis_type',...
-                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',0);
+                'Full scalp analysis', 'type','Channels','nboot',nboot,'tfce',tfce);
             LIMO = load('LIMO.mat');
             [~, mask] = limo_stat_values('Paired_Samples_Ttest_parameter_2_1.mat',...
                 0.05,2,LIMO.LIMO);
@@ -943,7 +950,7 @@ if strcmpi(AnalysisLevel,'2')
             results(results==0) = NaN;
             save('signitifcant_values','results');
             copyfile(fullfile(resultdir,'signitifcant_values.mat'),...
-                fullfile(outdir,'task-P3_desc-signitifcant_values.mat'));            
+                fullfile(outdir,'task-P3_desc-significant_values.mat'));            
             out.(TaskLabel{t}).P3 = get_rfxfiles(pwd);
             % limo_get_effect_size('paired_samples_ttest_parameter_2_1.mat')
             % % Param avg (use limo_add_plots to visualize)

@@ -13,6 +13,7 @@ The use cases serve to get a broad and representative sample of neuroimaging dat
 | [2.3](usecase-2.3/README.md) | MEG (OpenNeuro)           | datalad         | MATLAB                | Nijmegen            |
 | [2.4](usecase-2.4/README.md) | EEG (OSF)                 | osfclient       | MATLAB                | Copenhagen          |
 | [2.5](usecase-2.5/README.md) | Functional MRI (OpenNeuro)| AWS S3          | MATLAB                | Toulouse            |
+| [2.6](usecase-2.6/README.md) | Functional MRI (OpenNeuro)| AWS S3          | Octave                | Toulouse            |
 
 Detailed documentation for each use case is provided in the corresponding directories.
 

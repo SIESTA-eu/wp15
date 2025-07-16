@@ -1,0 +1,91 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%files 
+    work/   /work
+%post
+
+    echo "=== System update and dependency installation ==="
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update && apt-get upgrade -y
+    apt-get install -y \
+        tzdata \
+        keyboard-configuration \
+        ca-certificates \
+        wget \
+        which \
+        vim \
+        locate \
+        unzip \
+        git \
+        locales \
+        libcanberra-gtk-module \
+        libcanberra-gtk3-module \
+        build-essential \
+        octave \
+        octave-dev
+
+    # Clean up temporary files to reduce image size
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+    # Set the timezone
+    echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+    echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+
+    # Ensure that the work directory is executable
+    echo "Adding executable and write permission for *.m files in /wp15/usecase-2.5/work/"
+    chmod +w /work/*.m
+    chmod +x /work/*.m
+
+   # Download and extract SPM12 r7771
+   if [ ! -d "/spm12" ]; then
+        echo "Downloading SPM12 r7771..."
+        wget https://github.com/spm/spm12/archive/refs/tags/r7771.zip
+        mv r7771.zip spm12.zip
+        unzip spm12.zip
+        mv spm12-*/ /spm12
+        rm *.zip
+   fi
+    
+    # Apply the patch for SPM12
+    echo "=== Applying patch for SPM12 ==="
+    wget https://raw.githubusercontent.com/spm/spm-octave/main/spm12_r7771.patch -O /spm12/spm12_r7771.patch
+    cd /spm12
+    patch -p3 < spm12_r7771.patch
+
+    # Compile MEX files for Octave
+    echo "=== Compiling MEX files for Octave ==="
+    cd src
+    make PLATFORM=octave
+    make PLATFORM=octave install
+
+    # Add SPM12 to Octave's search path
+    echo "addpath('/spm12')" >> ~/.octaverc
+
+    # Generate en_US.UTF-8 locale
+    locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+
+    # Set the temporary directory for sed
+    export TMPDIR=/tmp
+
+%environment
+    # Environment configuration for locales
+    export LANG=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export LANGUAGE=en_US.UTF-8
+
+%runscript
+    echo "=== Starting execution script ==="
+    args=$(printf "'%s', " "$@")
+    args=${args%, }  # Remove the last comma
+    echo "Adding spm12, spm12 config, spm12 matlabbatch and running bidsapp with Octave"
+    #/usr/bin/octave --eval "addpath('/work'); hello($args);"
+    pwd
+    ls -l /work
+    /usr/bin/octave --eval "addpath('/work','/spm12','/spm12/config','/spm12/matlabbatch'); bidsapp($args);"
+
+    echo "=== End of execution script ==="
