@@ -1,15 +1,14 @@
 function realign(path_input)
-  
-  list_files = dir(fullfile(path_input, 'sub*nii'));
-  szFiles = size(list_files);
 	
-	path_file = '';
-    
-  for f = 1:szFiles(1)
-    check_nifti = endsWith(list_files(f).name, '.nii');
-        
-    if check_nifti == true
-      path_file = fullfile(path_input, list_files(f).name);  
+	list_files = dir(fullfile(path_input, 'sub*nii'));
+	szFiles = size(list_files);
+	
+	%path_file = '';
+	for f = 1:szFiles(1)
+    	check_nifti = endsWith(list_files(f).name, '.nii');
+	
+		if check_nifti == true
+      		path_file = fullfile(path_input, list_files(f).name);  
 			
 			V = spm_vol(path_file);
 			Vsize = size(V);
@@ -46,7 +45,6 @@ function realign(path_input)
             
 			% Run
 			spm_jobman('run', matlabbatch);   
-			
 		end
-  end		
+	end		
 end
