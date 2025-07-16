@@ -1,5 +1,7 @@
 function spm_preprocess(path_input, path_output)
 
+  addpath('/work')
+
   path_source = '';
   path_anat = fullfile(path_input, 'anat');
   unzipMRIs(path_anat);

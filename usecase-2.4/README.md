@@ -57,7 +57,56 @@ scramble input scrambled brainvision
 
 ### Privacy assessment on the scrambled data
 
-To be discussed and documented here.
+For the scrambled data you can ensure to what degree intended patterns or information are leaked from the original dataset. You can use [DatLeak](https://github.com/SIESTA-eu/DatLeak) to test for potential data leakage, checking whether the scrambled variables still contain any identifiable patterns that could be traced back to the original participants. DatLeak detects data leakage in anonymized datasets by comparing the original data with the scrambled version. It calculates **full leakage** (where all voxels are identical in an array) and **partial leakage** (where some, but not all, variables match). These calculation help assess the effectiveness of the anonymization process. Running DatLeak on scrambled datasets helps confirm that the anonymization process is robust and protects participant privacy.
+
+#### Installing DatLeak is done by cloning its repository
+
+```console
+git clone https://github.com/SIESTA-eu/DatLeak.git
+```
+
+#### DatLeak usage
+
+```console
+python run.py <base dir original> <base dir scrambled> [report]
+# example
+python run.py usecase-2.4/input usecase-2.4/scrambled True/False
+```
+
+#### DatLeak output
+
+The output will be:
+
+- A brief information of the subject
+- Full/Partial leakage in time dimension
+- Total full/partial leakage of the image
+  - Partial leakage will be assessed by numerical values where the maximum value  [0.999]  indicates the maximum information leaked
+  - Full leakage will be assessed by True/False indicating whether or not the image needs to be re-scrambled
+
+```console
+########################################
+ - Subject ID: sub-001
+ - Task: ERN
+ - Session: ERN
+ - Shape: (33, 935936)
+########################################
+	 - Temporal: 	Full Leakage: 0/33 channels 	Average Partial Leakage 0.0001
+ - Partial Leakage: 0.0001
+ - Full Leakage: False
+```
+
+**NOTE:**
+
+- DatLeak is divided into two branches of **Tabular** and **NeuroImaging** folders, where anything related to BIDS dataset are stored in NeuroImaging folders.
+- All subjects are expected to be right in **base dir original/scrambled** folders.
+
+```console
+original/scrambled
+├── sub-01
+├── sub-02
+├── ...
+├── ...
+```
 
 ### Data citation
 
@@ -72,6 +121,10 @@ The input dataset has been released under the [CC-BY-4.0](https://spdx.org/licen
 The data user's pipeline implements the [Event-Related Potential](https://en.wikipedia.org/wiki/Event-related_potential) (ERP) analysis of 'classical' [ElectroEncephalography](https://en.wikipedia.org/wiki/Electroencephalography) research paradigms. This represents a very common type of biomedical data. The data are simple enough, allow automated data processing, and follows the BIDS standard.
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
+
+### Pipeline results
+
+The analysis results in ...
 
 ### Computational requirements for the participant level
 
@@ -109,14 +162,11 @@ unzip 2024.2.1.zip
 mv eeglab-2024.2.1 eeglab
 rm 2024.2.1.zip
 
-git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
+git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
 mv limo_tools           eeglab/plugins/limo_tools
 
 # clone repo and checkout a version that is known to work
-git clone https://github.com/sccn/zapline-plus
-cd zapline-plus
-git checkout 18d4eec
-cd ../
+git clone https://github.com/MariusKlug/zapline-plus
 mv zapline-plus         eeglab/plugins/zapline-plus
 
 wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip

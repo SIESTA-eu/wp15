@@ -1,0 +1,4 @@
+# the first file is in MATLAB v6 format
+s1.mat
+# the second file is in MATLAB v7.3 format
+s2.mat

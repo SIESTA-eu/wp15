@@ -168,6 +168,36 @@ jobs:
           apptainer push usecase-2.5/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.5.sif:${GITHUB_REF_NAME}
           apptainer push usecase-2.5/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.5.sif:latest
 
+  build-pipeline-2-6:
+    name: Pipeline 2.6
+    
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    container:
+        image: kaczmarj/apptainer:latest
+        options: --privileged
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Lowercase namespace    # see https://github.com/orgs/community/discussions/25768
+        run: |
+          echo "NAMESPACE=$( echo ${GITHUB_REPOSITORY_OWNER} | tr '[:upper:]' '[:lower:]' )" >> "${GITHUB_ENV}"
+
+      - name: Build pipeline container
+        run: |
+          cd ${GITHUB_WORKSPACE}/usecase-2.6 && apptainer build pipeline.sif pipeline.def
+
+      - name: Login and push container
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | apptainer registry login -u "${{ github.actor }}" --password-stdin oras://ghcr.io
+          apptainer push usecase-2.6/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.6.sif:${GITHUB_REF_NAME}
+          apptainer push usecase-2.6/pipeline.sif oras://ghcr.io/${NAMESPACE}/pipeline-2.6.sif:latest
+
   build-infrastructure:
     name: Infrastructure containers
 

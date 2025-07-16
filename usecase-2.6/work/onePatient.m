@@ -52,3 +52,4 @@ function onePatient(path_subject, path_output)
     disp('contrasts is done !');
   end
 end
+

@@ -3,13 +3,8 @@ From: python:3.13-slim
 Stage: final
 
 %help
-    This Apptainer image includes:
-
-    * Debian stable,
-    * The latest BIDScramble version at the time of creation
 
     The general form to run the leaveoneout commands is:
-
         apptainer run leaveoneout.sif <input> <output> <participant_nr>
 
 %labels

@@ -1,10 +1,16 @@
-BootStrap: docker
-From: ubuntu:24.04
+Bootstrap: docker
+From: python:3-slim
+
+%help
+
+    The general form to run the addnoise command is:
+        apptainer run addnoise.sif <whitelist.txt> <noise.tsv> <outputdir>
 
 %labels
   org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
 %files
+  addnoise/addnoise.py /opt/addnoise.py
 
 %post
   ################################################################################
@@ -14,22 +20,11 @@ From: ubuntu:24.04
   echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
   echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
   DEBIAN_FRONTEND=noninteractive apt install -y tzdata
-
-  # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
-  apt-get clean && rm -rf /var/lib/apt/lists/*
+  pip install more_itertools numpy nibabel h5py scipy tqdm --quiet
 
 %environment
   export LC_ALL=C
 
 %runscript
-  if [ ! -d "$1" ]; then
-    echo Error: the directory "$1" does not exist
-    exit 1
-  fi  
-  if [ ! -d "$2" ]; then
-    echo Error: the directory "$2" does not exist
-    exit 1
-  fi
-  echo Creating output directory "$3"
-  mkdir -p "$3"
-  echo Adding noise is not yet implemented ...
+    python3 /opt/addnoise.py "$@"
+

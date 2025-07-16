@@ -3,7 +3,7 @@
 % Copyright (C) 2024, SIESTA workpackage 15 team
 
 % add EEGLAB -- edit path as needed
-addpath('eeglab');
+%addpath('eeglab');
 
 % the rest runs automatically
 eeglab('nogui')

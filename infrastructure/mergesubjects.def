@@ -1,15 +1,9 @@
 Bootstrap: docker
 From: python:3.13-slim
-Stage: final
 
 %help
-    This Apptainer image includes:
-
-    * Debian stable,
-    * The latest BIDScramble version at the time of creation
 
     The general form to run the mergesubjects command is:
-
         apptainer run mergesubjects.sif <inputs> <output>
 
 %labels

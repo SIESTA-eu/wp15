@@ -50,7 +50,6 @@ function patientsDatabase(path_input, path_output, level, sub_list, task_list)
         path_patient_out = fullfile(path_output, sub_list{p});
         onePatient(path_patient_in, path_patient_out);
       end
-
     case 'group'
       % Run second-level analysis
       secondLevel(path_input, path_output, task_list, sub_list);

@@ -11,6 +11,7 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   work/bidsapp.m             /work/bidsapp.m
   work/ERP_Core_WB.m         /work/ERP_Core_WB.m
   work/ERP_Core_WB_install.m /work/ERP_Core_WB_install.m
+  work/limo-AvgChanlocs.mat  /work/limo-AvgChanlocs.mat
 
 %post
   ################################################################################
@@ -39,15 +40,8 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv eeglab-2024.2.1 eeglab
   rm 2024.2.1.zip
 
-  git clone -b v4.0 --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
-  mv limo_tools eeglab/plugins/limo_tools
-
-  
-  # also use the github-repo for zapline, the v1.2.1 zip-file is buggy
-  git clone https://github.com/sccn/zapline-plus.git
-  cd zapline-plus
-  git checkout 18d4eec
-  cd ../
+  # also use the original github-repo for zapline
+  git clone https://github.com/MariusKlug/zapline-plus.git
   mv zapline-plus eeglab/plugins/zapline-plus
   
   wget https://sccn.ucsd.edu/eeglab/plugins/fieldtrip-lite-20240111.zip
@@ -79,6 +73,10 @@ From: ubuntu:24.04    # Alternatively use a ready-made MATLAB base image: https:
   mv picard-matlab        eeglab/plugins/PICARD1.0
   mv bids-matlab-tools    eeglab/plugins/bids-matlab-tools8.0
 
+  git clone -b SIESTA --depth 1 https://github.com/LIMO-EEG-Toolbox/limo_tools.git
+  mv limo_tools eeglab/plugins/limo_tools
+  cp eeglab/plugins/limo_tools/std_limo.m eeglab/functions/studyfunc/std_limo.m
+  
   # reduce the image size, see https://depot.dev/blog/how-to-reduce-your-docker-image-size
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
