@@ -162,8 +162,6 @@ The analysis results in a timecourse of the activity of the whole brain that sur
 
 The execution of the pipeline for each participant takes 2.2 GB of RAM, about 900 seconds per subject, and results in 685 GB of temporary data per subject in the output folder + an unspecified amount of anatomical image segmentation related intermediate data written into the input folder.
 
-There are 44(?) subjects, 27 of which make it through the participant pipeline.
-
 ### Computational requirements for the group level
 
 The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
