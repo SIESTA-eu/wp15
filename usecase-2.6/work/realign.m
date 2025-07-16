@@ -1,4 +1,4 @@
-function realign(path_input)
+function realign(path_input) 
 	
 	list_files = dir(fullfile(path_input, 'sub*nii'));
 	szFiles = size(list_files);

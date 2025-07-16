@@ -1,5 +1,5 @@
 function segmentation(path_input)
-	
+
  	list_files = dir(path_input);
 	szFiles = size(list_files);
 		

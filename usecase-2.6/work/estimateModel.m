@@ -10,11 +10,11 @@ function estimateModel(path_output)
     matlabbatch{1}.spm.stats.fmri_est.write_residuals = 0;
 
     % method
-	matlabbatch{1}.spm.stats.fmri_est.method.Classical = 1;
-        
-	% run batch job
-	spm_jobman('run', matlabbatch);
-	clear matlabbatch;
+    matlabbatch{1}.spm.stats.fmri_est.method.Classical = 1;
+
+    % run batch job
+   spm_jobman('run', matlabbatch);
+   clear matlabbatch;
 
     path_estimate = fullfile(path_output, 'estimate_model.mat');
     copyfile(path_spmmat, path_estimate);

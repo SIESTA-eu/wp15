@@ -27,8 +27,6 @@ function bidsapp(varargin)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % parse the command-line options
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  addpath('/work');
   
   % the last three arguments must be inputdir, outputdir and level
   if nargin<3
@@ -56,7 +54,7 @@ function bidsapp(varargin)
     disp(inputdir);
     error('input directory does not exist');
   end
-
+  
   if ~exist(outputdir, 'dir')
     warning('creating output directory');
     [success, message] = mkdir(outputdir);
