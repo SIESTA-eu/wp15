@@ -74,7 +74,7 @@ def main():
             raise ValueError("Insufficient arguments")
     except Exception as e:
         print(f"Error: {e}")
-        print("Usage: apptainer run mergesubjects.sif <inputdir1> <inputdir2> ... <inputdirN> <outputdir>")
+        print("Usage: mergesubjects.py <inputdir1> <inputdir2> ... <inputdirN> <outputdir>")
         sys.exit(1)
 
     try:

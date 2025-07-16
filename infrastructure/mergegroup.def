@@ -1,4 +1,4 @@
-BootStrap: docker
+Bootstrap: docker
 From: python:3-slim
 
 %help
@@ -11,6 +11,7 @@ From: python:3-slim
 
 %files
     mergegroup/mergegroup.py /opt/mergegroup.py
+    mergegroup/lib           /opt/lib
 
 %post
     ################################################################################

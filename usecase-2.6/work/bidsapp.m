@@ -55,6 +55,7 @@ function bidsapp(varargin)
     disp(inputdir);
     error('input directory does not exist');
   end
+  
   if ~exist(outputdir, 'dir')
     warning('creating output directory');
     [success, message] = mkdir(outputdir);
@@ -113,3 +114,9 @@ function bidsapp(varargin)
     return
   end
 
+  % Here the analysis pipeline specific MATLAB code is called, using the options
+  % structure that was parsed above. The purpose of this "bidsapp" function and the
+  % "workPackageCerCo" function is very similar and in principle they could be merged.
+
+  workPackageCerCo(options.inputdir, options.outputdir, options.level);
+end

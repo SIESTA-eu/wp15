@@ -1,5 +1,7 @@
 function workPackageCerCo(path_input, path_output, level, sub_list, task_list)
 
+  addpath('/work');
+
   if nargin<4 || isempty(sub_list)
     sub_list = 'all';
   end
