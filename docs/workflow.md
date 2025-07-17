@@ -63,17 +63,15 @@ Merge the leave-one-out results and calibrate the noise.
     ./mergegroup.sif $(eval echo leaveoneout-{1..$NSUBJ}-output) leaveoneout-merged-output ./whitelist.txt
     ./calibratenoise.sif leaveoneout-merged-output noise
 
-Run the group-level analysis on all subjects together and add the calibrated noise.
+Add the calibrated noise to the group-level analysis output from all subjects together.
 
-    ./pipeline.sif singlesubject-merged-input singlesubject-merged-output group  # this should result in the same as "output"
-    ./addnoise.sif singlesubject-merged-output noise singlesubject-merged-output-noise
-    ./addnoise.sif output noise output-noise    # this should result in the same as "singlesubject-merged-output-noise"
+    ./addnoise.sif output output-dp noise ./whitelist.txt
 
 ## Data rights holder
 
-Review the group-level results with the calibrated noise and release them to the data user.
+Review the group-level results with the calibrated noise (these should be differentially private) and release them to the data user.
 
-    ./privacy.sif input output-noise
+    ./privacy.sif input output-dp
 
 # Required applications or containers
 
@@ -103,5 +101,4 @@ Review the group-level results with the calibrated noise and release them to the
 - leaveoneout-xxx-output
 - leaveoneout-merged-output
 - noise
-- singlesubject-merged-output-noise
-- output-noise
+- output-dp

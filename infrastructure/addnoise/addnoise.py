@@ -5,10 +5,15 @@ from pathlib import Path
 from more_itertools import collapse
 
 # Ensure the script can find the mergegroup/lib directory
+# which contains some python code for reading and writing various file formats
 current_dir = Path(__file__).resolve().parent
 shared_dir = current_dir.parent / 'mergegroup'
-if shared_dir not in sys.path:
+if os.path.isdir(shared_dir) and shared_dir not in sys.path:
     sys.path.append(str(shared_dir))
+else:
+    # assume that the lib directory is copied into the current directory 
+    # which is what we do when building the addnoise container
+    pass
 
 # Importing necessary modules from the mergegroup/lib directory
 from lib.filetype import filetype as filetype
@@ -85,6 +90,10 @@ def main(args=None):
             content[i] += noise[i]
         offset += len(content)
 
+        # Ensure the output directory exists
+        if not os.path.exists(os.path.dirname(output_file)):
+            os.makedirs(os.path.dirname(output_file))
+            
         # Write the noisy result to the output file        
         if file_type == "txt":
             txt.write(output_file, content, structure)

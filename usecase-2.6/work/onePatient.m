@@ -22,7 +22,7 @@ function onePatient(path_subject, path_output)
     duration = data(:, 2);
     trial_type = data(:, 7);
 
-    levels = create_levelParameters(2, trial_type, onset, duration); % I did not understand what is the philosophy of the dataEvents function, and at least for me it did not work
+    levels = create_levelParameters(2, trial_type, onset, duration);
     disp('specify first level is done !');
 
     path_run = fullfile(path_output, run_event);

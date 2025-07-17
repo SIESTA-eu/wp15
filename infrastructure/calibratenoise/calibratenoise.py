@@ -1,7 +1,6 @@
+import os, sys
 import csv
 import math
-import sys
-
 
 def main(args=None):
     """
@@ -76,7 +75,11 @@ def main(args=None):
             # Scale the noise with the number of columns
             std_dev *= math.sqrt(num_columns)
         std_devs.append(std_dev)
-    
+
+    # Ensure the output directory exists    
+    if not os.path.exists(os.path.dirname(output_file)):
+        os.makedirs(os.path.dirname(output_file))
+
     # Write results to output file
     with open(output_file, 'w', newline='') as tsv_out:
         writer = csv.writer(tsv_out, delimiter='\t')
