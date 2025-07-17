@@ -1,12 +1,12 @@
 function secondLevel(path_input, path_output, list_runs, list_subjects)
-
+    
     % === Generate the common mask only once ===
     path_mask = fullfile(path_input, 'mask_common.nii');
     if ~exist(path_mask, 'file')
         path_mask = generate_mask(path_input, list_runs);  % ← One-time generation
     else
         fprintf('Mask already exists: %s\n', path_mask);
-    end
+    end 
 
     for r = 1:numel(list_runs)
         run_name = list_runs{r};
@@ -56,7 +56,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
         clear matlabbatch;
 
         fprintf('Estimation completed for %s\n', run_name);
-        
+
         % === Check presence of xVol ===
         spm_path = fullfile(outputdir, 'SPM.mat');
         if exist(spm_path, 'file')
@@ -68,7 +68,7 @@ function secondLevel(path_input, path_output, list_runs, list_subjects)
                 fprintf('xVol is MISSING in %s\n', spm_path);
             end
         else
-            fprintf('SPM.mat file not found in %s\n', outputdir);
+            fprintf('SPM.mat file not found in %s\n', outputdir);        
         end
     end
 end

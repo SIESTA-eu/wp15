@@ -156,13 +156,11 @@ The pipeline is expected to be executed on a Linux computer and MATLAB R2020b.
 
 ### Pipeline results
 
-The analysis results in ...
+The analysis results in a timecourse of the activity of the whole brain that survives statistical t-test threshold value for a specific task. The activity is based on the averaging for all subjects of the parameter estimates and contrast estimates from the 1st-level analyses. The output will be nifti files corresponding to the final result of the statistical test. One nifti file is a contrast image whereas the other nifi file is a t-map.
 
 ### Computational requirements for the participant level
 
 The execution of the pipeline for each participant takes 2.2 GB of RAM, about 900 seconds per subject, and results in 685 GB of temporary data per subject in the output folder + an unspecified amount of anatomical image segmentation related intermediate data written into the input folder.
-
-There are 44(?) subjects, 27 of which make it through the participant pipeline.
 
 ### Computational requirements for the group level
 
@@ -279,3 +277,4 @@ apptainer run --env MLM_LICENSE_FILE=port@server pipeline.sif input output group
 ```
 
 You should replace the `input` and `output` directories in the instructions above with the ones where the actual data is located or should be written.
+

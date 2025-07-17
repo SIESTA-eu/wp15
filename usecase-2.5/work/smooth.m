@@ -4,9 +4,10 @@ function smooth(path_input)
 	szFiles = size(list_files);
 	
 	for f = 3:szFiles(1)
-		check_rFile = startsWith(list_files(f).name, 'rsub');
+		check_file = startsWith(list_files(f).name, 'wrsub');
+		%check_rFile = startsWith(list_files(f).name, 'rsub');
 		
-		if check_rFile == true
+		if check_file == true
 			path_file = fullfile(path_input, list_files(f).name);
 	            
 			% Data
