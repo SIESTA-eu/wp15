@@ -11,6 +11,7 @@ From: python:3-slim
 
 %files
   addnoise/addnoise.py /opt/addnoise.py
+  mergegroup/lib /opt/lib
 
 %post
   ################################################################################
