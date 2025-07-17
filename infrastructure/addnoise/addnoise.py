@@ -90,6 +90,10 @@ def main(args=None):
             content[i] += noise[i]
         offset += len(content)
 
+        # Ensure the output directory exists
+        if not os.path.exists(os.path.dirname(output_file)):
+            os.makedirs(os.path.dirname(output_file))
+            
         # Write the noisy result to the output file        
         if file_type == "txt":
             txt.write(output_file, content, structure)
