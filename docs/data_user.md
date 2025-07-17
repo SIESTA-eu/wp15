@@ -18,7 +18,7 @@ The data analysis can be implemented on the basis of any analysis tool and/or an
 
 ### General recommendations
 
-By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global diofferential private execution on the original data, they may work again.
+By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global differential private execution on the original data, they may work again.
 
 As with any real data, there might be participants whose original data is not of sufficient quality for all steps in the analysis. Since the original sensitive data is not shared, you cannot do interactive individual-subject quality assessments.
 
