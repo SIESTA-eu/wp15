@@ -27,9 +27,10 @@ function bidsapp(varargin)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % parse the command-line options
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
+
   % the last three arguments must be inputdir, outputdir and level
   if nargin<3
+    disp(nargin);
     error('not enough input arguments')
   end
 
