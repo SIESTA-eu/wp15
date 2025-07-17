@@ -165,7 +165,7 @@ During the group-level analysis, the data from multiple participants is combined
 
 The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used.
 
-For instance, if the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
+For instance, if the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `MLM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
 
 If the data user want to make use other non-free software in the analysis (for example for [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/License)), they should provide the platform operator with that software and with the license to use that software on their behalf.
 
