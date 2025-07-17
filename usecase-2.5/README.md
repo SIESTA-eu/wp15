@@ -164,7 +164,7 @@ The execution of the pipeline for each participant takes 2.2 GB of RAM, about 90
 
 ### Computational requirements for the group level
 
-The execution of the group-level pipeline takes XX GB of RAM, XX seconds, and results in XX GB of temporary data per leave-one-out sample.
+The execution of the group-level pipeline takes XX GB of RAM, 45 seconds per leave-one-out, and results in 66 GB of temporary data per leave-one-out sample.
 
 ### Output data
 
