@@ -27,6 +27,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install pytest
+          pip install numpy
       
       - name: Run tests
         run: pytest test_calibratenoise.py -v -s
