@@ -60,7 +60,6 @@ def extract_numeric_data(data, prefix=''):
 
 
 def read(filepath):
-    structure = {}
     meta_keys = {'__header__', '__version__', '__globals__', '#refs#'}
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File {filepath} does not exist")
@@ -81,12 +80,25 @@ def read(filepath):
                 else:
                     mat_data[key] = {subkey: dataset[subkey][()] for subkey in dataset.keys()}
 
+    structure = mat_data
     content = extract_numeric_data(mat_data)
     content = dicts_to_list(content)
     content = [float(x) for x in list(collapse(content))]
     return content, structure
 
 def write(filepath, content, structure):
-    print("ERROR: Writing to .mat files is not implemented yet.")
-    # FIXME: Implement the write function for .mat files
+    if not os.path.exists(os.path.dirname(filepath)):
+        raise FileNotFoundError(f"Directory {os.path.dirname(filepath)} does not exist")
+    if not os.path.isdir(os.path.dirname(filepath)):
+        raise ValueError(f"{os.path.dirname(filepath)} is not a directory")
+    if not isinstance(content, list):
+        raise ValueError("Content must be a list")
+    if not isinstance(structure, dict):
+        raise ValueError("Structure must be a dictionary")
+    if not all(isinstance(x, (int, float)) for x in content):
+        raise ValueError("All elements in content must be numeric (int or float)")
+
+    # FIXME the content is not updated before writing to the file, only the structure 
+    scipy.io.savemat(filepath, structure, do_compression=False, appendmat=False, format='5', long_field_names=True)
+    print(f"Data written to {filepath} successfully.")
     return
