@@ -20,26 +20,21 @@ In the test folder, we have prepared a number of simulation. This simulation exa
 *Notebook 1: This illustrates how an attacker can gain information about a subject from group results and how golbal privacy works*  
 - simple example with an outlier, and how asking for the mean of the group can be used to gain information
 
-*Notebook 2*: Illustration of global privacy using mean value
+*[Notebook 2.1](https://github.com/SIESTA-eu/wp15/blob/dev-code-under-loo-privacy/infrastructure/privacy_dev/notebook_2.ipynb)*: Illustration of global privacy using mean value
 - use the 1st column of use case 2.1 and compute the mean
 - explain the loo approach to privacy to derive parameters for a Gaussian or Laplace distribution and the L1-norm as lower limnit to add noise
 - run a monte carlo 1000 times to prove this is always globally private
 
-To prove that the mean if differentailly private ... 
+*Notebook 2.2*: Same as 2.1 but we use a Gaussian distribution rther than a Laplace distribution for noise. If Gaussian works, that is the prefered method.
 
-*Notebook 3*: Illustration of global privacy using multiple mean values
-- use the 1st column of use case 2.1 and compute the loo means to figure out the outlier (like notebook 1)
-- apply the differential privacy method
-- demonstrates that the method scales to multiple univariate results
+*Notebook 3*: Assuming a user wants to perform a one-sample t-test on data, we test the type I error rates and power of the noisy outputs, either directly from a t-test or from noisy means and standard deviations (recomputing t-test).
 
-*Notebook 4*: Assuming a user wants to perform a one-sample t-test on data, we test the type I error rates and power of the noisy outputs, either directly from a t-test or from noisy means and standard deviations (recomputing t-test).
-
-*Notebook 5*: Illustration of global privacy using bivariate mean values
+*Notebook 4*: Illustration of global privacy using bivariate mean values
 - use data from use case 2.1 and compute the means
-- exploit covariance to create multivariate noise
+- exploit covariance to create multivariate noise with the same covariance
 - run a monte carlo 1000 times to prove this is always globally private
 
-*Notebook 6*: Assuming a user wants to perform one-sample t-tests on data, we test the type I error rates and power of the noisy outputs from bivariate data, again either directly from a t-test or from noisy means and standard deviations (recomputing t-tests).
+*Notebook 5*: Assuming a user wants to perform one-sample t-tests on data, we test the type I error rates and power of the noisy outputs from bivariate data, again either directly from a t-test or from noisy means and standard deviations (recomputing t-tests).
 
 
 ## Usage
