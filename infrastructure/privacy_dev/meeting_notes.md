@@ -11,7 +11,7 @@ Planned or current sections in the notebook:
 - [X] make 'two' simulations one without outliers and one with outliers (but ideally in a single double loop)
 - [ ] do the sample size vs sensitivity plots from the simulated data without adding the outlier in position 0 (no need to plot with outliers)
 - [ ] do the MAE vs sensitivity plots from the simulated data without outlier in position 0 (no need to plot with outliers)
-- [ ] compute the outlier in position 0 for the biggest sample size (ie 'data' in the code) and reuse that value in subsamples (ie get lower outside the loop) = the same outlier values is used for each subsamples in a given relplicate
+- [X] compute the outlier in position 0 for the biggest sample size (ie 'data' in the code) and reuse that value in subsamples (ie get lower outside the loop) = the same outlier values is used for each subsamples in a given relplicate
 - [ ] plot together (on the same figure) the outlier detection rate for the fixed outlier (index 0) vs others (average of other indices)
 
 🔴 bloker
