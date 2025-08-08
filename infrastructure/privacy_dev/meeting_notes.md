@@ -11,8 +11,18 @@ Planned or current sections in the notebook:
 - [X] make 'two' simulations one without outliers and one with outliers (but ideally in a single double loop)
 - [ ] do the sample size vs sensitivity plots from the simulated data without adding the outlier in position 0 (no need to plot with outliers)
 - [ ] do the MAE vs sensitivity plots from the simulated data without outlier in position 0 (no need to plot with outliers)
-- [X] compute the outlier in position 0 for the biggest sample size (ie 'data' in the code) and reuse that value in subsamples (ie get lower outside the loop) = the same outlier values is used for each subsamples in a given relplicate
+- [X] compute the outlier in position 0 for the biggest sample size (ie 'data' in the code) and reuse that value in subsamples (ie get lower outside the loop) = the same outlier values is used for each subsamples in a given replicate
 - [ ] plot together (on the same figure) the outlier detection rate for the fixed outlier (index 0) vs others (average of other indices)
+- [ ] **errors found in code to fix: n_replicates indexation is missing**
+```
+error_[size].append(recons_error)
+sensitivities_[size].append(sens_outputs)
+reconstructed[size].append(recons)
+counts[size] += 1
+id_dr[size][idx] += 1
+````
+
+
 
 🔴 bloker
 Local differential privacy is wrong, since detection rates are too high
