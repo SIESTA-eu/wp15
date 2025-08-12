@@ -25,6 +25,7 @@ id_dr[size][idx] += 1
 🔴 bloker
 Local differential privacy is wrong, since detection rates are too high
 - [ ] start by testing for the observed data, to explain how it works (and figure out the right solution)
+- [ ] try local privacy such as noise is signed (if a value is lower than user_output then the noise is added, if a value is higher than user_output, noise is substracted -- meaning that noise is an abs value (abs(laplace))
 - [ ] then move to simulations
 
 # Notebook 2.2
