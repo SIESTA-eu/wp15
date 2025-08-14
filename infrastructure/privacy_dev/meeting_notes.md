@@ -27,6 +27,8 @@ Local differential privacy is wrong, since detection rates are too high
 - [x] start by testing for the observed data, to explain how it works (and figure out the right solution)
 - [x] try local privacy such as noise is signed (if a value is lower than user_output then the noise is added, if a value is higher than user_output, noise is substracted -- meaning that noise is an abs value (abs(laplace))
 - [x] then move to simulations
+
+## 3. To do 🔴
 - [ ] still results make no sense - check with team WP15-WP10
 
 # Notebook 2.2
@@ -37,6 +39,15 @@ Planned or current sections in the notebook:
 - [x] Solution explained
 - [x] Simulations
 - [x] Interpretation
-## 3. To do 🔴
+
+# Notebook 3
+- [ ] user_output ; return mean, std, t-test value
+- [ ] dp as before
+- [ ] set alpha 0.05
+- [ ] for size, do as notebook 2 (subsamples)
+- [ ] user_output(data) and then dp(mean), dp(std), dp(t-test)
+- [ ] then test if dp(t-test), p-value and signitifcance
+- [ ] same compute t-test from dp(mean) and dp(std), and get p-value and signitifcance
+
 
 
