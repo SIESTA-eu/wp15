@@ -40,14 +40,14 @@ Planned or current sections in the notebook:
 - [x] Simulations
 - [x] Interpretation
 
-# Notebook 3
-- [ ] user_output ; return mean, std, t-test value
-- [ ] dp as before
-- [ ] set alpha 0.05
-- [ ] for size, do as notebook 2 (subsamples)
-- [ ] user_output(data) and then dp(mean), dp(std), dp(t-test)
-- [ ] then test if dp(t-test), p-value and signitifcance
-- [ ] same compute t-test from dp(mean) and dp(std), and get p-value and signitifcance
+# Notebook 3 & 5
+- [x] redone, optimized, validated
+
+# Notebook 4
+- [ ] simulations: outlier in one or both variables
+- [ ] simulations: adjust covariance matrix with 0, 0.4, 0.9 off diagonal
+- [ ] plot per variable and variables together
+
 
 # Notebook 6
 - [ ] use an MRI and an EEG dataset for dimenionality
