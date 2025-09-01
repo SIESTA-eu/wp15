@@ -49,5 +49,10 @@ Planned or current sections in the notebook:
 - [ ] then test if dp(t-test), p-value and signitifcance
 - [ ] same compute t-test from dp(mean) and dp(std), and get p-value and signitifcance
 
-
-
+# Notebook 6
+- [ ] use an MRI and an EEG dataset for dimenionality
+- [ ] for MRI consider places where we have 0
+- [ ] use the optimized code from notebook 5 (vectorized loo)
+- [ ] use the cholensky favctorization to create multivariate Gaussian (see notebook 5)
+- [ ] ensure regulatized covariance (see notebook 5)
+- [ ] describe how outliers are made for MRI and for EEG (like a sub-region)
