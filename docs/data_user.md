@@ -30,7 +30,7 @@ The storage and directory on the computer used for local interactive development
 
 We recommend against changing the present working directory during the analysis, it is commonly better to specify filenames and directories relative to the absolute "inputdir" and "outputdir".
 
-Also, we recommend against working with intermediate text files that specify derived files that may be needed for a subsequent analysis step. Specifically, if at the participant level (see below) analysis a list of files is generated, containing first-level results, this list will not correctly represent the names (and locations) of the files used at the group level analysis. 
+Also, we recommend against working with intermediate text files that specify derived files that may be needed for a subsequent analysis step. Specifically, if at the participant level (see below) analysis a list of files is generated, containing first-level results, this list will not correctly represent the names (and locations) of the files used at the group level analysis step. 
 
 The analysis pipeline will be executed inside a container based on Linux, hence you should avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you should use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
 
