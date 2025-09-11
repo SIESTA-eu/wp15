@@ -30,9 +30,11 @@ The storage and directory on the computer used for local interactive development
 
 We recommend against changing the present working directory during the analysis, it is commonly better to specify filenames and directories relative to the absolute "inputdir" and "outputdir".
 
+Also, we recommend against working with intermediate text files that specify derived files that may be needed for a subsequent analysis step. Specifically, if at the participant level (see below) analysis a list of files is generated, containing first-level results, this list will not correctly represent the names (and locations) of the files used at the group level analysis. 
+
 The analysis pipeline will be executed inside a container based on Linux, hence you should avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you should use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
 
-For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second=level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
+For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second-level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
 
 You should install all software and all dependencies from the command line, as that will facilitate containerizing the pipeline.
 
