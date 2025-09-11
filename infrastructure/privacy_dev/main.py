@@ -11,21 +11,7 @@ from src.src import *
 from rich import print
 from src.eeg_ import eeg_
 
-def main(path, path_list, Dim4=False):
-
-    ext = path.split("/")[-1]
-    if ext.endswith(".nii") or ext.endswith(".nii.gz"):
-        data = nii_reader(path).get_data()
-        if len(list(original.shape)) == 4:
-            Dim4 = True
-    elif ext.endswith(".fif") \
-        or ext.endswith(".fif.gz") \
-        or ext.endswith(".vhdr") \
-        or ext.endswith(".vhdr.gz"):
-        data = neuro_reader(path).get_data()
-        
-    else: 
-        print(f" - Unsupported file type.")
+def main(path_list, Dim4=False):
 
 
     tasks = ["ERN","LRP","MMN","N2pc","N170","N400","P3"]
@@ -67,15 +53,12 @@ def main(path, path_list, Dim4=False):
     
   
 def process_(original_list, data_type):
-    for o in original_list: # 
-        try:
-            #file_ = neuro_reader(o).get_data() if "fif" in o or "vhdr" in o else nii_reader(o).get_data()
-            args = {"path": o,
-                    "path_list": original_list}
-            _ = main(**args)
-        except Exception as e:
-            traceback.print_exc()
-        break
+
+    try:
+        args = {"path_list": original_list}
+        _ = main(**args)
+    except Exception as e:
+        traceback.print_exc()
     #########################################
     #             MAIN CALL                 #
     #########################################  
