@@ -3,8 +3,20 @@ import warnings
 from joblib import Parallel, delayed
 from numba import jit
 
+#@jit(nopython=True)
+#def user_pipeline(data):
+#    return np.mean(data, axis=1, keepdims=True)
+
+@jit(nopython=True)
 def user_pipeline(data):
-    return np.mean(data, axis=1, keepdims=True)
+    n_rows, n_cols = data.shape
+    result = np.empty((n_rows, 1), dtype=np.float64)
+    for i in range(n_rows):
+        row_sum = 0.0
+        for j in range(n_cols):
+            row_sum += data[i, j]
+        result[i, 0] = row_sum / n_cols
+    return result
 
 @jit(nopython=True)
 def loo_(data):
