@@ -3,9 +3,6 @@ import warnings
 from joblib import Parallel, delayed
 from numba import jit
 
-#@jit(nopython=True)
-#def user_pipeline(data):
-#    return np.mean(data, axis=1, keepdims=True)
 
 @jit(nopython=True)
 def user_pipeline(data):
@@ -20,18 +17,37 @@ def user_pipeline(data):
 
 @jit(nopython=True)
 def loo_(data):
-    n_features, n_samples = data.shape
-    loo_means = np.zeros((n_features, n_samples))
-    loo_stds = np.zeros((n_features, n_samples))
+    if not isinstance(data, np.ndarray):
+        data = np.array(data)
+    
+    #if data.ndim != 2:
+    #    raise ValueError("Input array must be 2-dimensional")
+    
+    n_rows, n_cols = data.shape
+    
+    for i in range(n_rows):
+        for j in range(n_cols):
+            if not np.isfinite(data[i, j]):
+                raise ValueError("Array contains NaN or infinite values")
+    
+    loo_results = np.empty((n_rows, n_cols), dtype=np.float32)
+    row_sums = np.empty(n_rows, dtype=np.float64)
+    for i in range(n_rows):
+        row_sums[i] = 0.0
+        for j in range(n_cols):
+            row_sums[i] += data[i, j]
 
-    for i in range(n_features):
-        v = data[i]
-        s, s2 = np.sum(v), np.sum(v**2)
-        means = (s - v) / (n_samples - 1)
-        vars_ = ((s2 - v**2) - (n_samples - 1) * means**2) / (n_samples - 2)
-        loo_means[i], loo_stds[i] = means, np.sqrt(vars_)
+    for j in range(n_cols):
+        reduced_means = np.empty((n_rows, 1), dtype=np.float64)
+        for i in range(n_rows):
+            reduced_means[i, 0] = (row_sums[i] - data[i, j]) / (n_cols - 1)
 
-    return loo_means, loo_stds
+        result = user_pipeline(reduced_means)
+        
+        for i in range(n_rows):
+            loo_results[i, j] = result[i, 0]
+
+    return loo_results
 
 @jit(nopython=True)
 def gen_noise(chol_factor, sensitivity, max_attempts=10000):
@@ -44,10 +60,10 @@ def gen_noise(chol_factor, sensitivity, max_attempts=10000):
     return noise, False
 
 def dp(data, original_output, epsilon=1.0):
-    loo_means, loo_stds = loo_(data)
-    sensitivity = np.max(np.abs(loo_means - original_output), axis=1)
+    loo_results = loo_(data)
+    sensitivity = np.max(np.abs(loo_results - original_output), axis=1)
 
-    loo_scales = np.std(loo_stds, axis=1) / epsilon
+    loo_scales = np.std(loo_results, axis=1) / epsilon
     cov = np.cov(data)
     scale_factors = 2 * loo_scales / np.sqrt(np.diag(cov))
     scale_matrix = np.diag(scale_factors)
