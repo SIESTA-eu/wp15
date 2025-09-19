@@ -19,19 +19,16 @@ Planned or current sections in the notebook:
 - [x] Simulations
 - [x] Interpretation
 
-# Notebook 3 & 5
-- [x] redone, optimized, validated
-
-# Notebook 4
-- [ ] simulations: outlier in one or both variables
-- [ ] simulations: adjust covariance matrix with 0, 0.4, 0.9 off diagonal
-- [ ] plot per variable and variables together
-
+# Notebook 3, 4 & 5
+- [x] redone CP, optimized, validated
 
 # Notebook 6
 - [ ] use an MRI and an EEG dataset for dimenionality
 - [ ] for MRI consider places where we have 0
-- [ ] use the optimized code from notebook 5 (vectorized loo)
-- [ ] use the cholensky favctorization to create multivariate Gaussian (see notebook 5)
-- [ ] ensure regulatized covariance (see notebook 5)
 - [ ] describe how outliers are made for MRI and for EEG (like a sub-region)
+
+- specific EEG handling
+- [ ] use output from use case - not raw data since this is what global privacy does
+- [X] use existing neibourghs
+- [ ] ensure the loaded data and the neibourghs are ordered in the same channel order
+- [ ] 
