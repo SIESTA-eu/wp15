@@ -3,33 +3,42 @@ import os
 import nibabel as nib
 from sklearn.neighbors import BallTree
 from nilearn.input_data import NiftiMasker
+from joblib import Parallel, delayed
 
-def searchlight_cov(fmri_path, mask_path, radius=2, output_path="sl_cov_map.nii.gz"):
+def searchlight_cov(fmri_path, mask_path, radius=2, output_path=None, n_jobs=-1):
+
     fmri_img = nib.load(fmri_path)
     mask_img = nib.load(mask_path)
 
     masker = NiftiMasker(mask_img=mask_img, standardize=True)
-    ts = masker.fit_transform(fmri_img).T
+    ts = masker.fit_transform(fmri_img).T  
 
     n_vox, _ = ts.shape
     coords = np.array(np.where(mask_img.get_fdata())).T
     tree = BallTree(coords)
-    neighbors = tree.query_radius(coords, r=radius)
+    neighbors_list = tree.query_radius(coords, r=radius)
 
-    values = np.zeros(n_vox)
-    for c, idx in enumerate(neighbors):
+    def voxel_mean_cov(idx):
         if len(idx) < 2:
-            continue
+            return 0.0
         X = ts[idx] - ts[idx].mean(axis=1, keepdims=True)
         cov = np.cov(X)
-        d = np.sqrt(np.diag(cov))
-        corr = cov / np.outer(d, d)
-        mean_corr = (np.sum(corr) - np.trace(corr)) / (corr.size - len(d))
-        values[c] = mean_corr
+        mean_cov = (np.sum(cov) - np.trace(cov)) / (cov.size - len(idx))
+        return mean_cov
 
-    cov_map = masker.inverse_transform(values.reshape(1, -1))
-    cov_map.to_filename(output_path)
-    return cov_map
+    values = Parallel(n_jobs=n_jobs, backend="loky")(
+        delayed(voxel_mean_cov)(idx) for idx in neighbors_list
+    )
+    values = np.array(values)
+    out_data = np.zeros(mask_img.shape)
+    mask_indices = tuple(coords.T)
+    out_data[mask_indices] = values
+
+    out_img = nib.Nifti1Image(out_data, affine=mask_img.affine)
+    if not output_path:
+        nib.save(out_img, output_path)
+    
+    return out_data
 
 
 def detect_file(folder):
