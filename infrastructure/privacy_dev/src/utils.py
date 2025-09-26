@@ -5,41 +5,52 @@ from sklearn.neighbors import BallTree
 from nilearn.input_data import NiftiMasker
 from joblib import Parallel, delayed
 
-def searchlight_cov(fmri_path, mask_path, radius=2, output_path=None, n_jobs=-1):
+
+def searchlight_cov(fmri_path, mask_path=None, radius=2.0, output_path=None, n_jobs=-1):
 
     fmri_img = nib.load(fmri_path)
-    mask_img = nib.load(mask_path)
+    fmri_data = fmri_img.get_fdata()
 
-    masker = NiftiMasker(mask_img=mask_img, standardize=True)
-    ts = masker.fit_transform(fmri_img).T  
+    if mask_path is None:
+        mask_data = (fmri_data.mean(axis=-1) > 0.0).astype(bool)
+        affine = fmri_img.affine
+    else:
+        mask_img = nib.load(mask_path)
+        mask_data = mask_img.get_fdata().astype(bool)
+        affine = mask_img.affine
 
-    n_vox, _ = ts.shape
-    coords = np.array(np.where(mask_img.get_fdata())).T
-    tree = BallTree(coords)
-    neighbors_list = tree.query_radius(coords, r=radius)
+    coords_voxel = np.array(np.where(mask_data)).T
+    coords_mm = nib.affines.apply_affine(affine, coords_voxel)
+    ts = fmri_data[mask_data]  
+    ts = ts - ts.mean(axis=1, keepdims=True)
+    tree = BallTree(coords_mm)
+    neighbors_list = tree.query_radius(
+        coords_mm,
+        r=np.linalg.norm(affine[:3, :3], axis=0).mean() * radius
+    )
 
     def voxel_mean_cov(idx):
-        if len(idx) < 2:
+        k = len(idx)
+        if k < 2:
             return 0.0
-        X = ts[idx] - ts[idx].mean(axis=1, keepdims=True)
-        cov = np.cov(X)
-        mean_cov = (np.sum(cov) - np.trace(cov)) / (cov.size - len(idx))
+        X = ts[idx] 
+        cov_sum = X @ X.T 
+        mean_cov = (np.sum(cov_sum) - np.trace(cov_sum)) / (k*(k-1)*X.shape[1])
         return mean_cov
 
     values = Parallel(n_jobs=n_jobs, backend="loky")(
         delayed(voxel_mean_cov)(idx) for idx in neighbors_list
     )
-    values = np.array(values)
-    out_data = np.zeros(mask_img.shape)
-    mask_indices = tuple(coords.T)
-    out_data[mask_indices] = values
 
-    out_img = nib.Nifti1Image(out_data, affine=mask_img.affine)
-    if not output_path:
+    out_data = np.zeros(mask_data.shape)
+    for v, val in zip(coords_voxel, values):
+        out_data[tuple(v)] = val
+
+    out_img = nib.Nifti1Image(out_data, affine=affine)
+    if output_path:
         nib.save(out_img, output_path)
-    
-    return out_data
 
+    return out_data
 
 def detect_file(folder):
     has_fif = False
