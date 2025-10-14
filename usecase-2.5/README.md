@@ -14,7 +14,7 @@ In the following it is assumed that the wp15 repository with the code for all us
 
 ### Summary of the input data
 
-The input data is freely available from "OpenNeuro" with the Accession Number [ds004934](https://doi.org/10.18112/openneuro.ds004934.v1.0.0). The dataset includes 44 subjects who are divided into two experiments: 17 subjects undergo fMRIs dedicated to experiment 1, whereas 29 subjects undergo fMRIs dedicated to experiment 2.
+The input data is freely available from "OpenNeuro" with the Accession Number [ds004934](https://doi.org/10.18112/openneuro.ds004934.v1.0.0). The dataset includes 44 subjects who are divided into two experiments: 17 subjects underwent fMRIs dedicated to experiment 1, whereas 29 subjects underwent fMRIs dedicated to experiment 2. The data was acquired from 29 female and 16 male participants.
 
 The input data consists of about 1548 files with a combined size of 18.63G.
 

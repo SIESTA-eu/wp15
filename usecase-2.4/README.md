@@ -14,7 +14,7 @@ In the following it is assumed that the wp15 repository with the code for all us
 
 ### Summary of the input data
 
-The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN).
+The input data is a freely available online resource named ["ERP CORE"](https://doi.org/10.18115/D5JW4R), consisting of optimized paradigms, experiment control scripts, example data from 40 neurotypical adults, data processing pipelines and analysis scripts, and a broad set of results for 7 widely used ERP components: N170, mismatch negativity (MMN), N2pc, N400, P3, lateralized readiness potential (LRP), and error-related negativity (ERN). The data was acquired from 25 female and 15 male participants.
 
 The input data consists of about 2000 files with a combined size of 24.1GB.
 
