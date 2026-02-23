@@ -38,7 +38,7 @@ function patientsDatabase(path_input, path_output, level, sub_list, task_list)
           continue;
         end
 
-        % Read the heade
+        % Read the header
         header_line = fgetl(fid);
 
         % Initialize the column
