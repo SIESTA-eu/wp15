@@ -1,4 +1,4 @@
-# SIESTA - work package 15 - use case 2.1
+# SIESTA - work package 15 - use case 2.7
 
 The pipeline is expected to be executed on a Linux computer, although it might also work on macOS or Windows.
 
