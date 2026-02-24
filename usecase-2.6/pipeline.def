@@ -73,7 +73,6 @@ From: ubuntu:24.04
     export TMPDIR=/tmp
 
 %environment
-    # Configuration de l environnement pour les locales
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
     export LANGUAGE=en_US.UTF-8
