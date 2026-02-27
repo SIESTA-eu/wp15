@@ -14,7 +14,7 @@ In the following it is assumed that the wp15 repository with the code for all us
 
 ### Summary of the input data
 
-The [input dataset](https://doi.org/10.18112/openneuro.ds003826.v3.0.1) contains structural T1-weighted MRI brain scans from 136 young individuals (87 females; age range from 18 to 35 years old) along with questionnaire-assessed measurements of trait-like chronotype, sleep quality and daytime sleepiness. The data is organized according to the BIDS standard (combined size of 1.18GB) and mostly useful to scientists interested in circadian rhythmicity, structural brain correlates of chronotypes in humans and the effects of sleeping habits and latitude on brain anatomy. The dataset is described in more detail in an [accompanying publication](https://doi.org/10.1080/09291016.2021.1990501).
+The [input dataset](https://doi.org/10.18112/openneuro.ds003826.v3.0.1) contains structural T1-weighted MRI brain scans from 136 young individuals (age range from 18 to 35 years old) along with questionnaire-assessed measurements of trait-like chronotype, sleep quality and daytime sleepiness. The data was acquired from 87 female and 49 male participants. The data is organized according to the BIDS standard (combined size of 1.18GB) and mostly useful to scientists interested in circadian rhythmicity, structural brain correlates of chronotypes in humans and the effects of sleeping habits and latitude on brain anatomy. The dataset is described in more detail in an [accompanying publication](https://doi.org/10.1080/09291016.2021.1990501).
 
 ### Data transfer
 

@@ -1,4 +1,4 @@
-# SIESTA - work package 15 - use case 2.1
+# SIESTA - work package 15 - use case 2.7
 
 This is a specific use case that serves as a prototype for development and testing the SIESTA computational strategy for sensitive medical imaging data on representative BIDS datasets. The general outline is provided in the documentation. In short, it consists of these steps:
 
@@ -36,4 +36,4 @@ The execution of the group-level pipeline takes ...
 
 ## Output data
 
-The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher.
+The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher. The whitelist.txt file contains a complete list of the output data that is to be shared.

@@ -18,7 +18,7 @@ The data analysis can be implemented on the basis of any analysis tool and/or an
 
 ### General recommendations
 
-By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global diofferential private execution on the original data, they may work again.
+By design the original sensitive data is never shared with the data user, which means that the sensitive data _cannot_ be accessed for pipeline development and testing. Only the scrambled version of the data is shared: this has the same files and file organization, but the sensitive features have been scrambled to ensure privacy. This means that the scrambled individual-subject data might be distorted so much, that certain algorithms (like segmenting) won't work on the scrambled data. When applied under global differential private execution on the original data, they may work again.
 
 As with any real data, there might be participants whose original data is not of sufficient quality for all steps in the analysis. Since the original sensitive data is not shared, you cannot do interactive individual-subject quality assessments.
 
@@ -30,9 +30,11 @@ The storage and directory on the computer used for local interactive development
 
 We recommend against changing the present working directory during the analysis, it is commonly better to specify filenames and directories relative to the absolute "inputdir" and "outputdir".
 
+Also, we recommend against working with intermediate text files that specify derived files that may be needed for a subsequent analysis step. Specifically, if at the participant level (see below) analysis a list of files is generated, containing first-level results, this list will not correctly represent the names (and locations) of the files used at the group level analysis step. 
+
 The analysis pipeline will be executed inside a container based on Linux, hence you should avoid using Windows-specific file path operations. For example in MATLAB, instead of using "\", you should use the [fullfile](https://nl.mathworks.com/help/matlab/ref/fullfile.html) and/or [filesep](https://nl.mathworks.com/help/matlab/ref/filesep.html) commands.
 
-For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second=level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
+For efficiency resaons, your analysis pipeline should implement a "participant" and a "group" step. It is common to use these to implement the first-level (subject) and second-level (group) statistical analysis. If you don't have the need to distinguish the two steps, you must still for technical reasons implement the two steps: the first "participant" level step can then consist of only creating an empty output directory for each of the subjects.
 
 You should install all software and all dependencies from the command line, as that will facilitate containerizing the pipeline.
 
@@ -165,7 +167,7 @@ During the group-level analysis, the data from multiple participants is combined
 
 The SIESTA platform or its platform operators does not provide the software and/or licenses for the software that you may want to use in your analysis pipeline. When implementing the container that runs the analysis pipeline, you should take the appropriate measures such that the software can be installed and that it can be both legally and technically used.
 
-For instance, if the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `LM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
+For instance, if the data user want to make use of MATLAB in the analysis, they should give the platform operator access to the MATLAB license server and provide the `MLM_LICENSE_FILE` environment variable. If there are license restriction, e.g. the institutional license does not allow for use of the MATLAB license on hardware that is not from the institute, the data user can consider to create a compiled executable from the pipeline, and containerize this executable.
 
 If the data user want to make use other non-free software in the analysis (for example for [FreeSurfer](https://surfer.nmr.mgh.harvard.edu/fswiki/License)), they should provide the platform operator with that software and with the license to use that software on their behalf.
 

@@ -19,7 +19,7 @@ function localizer = extractEvents(filename)
 
     real_begin = start_pos + 5;
     real_end = final_pos - 2;
-    
+
     % Extraction du segment du nom du fichier (utilisation de l'opérateur + pour les chaînes de caractères modernes)
     for r = real_begin:real_end
         localizer = [localizer,filename(r)]; % Utilisation de l'opérateur + pour les chaînes modernes

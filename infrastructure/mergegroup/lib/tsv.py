@@ -3,6 +3,10 @@ from more_itertools import collapse
 
 
 def read(filepath, delimiter='\t'):
+    """
+    Reads a TSV file and returns its content as a vector 
+    and its structure as the number of rows and columns.
+    """
     content = []
     structure = {}
     if not os.path.exists(filepath):
@@ -24,14 +28,24 @@ def read(filepath, delimiter='\t'):
                 except ValueError:
                     continue
             if line:
-                content.append(line)
+                content += line
+                # store the number of columns in the structure
+                structure['ncols'] = len(line)
+    # store the number of rows in the structure
+    structure['nrows'] = int(len(content) / structure['ncols'])
 
-    content = list(collapse(content))
     return content, structure
 
 
 def write(filepath, content, structure, delimiter='\t'):
-    # FIXME the structure should contain information about the number of rows and columns, and about the header
+    nrows = structure.get('nrows', 0)
+    ncols = structure.get('ncols', 0)
+    if nrows>1 or ncols>1:
+        # reformat the vectorized content into a table with rows and columns
+        if len(content) != nrows * ncols:
+            raise ValueError("Content length does not match structure dimensions")
+        content = [[ content[i * ncols + j] for j in range(ncols) ] for i in range(nrows)]
+
     with open(filepath, 'w', newline='') as file:
         writer = csv.writer(file, delimiter=delimiter)
         if isinstance(content, list) and all(isinstance(row, list) for row in content):
@@ -45,3 +59,4 @@ def write(filepath, content, structure, delimiter='\t'):
             # If content is not a list, write it as a single value
             writer.writerow([content])
     return
+

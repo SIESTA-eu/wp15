@@ -16,7 +16,7 @@ function workPackageCerCo(path_input, path_output, level, sub_list, task_list)
   spm('defaults','fmri');
   spm_jobman('initcfg');
   spm_get_defaults('cmdline',true);
-	
+
   % create output architecture directory based on input directory
   if ~exist(path_output, 'dir')
     createDataStructure(path_input, path_output);
