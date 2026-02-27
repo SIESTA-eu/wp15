@@ -10,9 +10,7 @@ This is a specific use case that serves as a prototype for development and testi
 
 ## Summary of the input data
 
-The dataset pertains to an fMRI study investigating the brain mechanisms underlying visual and multisensory recognition in 12 healthy participants (8 females; mean age = 28.06 years). Participants performed a short-term memory task involving auditory, visual, and audio‑visual stimuli, recognizing and remembering objects in different multisensory contexts. The dataset is organized in BIDS format (2.17 GB) and includes, for each participant, anatomical images (T1w.nii.gz), functional data (task-memory_run-_bold.nii.gz), and event files (_events.tsv) detailing conditions, responses, and reaction times.
-
-The dataset is intended as a standardized resource for the scientific community. It has already been used to test an automated fMRI analysis pipeline capable of preprocessing, motion correction, spatial normalization, and preparation of data for univariate and multivariate analyses, allowing evaluation of method robustness and reproducibility.
+This dataset pertains to an fMRI study investigating the brain mechanisms underlying visual and multisensory recognition in 12 healthy participants (8 females; mean age = 28.06 years). Participants performed a short-term memory task involving auditory, visual, and audio‑visual stimuli, recognizing and remembering objects in different multisensory contexts. The dataset is organized in BIDS format (2.17 GB) and includes, for each participant, anatomical images (T1w.nii.gz), functional data (task-memory_run-_bold.nii.gz), and event files (_events.tsv) detailing conditions, responses, and reaction times. This dataset is intended as a standardized resource for the scientific community. It has already been used to test an automated fMRI analysis pipeline capable of preprocessing, motion correction, spatial normalization, and preparation of data for univariate and multivariate analyses, allowing evaluation of method robustness and reproducibility.
 
 ## Data citation
 
