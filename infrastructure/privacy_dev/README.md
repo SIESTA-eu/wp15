@@ -25,4 +25,4 @@ In this dub-project, we validate a global differential privacy (GDP) procedure f
 
 *[Notebook 5](https://github.com/SIESTA-eu/wp15/blob/dev-code-under-loo-privacy/infrastructure/privacy_dev/notebook_5.ipynb)*: Assuming a user wants to perform one-sample t-tests on data, we test the type I error rates and power of the noisy outputs from bivariate data directly from a t-test.
 
-*[Notebook 6](https://github.com/SIESTA-eu/wp15/blob/dev-code-under-loo-privacy/infrastructure/privacy_dev/notebook_6.ipynb)*: Illustration of global privacy using multivariate noise for real neuroimaging data
+*[Notebook 6](https://github.com/SIESTA-eu/wp15/blob/dev-code-under-loo-privacy/infrastructure/privacy_dev/notebook_6.ipynb)*: Failed attempts of global privacy using multivariate noise for real neuroimaging data -- the issue is dimensionality. The simple starting point of estimating covariance is difficult (1) is depends the data type and analysis to be performed (which dimension is relevant for analysis and thus privacy) and (2) it needs to be compute piece-wise and data are too large to be computed all at once, and locallity matters to effects which are distributed. 
