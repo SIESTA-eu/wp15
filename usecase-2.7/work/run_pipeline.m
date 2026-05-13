@@ -1,0 +1,24 @@
+function run_pipeline(path_input, path_output, level)
+
+time_start = tic;
+
+% initialize spm12 via matlab
+spm('defaults','fmri');
+spm_jobman('initcfg');
+spm_get_defaults('cmdline',true);
+
+% create output architecture directory based on input directory, and copy
+% over the data + unzip the nii.gz files
+if ~exist(path_output, 'dir')
+  create_outputfolder(path_input, path_output);
+end
+
+switch level
+  case 'participant'
+    run_participant(path_input, path_output, 'all');
+  case 'group'
+    run_group(path_input, path_output);
+end
+
+time_end = toc(time_start);
+disp(time_end);
