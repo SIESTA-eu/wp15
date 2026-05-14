@@ -4,28 +4,34 @@ function spm_preprocess(path_output, participant_id)
 % usecase 2.5. I removed the dependency on the matlabbatch system, and call
 % the job specific SPM-functions directly
 
-% realign
+% realign -> note that the motion correction + reslicing probably may be
+% improved by using the same reference volume across runs-within-session,
+% or even across sessions. I don't know what the best practice is here
 niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'sub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
-niftis = niftis(1:3);
-%realign(niftis);
+%niftis = niftis(1:3);
+realign(niftis);
 
 % slice-timing correction
 niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'rsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
-niftis = niftis(1:3);
-%stc(niftis);
+%niftis = niftis(1:3);
+stc(niftis);
 
-% coregister with the session specific anatomicals
+% coregister with the session specific anatomicals -> note this probably is
+% not optimal in the intended analysis context since we want to accumulate
+% the data across sessions in order to estimate the first level model. I
+% would expect it to make more sense to coregister to a single reference
+% anatomical image. 
 niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'meansub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 anatomicals = dir(fullfile(path_output, participant_id, 'ses*', 'anat', 'sub-*.nii'));
 anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
-anatomicals = anatomicals(1);
-%coreg(anatomicals, niftis);
+%anatomicals = anatomicals(1);
+coreg(anatomicals, niftis);
 
-
-% segment the anatomicals
+% segment the anatomicals -> note I don't know whether all anatomicals need
+% to be segmented, or whether any of the anatomicals needs to be segmented
 segmentation(anatomicals);
 
 end
@@ -118,11 +124,34 @@ for f = 1:numel(anatomicals)
     job.warp.samp = 3;
     job.warp.write = [1 1];
 
-    x = spm_get_defaults('old');
-    job.tissue.tpm = x.preproc.tpm; % whatever, life's just to short but this seems to work
-    
+    tpmdir = fullfile(spm('dir'), 'tpm');
+    job.tissue(1).tpm = {fullfile(tpmdir, 'TPM.nii,1')};
+    job.tissue(1).ngaus = 1;
+    job.tissue(1).native = [1 0];
+    job.tissue(1).warped = [0 0];
+    job.tissue(2).tpm = {fullfile(tpmdir, 'TPM.nii,2')};
+    job.tissue(2).ngaus = 1;
+    job.tissue(2).native = [1 0];
+    job.tissue(2).warped = [0 0];
+    job.tissue(3).tpm = {fullfile(tpmdir, 'TPM.nii,3')};
+    job.tissue(3).ngaus = 2;
+    job.tissue(3).native = [1 0];
+    job.tissue(3).warped = [0 0];
+    job.tissue(4).tpm = {fullfile(tpmdir, 'TPM.nii,4')};
+    job.tissue(4).ngaus = 3;
+    job.tissue(4).native = [1 0];
+    job.tissue(4).warped = [0 0];
+    job.tissue(5).tpm = {fullfile(tpmdir, 'TPM.nii,5')};
+    job.tissue(5).ngaus = 4;
+    job.tissue(5).native = [1 0];
+    job.tissue(5).warped = [0 0];
+    job.tissue(6).tpm = {fullfile(tpmdir, 'TPM.nii,6')};
+    job.tissue(6).ngaus = 2;
+    job.tissue(6).native = [0 0];
+    job.tissue(6).warped = [0 0];
+
     % Run
-    spm_preproc_run(job)
+    spm_preproc_run(job);
 
 end
 end
