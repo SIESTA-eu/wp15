@@ -10,13 +10,13 @@ function spm_preprocess(path_output, participant_id)
 niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'sub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 %niftis = niftis(1:3);
-realign(niftis);
+%realign(niftis);
 
 % slice-timing correction
 niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'rsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 %niftis = niftis(1:3);
-stc(niftis);
+%stc(niftis);
 
 % coregister with the session specific anatomicals -> note this probably is
 % not optimal in the intended analysis context since we want to accumulate
@@ -28,11 +28,24 @@ niftis = fullfile({niftis.folder}', {niftis.name}');
 anatomicals = dir(fullfile(path_output, participant_id, 'ses*', 'anat', 'sub-*.nii'));
 anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
 %anatomicals = anatomicals(1);
-coreg(anatomicals, niftis);
+%coreg(anatomicals, niftis);
 
-% segment the anatomicals -> note I don't know whether all anatomicals need
+% segment + normalise the anatomicals -> note I don't know whether all anatomicals need
 % to be segmented, or whether any of the anatomicals needs to be segmented
-segmentation(anatomicals);
+%segmentation(anatomicals);
+
+% normalise the functional data
+niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'arsub-*.nii'));
+niftis = fullfile({niftis.folder}', {niftis.name}');
+anatomicals = dir(fullfile(path_output, participant_id, 'ses*', 'anat', 'y_sub-*.nii'));
+anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
+anatomicals = anatomicals(1);
+niftis = niftis(1);
+%normalisation(anatomicals, niftis);
+
+niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'warsub-*.nii'));
+niftis = fullfile({niftis.folder}', {niftis.name}');
+smooth(niftis);
 
 end
 
@@ -153,5 +166,37 @@ for f = 1:numel(anatomicals)
     % Run
     spm_preproc_run(job);
 
+end
+end
+
+function normalisation(anatomicals, niftis)
+  
+for f = 1:numel(niftis)
+  % find the matching anatomical
+  [p,ff,e] = fileparts(niftis{f});
+  ff = split(ff, '_');
+  sess_id = ff{2};
+  
+  job.subj.def        = {anatomicals(find(contains(anatomicals, sess_id),1,'first'))};
+  job.subj.resample   = cellstr(spm_select('expand', niftis{f}));
+  job.woptions.bb     = [-78 -112 -70; 78 76 85];
+  job.woptions.vox    = [2 2 2];
+  job.woptions.interp = 4;
+  job.woptions.prefix = 'w';
+
+  spm_run_norm(job);
+end
+end
+
+function smooth(niftis)
+
+for f = 1:numel(niftis)
+  job.data = niftis(f);
+  job.fwhm = [8 8 8];
+  job.dtype = 0;
+  job.prefix = 's';
+  job.im = false; %???
+  
+  spm_run_smooth(job);
 end
 end
