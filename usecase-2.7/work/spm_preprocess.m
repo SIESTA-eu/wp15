@@ -1,4 +1,8 @@
-function spm_preprocess(path_output, participant_id)
+function spm_preprocess(path_output, participant_id, session_id)
+
+if nargin<3
+  session_id = 'ses*';
+end
 
 % this function has been inspired by the equivalently named function in
 % usecase 2.5. I removed the dependency on the matlabbatch system, and call
@@ -7,43 +11,43 @@ function spm_preprocess(path_output, participant_id)
 % realign -> note that the motion correction + reslicing probably may be
 % improved by using the same reference volume across runs-within-session,
 % or even across sessions. I don't know what the best practice is here
-niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'sub-*.nii'));
+niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'sub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 %niftis = niftis(1:3);
-%realign(niftis);
+realign(niftis);
 
 % slice-timing correction
-niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'rsub-*.nii'));
+niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'rsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 %niftis = niftis(1:3);
-%stc(niftis);
+stc(niftis);
 
 % coregister with the session specific anatomicals -> note this probably is
 % not optimal in the intended analysis context since we want to accumulate
 % the data across sessions in order to estimate the first level model. I
 % would expect it to make more sense to coregister to a single reference
 % anatomical image. 
-niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'meansub-*.nii'));
+niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'meansub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
-anatomicals = dir(fullfile(path_output, participant_id, 'ses*', 'anat', 'sub-*.nii'));
+anatomicals = dir(fullfile(path_output, participant_id, session_id, 'anat', 'sub-*.nii'));
 anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
 %anatomicals = anatomicals(1);
-%coreg(anatomicals, niftis);
+coreg(anatomicals, niftis);
 
 % segment + normalise the anatomicals -> note I don't know whether all anatomicals need
 % to be segmented, or whether any of the anatomicals needs to be segmented
-%segmentation(anatomicals);
+segmentation(anatomicals);
 
 % normalise the functional data
-niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'arsub-*.nii'));
+niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'arsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
-anatomicals = dir(fullfile(path_output, participant_id, 'ses*', 'anat', 'y_sub-*.nii'));
+anatomicals = dir(fullfile(path_output, participant_id, session_id, 'anat', 'y_sub-*.nii'));
 anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
-anatomicals = anatomicals(1);
-niftis = niftis(1);
-%normalisation(anatomicals, niftis);
+%anatomicals = anatomicals(1);
+%niftis = niftis(1);
+normalisation(anatomicals, niftis);
 
-niftis = dir(fullfile(path_output, participant_id, 'ses*', 'func', 'warsub-*.nii'));
+niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'warsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 smooth(niftis);
 
@@ -196,7 +200,7 @@ for f = 1:numel(niftis)
   job.dtype = 0;
   job.prefix = 's';
   job.im = false; %???
-  
+
   spm_run_smooth(job);
 end
 end
