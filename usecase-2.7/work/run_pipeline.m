@@ -15,7 +15,8 @@ end
 
 switch level
   case 'participant'
-    run_participant(path_input, path_output, 'all');
+    %run_participant(path_input, path_output, 'all');
+    run_participant(path_input, path_output, {'sub-01' 'sub-02' 'sub-03'}, {'ses-01' 'ses-02'}); % for now only run 3 subjects and 2 sessions
   case 'group'
     run_group(path_input, path_output);
 end

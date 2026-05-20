@@ -117,5 +117,5 @@ function bidsapp(varargin)
   % structure that was parsed above. The purpose of this "bidsapp" function and the
   % "workPackageCerCo" function is very similar and in principle they could be merged.
 
-  workPackageCerCo(options.inputdir, options.outputdir, options.level);
+  run_pipeline(options.inputdir, options.outputdir, options.level);
 end
