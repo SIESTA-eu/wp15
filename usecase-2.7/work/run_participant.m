@@ -29,7 +29,7 @@ function run_participant(path_input, path_output, participant_id, session_id)
   for p = participant_id(:)'
     for s = session_id(:)'
       spm_preprocess(path_output, p{1}, s{1});
-      spm_glm(path_output, p{1}, s{1});
+      spm_glmfit(path_output, p{1}, s{1});
     end
   end
 

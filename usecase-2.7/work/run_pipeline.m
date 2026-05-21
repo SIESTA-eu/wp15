@@ -9,7 +9,9 @@ spm_get_defaults('cmdline',true);
 
 % create output architecture directory based on input directory, and copy
 % over the data + unzip the nii.gz files
-if ~exist(path_output, 'dir')
+if ~exist(path_output, 'dir') || ~exist(fullfile(path_output, 'participants.tsv'), 'file')
+  % either the folder does not exist, or the participants.tsv does not
+  % exist. in the latter case, I assume that the data are not there either
   create_outputfolder(path_input, path_output);
 end
 
