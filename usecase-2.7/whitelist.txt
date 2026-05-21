@@ -1,0 +1,4 @@
+derivatives/output/group/con_0001.nii
+derivatives/output/group/spmT_0001.nii
+derivatives/output/group/con_0002.nii
+derivatives/output/group/spmT_0002.nii
