@@ -1,32 +1,29 @@
 Bootstrap: docker
-From: python:3.13-slim
-Stage: final
+From: python:3-slim
 
 %help
 
     The general form to run the singlesubject command is:
-        apptainer run singlesubject.sif <input> <output> <participant_nr>
+        apptainer run singlesubject.sif <inputdir> <outputdir> <participant_nr>
 
 %labels
-  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+    org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
-%environment
-    export PIP_NO_CACHE_DIR=off
+%files
+    singlesubject/singlesubject.py /opt/singlesubject.py
 
 %post
-    # Install git
-    apt update && apt -y install git
-
-    # Install BIDScramble (update the repo source later)
-    # pip install bidscramble
-    git clone https://github.com/Donders-Institute/bidscramble.git
-    pip install ./bidscramble
+    ################################################################################
+    # general updates to the base image
+    ################################################################################
+    apt update -y && apt-get install -y python3-pip
+    echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+    echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+    DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+    pip install pandas --quiet
+  
+%environment
+    export LC_ALL=C
 
 %runscript
-    PID=$(ls -d $1/sub-*/ | sed -n "${3}p" | xargs basename)
-    if [ -z "$PID" ]; then
-        echo "Error: No data found for participant_nr $3" >&2
-        exit 1
-    fi
-    scramble $1 $2 stub -s NOTHING
-    exec scramble $1 $2 pseudo original -s "(.*/)*$PID([\._-].+)*(/|$).*"
+    python3 /opt/singlesubject.py "$@"
