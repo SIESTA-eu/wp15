@@ -1,25 +1,29 @@
 Bootstrap: docker
-From: python:3.13-slim
+From: python:3-slim
 
 %help
 
     The general form to run the mergesubjects command is:
-        apptainer run mergesubjects.sif <inputs> <output>
+        apptainer run mergesubjects.sif <inputdir1> <inputdir2> ... <inputdirN> <outputdir>
 
 %labels
-  org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
+    org.opencontainers.image.source = "https://github.com/SIESTA-eu/wp15"
 
-%environment
-    export PIP_NO_CACHE_DIR=off
+%files
+    mergesubjects/singlesubject.py /opt/mergesubjects.py
 
 %post
-    # Install git
-    apt update && apt -y install git
-
-    # Install BIDScramble (update the repo source later)
-    # pip install bidscramble
-    git clone https://github.com/Donders-Institute/bidscramble.git
-    pip install ./bidscramble
+    ################################################################################
+    # general updates to the base image
+    ################################################################################
+    apt update -y && apt-get install -y python3-pip
+    echo 'tzdata tzdata/Areas select Europe' | debconf-set-selections
+    echo 'tzdata tzdata/Zones/Europe select Amsterdam' | debconf-set-selections
+    DEBIAN_FRONTEND=noninteractive apt install -y tzdata
+    pip install pandas --quiet
+  
+%environment
+    export LC_ALL=C
 
 %runscript
-    exec merge $@
+    python3 /opt/mergesubjects.py "$@"
