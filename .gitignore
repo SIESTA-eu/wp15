@@ -14,4 +14,5 @@ usecase-*/venv
 usecase-2.3/fieldtrip
 usecase-2.4/eeglab
 usecase-2.5/spm12
+usecase-2.7/work/bidsapp_compiled
 .vscode/settings.json
