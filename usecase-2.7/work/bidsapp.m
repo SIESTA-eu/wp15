@@ -19,7 +19,8 @@ function bidsapp(varargin)
   %   -h,--help         show this help and exit
   %   -v,--verbose      show more verbose information for debugging
   %   --version         show the version and exit
-  %
+  %   --subject-label   list of subject labels to run in case level=participant
+  %   --session-label   list of session labels to run in case level=participant
   % See also INPUTPARSER, ARGUMENTS, FT_GETOPT
 
   % Copyright (C) 2024, Robert Oostenveld
