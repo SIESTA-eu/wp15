@@ -3,6 +3,15 @@ function run_group(path_input, path_output)
 grouppath = fullfile(path_output, 'derivatives', 'group');
 mkdir(grouppath);
 
+dspm = dir(fullfile(grouppath, 'SPM.mat'));
+if ~isempty(dspm)
+  spmmats = fullfile({dspm.folder}', {dspm.name}');
+  for i = 1:numel(spmmats) 
+    delete(spmmats{i});
+  end
+end
+
+
 % select the input files for the second level statistics
 d = dir(fullfile(path_output, 'sub*', 'ses*', 'func', 'con*.nii'));
 fnames = fullfile({d.folder}', {d.name}');
@@ -39,30 +48,32 @@ fprintf('Common mask saved to: %s\n', path_mask);
 % of this pipeline is to demonstrate computational feasibility, not
 % scientific correctness of what is going on inside it
 
-
-% Prepare SPM batch
-matlabbatch = {};
-
 % 1. Factorial design (one-sample t-test)
-matlabbatch{1}.spm.stats.factorial_design.dir = {grouppath};
-matlabbatch{1}.spm.stats.factorial_design.des.t1.scans = fnames;
-matlabbatch{1}.spm.stats.factorial_design.masking.em = {path_mask}; % explicit mask
-matlabbatch{1}.spm.stats.factorial_design.masking.im = 0;           % disable implicit mask
-matlabbatch{1}.spm.stats.factorial_design.masking.tm.tm_none = 1;   % no threshold masking
+factorial_design.dir = {grouppath};
+factorial_design.des.t1.scans = fnames;
+factorial_design.masking.em = {path_mask}; % explicit mask
+factorial_design.masking.im = 0;           % disable implicit mask
+factorial_design.masking.tm.tm_none = 1;   % no threshold masking
+factorial_design.multi_cov = [];
+factorial_design.cov = [];
+factorial_design.globalc.g_omit = 1;
+factorial_design.globalm.glonorm = 1;
+factorial_design.globalm.gmsca.gmsca_no = 1;
+spm_run_factorial_design(factorial_design);
 
 % 2. Model estimation
-matlabbatch{2}.spm.stats.fmri_est.spmmat = {fullfile(grouppath, 'SPM.mat')};
+fmri_est.spmmat = {fullfile(grouppath, 'SPM.mat')};
+fmri_est.method.Classical = 1;
+fmri_est.write_residuals = 0;
+spm_run_fmri_est(fmri_est);
 
 % 3. Contrasts
-matlabbatch{3}.spm.stats.con.spmmat = {fullfile(grouppath, 'SPM.mat')};
-matlabbatch{3}.spm.stats.con.consess{1}.tcon.name = 'Main_Effect';
-matlabbatch{3}.spm.stats.con.consess{1}.tcon.weights = 1;
-matlabbatch{3}.spm.stats.con.consess{1}.tcon.sessrep = 'none';
-
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.name = 'Main_Effect_Minus';
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.weights = -1;
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.sessrep = 'none';
-
-% Run full batch (design + estimation + contrasts)
-spm_jobman('run', matlabbatch);
-keyboard
+con.spmmat = {fullfile(grouppath, 'SPM.mat')};
+con.consess{1}.tcon.name = 'Main_Effect';
+con.consess{1}.tcon.weights = 1;
+con.consess{1}.tcon.sessrep = 'none';
+con.consess{2}.tcon.name = 'Main_Effect_Minus';
+con.consess{2}.tcon.weights = -1;
+con.consess{2}.tcon.sessrep = 'none';
+con.delete = 0;
+spm_run_con(con);

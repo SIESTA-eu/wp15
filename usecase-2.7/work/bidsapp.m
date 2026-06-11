@@ -81,28 +81,44 @@ function bidsapp(varargin)
   % other options each have their own value, either a string or a number
   % ...
 
-  % deal with the flags
-  isflag = false(size(varargin));
-  for i=1:numel(varargin)
-    switch varargin{i}
+  % deal with the additional stuff: FIXME all of this assumes that the last
+  % 3 arguments in the list are the positional required ones
+  while ~isempty(varargin)
+    switch varargin{1}
+      case {'--subject-label'}
+        cnt = 1;
+        options.subjectlist = cell(1,0);
+        while cnt<numel(varargin) && ~(startsWith(varargin{cnt+1}, '-'))
+          options.subjectlist{end+1} = sprintf('sub-%s', varargin{cnt+1});
+          cnt = cnt+1;
+        end
+        varargin(1:cnt) = [];
+      case {'--session-label'}
+        cnt = 1;
+        options.sessionlist = cell(1,0);
+        while cnt<numel(varargin) && ~(startsWith(varargin{cnt+1}, '-'))
+          options.sessionlist{end+1} = sprintf('ses-%s', varargin{cnt+1});
+          cnt = cnt+1;
+        end
+        varargin(1:cnt) = [];
       case {'--version'}
         options.version = true;
-        isflag(i) = true;
+        varargin(1) = [];
       case {'-h', '--help'}
         options.help = true;
-        isflag(i) = true;
+        varargin(1) = [];
       case {'-v', '--verbose'}
         options.verbose = true;
-        isflag(i) = true;
+        varargin(1) = [];
     end % switch
-  end % for
-
-  varargin = varargin(~isflag);
-  clear isflag
-
-  % deal with the remaining optional arguments
-  % ...
-
+  end % while
+  if ~isfield(options, 'subjectlist')
+    options.subjectlist = 'all';
+  end
+  if ~isfield(options, 'sessionlist')
+    options.sessionlist = 'all';
+  end
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % call the actual code to execute the pipeline
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,5 +133,5 @@ function bidsapp(varargin)
   % structure that was parsed above. The purpose of this "bidsapp" function and the
   % "workPackageCerCo" function is very similar and in principle they could be merged.
 
-  run_pipeline(options.inputdir, options.outputdir, options.level);
+  run_pipeline(options.inputdir, options.outputdir, options.level, options.subjectlist, options.sessionlist);
 end

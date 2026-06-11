@@ -1,4 +1,4 @@
-function spm_glm(path_output, participant_id, session_id)
+function spm_glmfit(path_output, participant_id, session_id)
  
 % function to specify and fit a simple GLM, combining across runs within a
 % session. Note, probably it would be more powerful (and correct) to create
@@ -11,9 +11,17 @@ end
 if iscell(session_id)
   % recurse and loop across sessions
   for s = session_id(:)'
-    spm_glm(path_output, participant_id, s{1});
+    spm_glmfit(path_output, participant_id, s{1});
   end
   return;
+end
+
+dspm = dir(fullfile(path_output, participant_id, session_id, 'func', 'SPM.mat'));
+if ~isempty(dspm)
+  spmmats = fullfile({dspm.folder}', {dspm.name}');
+  for i = 1:numel(spmmats) 
+    delete(spmmats{i});
+  end
 end
 
 d1 = dir(fullfile(path_output, participant_id, session_id, 'func', '*_events.tsv'));

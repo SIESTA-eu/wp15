@@ -1,4 +1,4 @@
-BootStrap: docker
+Bootstrap: docker
 From: containers.mathworks.com/matlab-runtime:r2024b
 
 %labels
@@ -6,7 +6,6 @@ From: containers.mathworks.com/matlab-runtime:r2024b
 
 %files
   work/bidsapp_compiled/bidsapp  /work/bidsapp_compiled/bidsapp
-  work/bidsapp_compiled/bidsapp.ctf  /work/bidsapp_compiled/bidsapp.ctf
 
 %post
   ################################################################################
@@ -19,6 +18,16 @@ From: containers.mathworks.com/matlab-runtime:r2024b
   DEBIAN_FRONTEND=noninteractive apt install -y keyboard-configuration
   apt install -y ca-certificates
 
+  ## Create wrapper script to copy files to a writable directory
+  #cat << 'EOF' > /work/bidsapp_compiled/run_bidsapp.sh
+  ##!/bin/bash
+  #WRKDIR=$(mktemp -d -t bidsapp_XXXXXX)
+  #cp -r /work/bidsapp_compiled/* "$WRKDIR/"
+  #cd "$WRKDIR"
+  #exec ./bidsapp "$@"
+  #EOF
+  #chmod +x /work/bidsapp_compiled/run_bidsapp.sh
+
 %environment
   export LC_ALL=C
   export AGREE_TO_MATLAB_RUNTIME_LICENSE=yes
@@ -28,5 +37,5 @@ From: containers.mathworks.com/matlab-runtime:r2024b
 
 %runscript
   # this follows the BIDS apps specification, see https://doi.org/10.1371/journal.pcbi.1005209
-  /work/bidsapp_compiled/bidsapp $*
+  exec /work/bidsapp_compiled/bidsapp $*
 

@@ -21,6 +21,7 @@ niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'rsub-*.n
 niftis = fullfile({niftis.folder}', {niftis.name}');
 %niftis = niftis(1:3);
 stc(niftis);
+deleteniftis(niftis);
 
 % coregister with the session specific anatomicals -> note this probably is
 % not optimal in the intended analysis context since we want to accumulate
@@ -46,10 +47,15 @@ anatomicals = fullfile({anatomicals.folder}', {anatomicals.name}');
 %anatomicals = anatomicals(1);
 %niftis = niftis(1);
 normalisation(anatomicals, niftis);
+deleteniftis(niftis);
 
 niftis = dir(fullfile(path_output, participant_id, session_id, 'func', 'warsub-*.nii'));
 niftis = fullfile({niftis.folder}', {niftis.name}');
 smooth(niftis);
+deleteniftis(niftis);
+
+% here, we ended up with 'swarsub-*.nii', and 'rp_sub-*.txt that serves as input to the GLM
+% fitting procedure
 
 end
 
@@ -195,12 +201,20 @@ end
 function smooth(niftis)
 
 for f = 1:numel(niftis)
-  smooth.data = niftis(f);
+  smooth.data = cellstr(spm_select('expand', niftis{f}));
   smooth.fwhm = [8 8 8];
   smooth.dtype = 0;
   smooth.prefix = 's';
   smooth.im = false; %???
 
   spm_run_smooth(smooth);
+end
+end
+
+function deleteniftis(niftis)
+
+% save up some disk space
+for f = 1:numel(niftis)
+  delete(niftis{f});
 end
 end
