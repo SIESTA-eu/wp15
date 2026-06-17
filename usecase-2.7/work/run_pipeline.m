@@ -15,6 +15,16 @@ spm('defaults','fmri');
 spm_jobman('initcfg');
 spm_get_defaults('cmdline',true);
 
+% ensure that the path_input and path_output are full paths
+if ~startsWith(path_input, filesep)
+  path_input = fullfile(pwd, path_input);
+  fprintf('path_input variable does not start with a file separator, converting to full-path string:\n %s\n', path_input);
+end
+if ~startsWith(path_output, filesep)
+  path_output = fullfile(pwd, path_output);
+  fprintf('path_output variable does not start with a file separator, converting to full-path string:\n %s\n', path_output);
+end
+
 % create output architecture directory based on input directory, and copy
 % over the data + unzip the nii.gz files
 if ~exist(path_output, 'dir') || ~exist(fullfile(path_output, 'participants.tsv'), 'file')
