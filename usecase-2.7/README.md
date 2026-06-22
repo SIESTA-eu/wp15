@@ -39,7 +39,7 @@ The execution of the group-level pipeline takes ...
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher. The whitelist.txt file contains a complete list of the output data that is to be shared.
 
 The whitelisted files are:
-- derivatives/output/group/con_0001.nii
-- derivatives/output/group/spmT_0001.nii
-- derivatives/output/group/con_0002.nii
-- derivatives/output/group/spmT_0002.nii
+- derivatives/group/con_0001.nii
+- derivatives/group/spmT_0001.nii
+- derivatives/group/con_0002.nii
+- derivatives/group/spmT_0002.nii
