@@ -24,7 +24,7 @@ _Please specify that the data cannot be shared for privacy reasons._
 
 ## Pipeline results
 
-The analysis results in ...
+The analysis consists of a first (participant) level SPM GLM analysis, using standard preprocessing steps, followed by a GLM. The resulting contrast files are then subjected to a second (group) level analysis, to produce contrast files and T-maps. 
 
 ## Computational requirements for the participant level
 
@@ -37,3 +37,9 @@ The execution of the group-level pipeline takes ...
 ## Output data
 
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher. The whitelist.txt file contains a complete list of the output data that is to be shared.
+
+The whitelisted files are:
+- derivatives/output/group/con_0001.nii
+- derivatives/output/group/spmT_0001.nii
+- derivatives/output/group/con_0002.nii
+- derivatives/output/group/spmT_0002.nii
