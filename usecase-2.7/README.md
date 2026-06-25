@@ -6,39 +6,44 @@ This is a specific use case that serves as a prototype for development and testi
 - the data user implementing and testing the pipeline on the scrambled version
 - the data rights holder executing the pipeline on the real data
 
-# Data rights holder
+Note that it skips the step where the platform operator executes the differentially private resampling and execution of the pipeline on the resampled data. The approach followed here is more similar to federated analysis.
 
-## Summary of the input data
+## Data rights holder
+
+### Summary of the input data
 
 This dataset pertains to an fMRI study investigating the brain mechanisms underlying visual and multisensory recognition in 12 healthy participants (8 females; mean age = 28.06 years). Participants performed a short-term memory task involving auditory, visual, and audio‑visual stimuli, recognizing and remembering objects in different multisensory contexts. The dataset is organized in BIDS format (2.17 GB) and includes, for each participant, anatomical images (T1w.nii.gz), functional data (task-memory_run-_bold.nii.gz), and event files (_events.tsv) detailing conditions, responses, and reaction times. This dataset is intended as a standardized resource for the scientific community. It has already been used to test an automated fMRI analysis pipeline capable of preprocessing, motion correction, spatial normalization, and preparation of data for univariate and multivariate analyses, allowing evaluation of method robustness and reproducibility.
 
-## Data citation
+### Data citation
 
-_Please specify how the data should be cited, for example by pointing to a previous paper that uses the data._
+Nikolaus, M., Mozafari, M., Berry, I., Asher, N., Reddy, L., & VanRullen, R. (2025). SemReps-8K. OpenNeuro. https://doi.org/10.18112/openneuro.ds007272.v1.0.0
 
-## Legal aspects of the input data
+Nikolaus, M., Mozafari, M., Berry, I., Asher, N., Reddy, L., & VanRullen, R. (2025). Modality-Agnostic Decoding of Vision and Language from fMRI. eLife. https://doi.org/10.7554/eLife.107933
 
-_Please specify that the data cannot be shared for privacy reasons._
+### Legal aspects of the input data
 
-# Data user
+This dataset has been published under the CC0 license.
 
-## Pipeline results
+## Data user
 
-The analysis consists of a first (participant) level SPM GLM analysis, using standard preprocessing steps, followed by a GLM. The resulting contrast files are then subjected to a second (group) level analysis, to produce contrast files and T-maps. 
+### Pipeline results
 
-## Computational requirements for the participant level
+The analysis consists of a first (participant) level SPM GLM analysis, using standard preprocessing steps, followed by a GLM. The resulting contrast files are then subjected to a second (group) level analysis, to produce contrast files and T-maps.
+
+### Computational requirements for the participant level
 
 The execution of the pipeline for each participant takes ...
 
-## Computational requirements for the group level
+### Computational requirements for the group level
 
 The execution of the group-level pipeline takes ...
 
-## Output data
+### Output data
 
 The output data that is to be shared consists of folders and files that represent group-level aggregated data. Many more individual-subject files are generated but these should not be shared with the researcher. The whitelist.txt file contains a complete list of the output data that is to be shared.
 
 The whitelisted files are:
+
 - derivatives/group/con_0001.nii
 - derivatives/group/spmT_0001.nii
 - derivatives/group/con_0002.nii

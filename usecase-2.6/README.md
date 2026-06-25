@@ -153,6 +153,8 @@ The input dataset has been released under the [CC0](https://spdx.org/licenses/CC
 
 ## Data user
 
+### Pipeline results
+
 TBD
 
 ### Computational requirements for the participant level
