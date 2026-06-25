@@ -56,14 +56,14 @@ apptainer run docker://busybox:latest echo "Hello, Apptainer works!"
 The analysis pileline requires both the original data and the scrambled version of the data to be BIDS compliant. This can be tested using the bids-validator.
 
 ```bash
-apptainer run docker://bidsc/bids-validator:latest --version
+apptainer run docker://bids/validator:latest --version
 ```
 
 Validate the original BIDS dataset:
 
 ```bash
 apptainer run --bind /path/to/dataset:/data \
-    docker://bidsc/bids-validator:latest /data
+    docker://bids/validator:latest /data
 ```
 
 ### Scrambling the data with BIDScramble
@@ -71,7 +71,7 @@ apptainer run --bind /path/to/dataset:/data \
 Pull the BIDScramble container:
 
 ```bash
-apptainer pull docker://bidsc/bidscramble:latest
+apptainer pull https://ghcr.io/siesta-eu/scramble.sif:latest
 ```
 
 Scramble the dataset:
@@ -79,7 +79,7 @@ Scramble the dataset:
 ```bash
 apptainer run --bind /path/to/original:/input \
     --bind /path/to/scrambled:/output \
-    docker://bidsc/bidscramble:latest \
+    https://ghcr.io/siesta-eu/scramble.sif:latest \
     --input /input --output /output
 ```
 
@@ -87,7 +87,7 @@ Validate the scrambled dataset:
 
 ```bash
 apptainer run --bind /path/to/scrambled:/data \
-    docker://bidsc/bids-validator:latest /data
+    docker://bids/validator:latest /data
 ```
 
 ### Transferring the scrambled data from DRH to the DU
