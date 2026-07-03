@@ -212,4 +212,4 @@ cp derivatives/group/spmT_0002.nii original_whitelisted_results/
 zip -r original_whitelisted_results.zip original_whitelisted_results/
 ```
 
-Review the output for correctness, then transfer the results to the data user.
+Review the output for privacy, then transfer the results to the data user.
