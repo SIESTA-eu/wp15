@@ -96,7 +96,7 @@ If the validator fails, the data rights holder should re-execute the scrambling 
 
 ### Transferring the scrambled data from DRH to the DU
 
-The data rights holder transfers the scrambled dataset to the data user (DU) via secure file transfer (e.g. `scp`, `rsync`, or a shared secure staging area).
+Following a review of the scrambled dataset to ensure that it does not contain personal data,  the data rights holder transfers the scrambled dataset to the data user (DU) via secure file transfer (e.g. `scp`, `rsync`, or a shared secure staging area).
 
 ```bash
 rsync -avz /path/to/scrambled/ user@remote:/path/to/scrambled/
