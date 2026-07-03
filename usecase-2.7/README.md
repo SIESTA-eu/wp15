@@ -45,6 +45,8 @@ Verify the installation:
 apptainer --version
 ```
 
+If the installation of apptainer failed, look at the online documentation of apptainer or use a search engine to resolve the problem.
+
 #### Validate Apptainer with a hello-world container
 
 ```bash
@@ -71,10 +73,10 @@ apptainer run --bind /path/to/dataset:/data \
 Pull the BIDScramble container:
 
 ```bash
-apptainer pull https://ghcr.io/siesta-eu/scramble.sif:latest
+apptainer pull oras://ghcr.io/siesta-eu/scramble.sif:latest
 ```
 
-Scramble the dataset:
+Scramble the dataset. This requires that the data rights holder figures out the appropriate scrambling parameters - given the dataset. The documentation is located at https://bidscramble.readthedocs.io/en/latest, and there are examples of it in the other SIESTA use cases.
 
 ```bash
 apptainer run --bind /path/to/original:/input \
@@ -89,6 +91,8 @@ Validate the scrambled dataset:
 apptainer run --bind /path/to/scrambled:/data \
     docker://bids/validator:latest /data
 ```
+
+If the validator fails, the data rights holder should re-execute the scrambling with different parameters which do match the original dataset.
 
 ### Transferring the scrambled data from DRH to the DU
 
