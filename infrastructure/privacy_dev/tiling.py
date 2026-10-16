@@ -212,29 +212,37 @@ def _hann_window(shape):
 # 4. Per-patch worker + whole-brain assembly
 # ===========================================================================
 def _process_chunk(volumes, boxes_idx, patch_size, pipeline_name, epsilon, base_seed,
-                   max_draws=2000, mech_kind="supervisor"):
+                   max_draws=2000, mech_kind="mode-eigen", mech_scale=None, mech_kcheck=None):
     """Run the per-patch mechanism on a chunk of patches. Self-contained & picklable.
     Returns per-patch (idx, origin, noise_draw, numerical_rank, eff95_rank, loo_total_var, fell_back).
 
-    mech_kind selects the mechanism, both built on the frozen harness:
-      'supervisor' -> mech_supervisor_loo_corr (per-voxel bar S_j = max_i|D_ij|)
-      'l2'         -> same mechanism wrapped by l2_sensitivity.l2_bar, which swaps in the
-                      L2-selected bar S_j = |D_{i*,j}| (i* = argmax_i ||D_i||_2). Covariance,
-                      rejection rule and fallback are unchanged; only the bar is gentler/coherent.
+    mech_kind selects the mechanism:
+      'mode-eigen' -> mode_eigen_mech.mech_mode_eigen: correlated noise as one coefficient per
+                      covariance eigenmode, mode-space L2 bar. Never forms p x p, so it scales to the
+                      large (OASIS-size) patches the voxel mechanisms OOM on. Uses the operating point
+                      (mech_scale, mech_kcheck, max_draws); scale defaults to 2/epsilon.
+      'supervisor' -> mech_supervisor_loo_corr (per-voxel bar S_j = max_i|D_ij|)  [legacy voxel]
+      'l2'         -> l2_sensitivity.l2_bar on the supervisor (L2-selected voxel bar)  [legacy voxel]
 
-    max_draws controls the rejection-sampler budget. For any multi-voxel patch the joint accept
-    condition is essentially never met, so the sampler falls back to the tail-normal regardless;
-    lowering max_draws gives the SAME output distribution far faster. fell_back is tracked."""
+    max_draws controls the rejection-sampler budget. fell_back is tracked."""
     import numpy as np
     import privacy_harness as ph
     pipe = {"mean": ph.pipeline_mean, "median": ph.pipeline_median,
             "variance": ph.pipeline_variance}[pipeline_name]
-    base = ph.mech_supervisor_loo_corr(epsilon=epsilon, max_draws=max_draws)
-    if mech_kind == "l2":
-        import l2_sensitivity as l2s
-        mech = l2s.l2_bar(base)
+    if mech_kind == "mode-eigen":
+        import mode_eigen_mech as me
+        _scale = mech_scale if mech_scale is not None else 2.0 / epsilon
+
+        def mech(y, D, S, **kw):
+            return me.mech_mode_eigen(y, D, S, scale=_scale, k_check=mech_kcheck,
+                                      max_draws=max_draws, **kw)
     else:
-        mech = base
+        base = ph.mech_supervisor_loo_corr(epsilon=epsilon, max_draws=max_draws)
+        if mech_kind == "l2":
+            import l2_sensitivity as l2s
+            mech = l2s.l2_bar(base)
+        else:
+            mech = base
     px, py, pz = patch_size
     out = []
     for idx, (x0, y0, z0) in boxes_idx:
@@ -245,10 +253,15 @@ def _process_chunk(volumes, boxes_idx, patch_size, pipeline_name, epsilon, base_
         rng = np.random.default_rng(np.random.SeedSequence([int(base_seed), int(idx)]))
         z = np.asarray(m.sample(rng)).reshape(patch_size)
         fell_back = int(m.n_fallback)
-        # structural rank from RAW Cov(LOO) (not the regularized nominal_cov)
+        # structural rank from the RAW Cov(LOO) eigenvalues, via the ECONOMY SVD of the centred
+        # perturbations (N x p) -- NEVER forms the p x p covariance, so this is OOM-safe at large p.
+        # The p x p covariance has only r = min(p, N-1) nonzero eigenvalues anyway, so the economy
+        # eigenvalues (s^2/(N-1)) reproduce the rank and 95% effective rank exactly.
         A = D.reshape(N, -1)
-        Craw = np.atleast_2d(np.cov(A, rowvar=False))
-        ev = np.clip(np.linalg.eigvalsh(Craw), 0, None)[::-1]
+        Ac = A - A.mean(0, keepdims=True)
+        sv = np.linalg.svd(Ac, compute_uv=False)
+        ev = (sv ** 2) / (N - 1)
+        ev = ev[:min(A.shape[1], N - 1)]
         tot = float(ev.sum())
         mx = ev.max() if ev.size else 0.0
         rank = int((ev > 1e-9 * max(mx, 1e-30)).sum())
@@ -262,12 +275,14 @@ def _process_chunk(volumes, boxes_idx, patch_size, pipeline_name, epsilon, base_
 
 def assemble_field(volumes, mask, pipeline_name, patch_size, overlap, epsilon=1.0,
                    base_seed=0, min_frac=0.5, n_jobs=2, chunks_per_job=6, max_draws=2000,
-                   mech_kind="supervisor"):
+                   mech_kind="mode-eigen", mech_scale=None, mech_kcheck=None, cover=True):
     """Build the whole-brain noise field by tiling the per-patch mechanism and overlap-adding.
     Returns dict with the blended fields, clean statistic, coverage multiplicity, per-patch rank
-    records, and the mean fallback rate. See _process_chunk for why max_draws can be small."""
+    records, per-patch fallback flags, and the mean fallback rate. mech_kind/mech_scale/mech_kcheck
+    select the per-patch mechanism and its operating point (see _process_chunk). `cover` toggles the
+    boundary coverage pass in tile_boxes (True = no privacy holes; False = threshold patches only)."""
     vol_shape = mask.shape
-    boxes, fracs, stride = tile_boxes(vol_shape, patch_size, overlap, mask, min_frac)
+    boxes, fracs, stride = tile_boxes(vol_shape, patch_size, overlap, mask, min_frac, cover=cover)
     boxes_idx = list(enumerate(boxes))
     if len(boxes_idx) == 0:
         raise RuntimeError(f"no patches for size {patch_size} overlap {overlap}")
@@ -276,7 +291,7 @@ def assemble_field(volumes, mask, pipeline_name, patch_size, overlap, epsilon=1.
     chunks = [[boxes_idx[i] for i in sp] for sp in splits if len(sp)]
     results = Parallel(n_jobs=n_jobs, prefer="processes")(
         delayed(_process_chunk)(volumes, ch, patch_size, pipeline_name, epsilon, base_seed,
-                                max_draws, mech_kind)
+                                max_draws, mech_kind, mech_scale, mech_kcheck)
         for ch in chunks)
     flat = [r for sub in results for r in sub]
 
@@ -285,7 +300,7 @@ def assemble_field(volumes, mask, pipeline_name, patch_size, overlap, epsilon=1.
     num_avg = np.zeros(vol_shape); cnt = np.zeros(vol_shape)
     num_w = np.zeros(vol_shape); den_w = np.zeros(vol_shape); den_w2 = np.zeros(vol_shape)
     win = _hann_window(patch_size)
-    ranks, eff, centers, fvals, nfb = [], [], [], [], 0
+    ranks, eff, centers, fvals, fbacks, nfb = [], [], [], [], [], 0
     for idx, (x0, y0, z0), z, rank, eff95, tot, fell_back in flat:
         nfb += fell_back
         sl = (slice(x0, x0+px), slice(y0, y0+py), slice(z0, z0+pz))
@@ -296,7 +311,7 @@ def assemble_field(volumes, mask, pipeline_name, patch_size, overlap, epsilon=1.
         num_w[sl] += wloc * zz; den_w[sl] += wloc; den_w2[sl] += wloc ** 2
         ranks.append(rank); eff.append(eff95)
         centers.append((x0 + px / 2.0, y0 + py / 2.0, z0 + pz / 2.0))
-        fvals.append(fracs[idx])
+        fvals.append(fracs[idx]); fbacks.append(bool(fell_back))
 
     fields = {
         "sum":        num_avg * m,                                     # raw Σ of contributions, no averaging
@@ -307,7 +322,7 @@ def assemble_field(volumes, mask, pipeline_name, patch_size, overlap, epsilon=1.
     clean = PIPELINES[pipeline_name](volumes)
     return {"fields": fields, "clean": clean * mask, "mult": cnt, "stride": stride,
             "ranks": np.array(ranks), "eff": np.array(eff), "centers": np.array(centers),
-            "patch_frac": np.array(fvals), "n_patches": len(flat),
+            "patch_frac": np.array(fvals), "fallbacks": np.array(fbacks, bool), "n_patches": len(flat),
             "fallback_rate": nfb / max(1, len(flat)),
             "patch_size": patch_size, "overlap": overlap, "pipeline": pipeline_name}
 
@@ -330,8 +345,21 @@ def whole_brain_utility(clean, field, mask):
         from skimage.metrics import structural_similarity as ssim
         rng_val = float(t.max() - t.min()) or 1.0
         sl = ndimage.find_objects(mb.astype(int))[0]
-        ss = float(ssim((clean)[sl], (noisy)[sl], data_range=rng_val))
-    except Exception:
+        a_im = clean[sl]; b_im = noisy[sl]
+        # robust window: largest odd <= 7 that fits the smallest cropped dim; channel_axis=None
+        # forces a true 3-D SSIM (older/newer skimage differ on the default), which was the silent
+        # failure mode that left ssim all-NaN on some environments.
+        dmin = min(a_im.shape)
+        win = min(7, dmin if dmin % 2 == 1 else dmin - 1)
+        if win >= 3:
+            ss = float(ssim(a_im, b_im, data_range=rng_val, win_size=win, channel_axis=None))
+        else:
+            ss = np.nan
+    except Exception as e:
         ss = np.nan
+        if not getattr(whole_brain_utility, "_ssim_warned", False):
+            import warnings
+            warnings.warn(f"SSIM disabled ({type(e).__name__}: {e}); other metrics unaffected.")
+            whole_brain_utility._ssim_warned = True
     return {"rel_mse": rel_mse, "neighbour_corr_gap": nc_gap, "spearman": float(spear),
             "ssim": ss, "neighbour_corr_true": float(nc_true), "neighbour_corr_released": float(nc_rel)}
