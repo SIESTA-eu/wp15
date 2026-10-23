@@ -363,3 +363,164 @@ def whole_brain_utility(clean, field, mask):
             whole_brain_utility._ssim_warned = True
     return {"rel_mse": rel_mse, "neighbour_corr_gap": nc_gap, "spearman": float(spear),
             "ssim": ss, "neighbour_corr_true": float(nc_true), "neighbour_corr_released": float(nc_rel)}
+
+
+# ===========================================================================
+# 6. Cached, resampleable blended-release noise model  (single source of the blend)
+# ===========================================================================
+class BlendedReleaseNoise:
+    """Cached, resampleable blended whole-brain (or sub-volume) noise field.
+
+    SINGLE SOURCE OF THE BLEND MATH. It reuses tile_boxes, _hann_window and the EXACT
+    average / pou / pou_energy aggregation of assemble_field (same formulas, same boundary
+    coverage), but the per-patch mode-eigen models are built ONCE and cached, so each .sample(rng)
+    only redraws coefficients and recombines. This is what a membership game needs (hundreds of
+    releases from the SAME world), and it replaces the notebook-local BlendedNeighborhoodNoise
+    (which duplicated this math and its own Hann window). NOTE: only the blend math is shared with
+    assemble_field; the RNG scheme differs (assemble_field seeds each patch independently via
+    SeedSequence([seed, idx]); here one rng stream feeds all patches in box order), so fields are
+    NOT draw-for-draw identical to assemble_field — they match only if fed the same per-patch draws.
+
+    Fallback: assemble_field reports fallback per build; a resampleable model must report it ACROSS
+    samples. Each .sample aggregates how many of its patch-draws fell back. The tracked metric is
+    `fallback_rate` = per-patch mean fallback fraction (fraction of all patch-draws that fell back).
+    `fallback_counts` holds the per-sample fallback COUNT (number of patches that fell back in that
+    release) — the per-sample "any-fallback" rate is deliberately NOT exposed, because it saturates
+    to ~1 at whole-brain patch counts.
+
+    .sample(rng) -> 1-D blended noise field over the in-mask voxels (length == mask.sum()).
+    Works on a sub-volume (crop the volumes + mask before passing) for the Delta-support region.
+    """
+    def __init__(self, volumes, mask, pipeline_name, patch_size, overlap, scale,
+                 k_check=None, max_draws=2000, blend="pou_energy", epsilon=1.0,
+                 min_frac=0.5, cover=True):
+        import mode_eigen_mech as me
+        if blend not in ("average", "pou", "pou_energy"):
+            raise ValueError(f"unknown blend {blend!r}")
+        self.mask = np.asarray(mask).astype(bool); self.shape = self.mask.shape; self.blend = blend
+        pipe = PIPELINES[pipeline_name]
+        boxes, fracs, stride = tile_boxes(self.shape, patch_size, overlap, self.mask, min_frac, cover=cover)
+        if len(boxes) == 0:
+            raise RuntimeError(f"no patches for size {patch_size} overlap {overlap}")
+        win = _hann_window(patch_size); px, py, pz = patch_size
+        m = self.mask.astype(float)
+        self.cnt = np.zeros(self.shape); self.den_w = np.zeros(self.shape); self.den_w2 = np.zeros(self.shape)
+        self.patches = []
+        for (x0, y0, z0) in boxes:
+            sl = (slice(x0, x0 + px), slice(y0, y0 + py), slice(z0, z0 + pz))
+            sub = volumes[:, x0:x0 + px, y0:y0 + py, z0:z0 + pz]
+            Nn = sub.shape[0]
+            y, D, S = ph.loo_artifacts(sub, pipe)
+            r = min(np.asarray(D).reshape(Nn, -1).shape[1], Nn - 1)
+            kc = min(k_check, r) if k_check is not None else r   # per-world rank clamp (out-world has r=N-2)
+            mdl = me.mech_mode_eigen(y, D, S, scale=scale, k_check=kc, max_draws=max_draws,
+                                     epsilon=epsilon, subjects=sub.reshape(Nn, -1), keep_modes=True)
+            mloc = m[sl]; wloc = win * mloc
+            self.cnt[sl] += mloc; self.den_w[sl] += wloc; self.den_w2[sl] += wloc ** 2
+            self.patches.append((sl, mdl, mloc, wloc, tuple(patch_size), mdl.modes))
+        self.n_patches = len(self.patches); self.stride = stride
+        self.patch_frac = np.asarray(fracs)
+        self.max_draws = int(max_draws)
+        # analytic per-patch fallback probability q = (1 - p_acc)^max_draws, p_acc = prod_{m<k_check}
+        # P(|a_m| >= b_m) (modes independent). Used by sample_batch (which never actually falls back).
+        self._q = np.array([_patch_fallback_prob(md, self.max_draws) for (_, _, _, _, _, md) in self.patches])
+        self._q_sum = float(self._q.sum())
+        # fallback accounting across samples (for the rejection-based .sample path)
+        self.n_samples = 0; self.n_patch_draws = 0; self.n_patch_fallbacks = 0
+        self.fallback_counts = []
+        # NoiseModel-ish surface (non-Gaussian -> no analytic cov)
+        self.cov = None; self.nominal_cov = None
+
+    def _blend(self, num_avg, num_w, cnt, den_w, den_w2):
+        if self.blend == "average":
+            return np.where(cnt > 0, num_avg / np.where(cnt > 0, cnt, 1.0), 0.0)
+        if self.blend == "pou":
+            return np.where(den_w > 1e-9, num_w / np.where(den_w > 1e-9, den_w, 1.0), 0.0)
+        return np.where(den_w2 > 1e-9, num_w / np.sqrt(np.where(den_w2 > 1e-9, den_w2, 1.0)), 0.0)
+
+    def sample(self, rng):
+        """FROZEN-FAITHFUL path: draws each patch via the frozen mech_mode_eigen rejection sampler
+        (real tail-fill, real fallback counting). Correct but slow when fallback is high. Kept for
+        validating sample_batch."""
+        num_avg = np.zeros(self.shape); num_w = np.zeros(self.shape); fb_this = 0
+        for sl, mdl, mloc, wloc, ps, _md in self.patches:
+            before = mdl.n_fallback
+            z = np.asarray(mdl.sample(rng)).reshape(ps) * mloc
+            fb_this += int(mdl.n_fallback - before)
+            num_avg[sl] += z
+            num_w[sl] += wloc * z
+        fld = self._blend(num_avg, num_w, self.cnt, self.den_w, self.den_w2)
+        self.n_samples += 1; self.n_patch_draws += self.n_patches; self.n_patch_fallbacks += fb_this
+        self.fallback_counts.append(fb_this)
+        return fld[self.mask]
+
+    def sample_batch(self, n, rng, block=256):
+        """DIRECT (rejection-free) path: samples n blended releases at once. Each patch's coefficients
+        are drawn DIRECTLY from the mechanism's output law (checked modes = folded tail beyond the bar;
+        the rest = natural), which is the SAME distribution the rejection sampler produces on accept OR
+        on tail-fill (the modes are independent, so the accept test factorizes). This eliminates the
+        max_draws rejection loop entirely. Validate distributional equivalence against .sample() before
+        trusting it. Returns (n, mask.sum()). Fallback is reported ANALYTICALLY (no draw ever 'falls
+        back' here); the reported fallback_rate equals the mean per-patch fallback probability."""
+        out = []; done = 0
+        while done < n:
+            nb = min(block, n - done)
+            num_avg = np.zeros((nb,) + self.shape); num_w = np.zeros((nb,) + self.shape)
+            for sl, mdl, mloc, wloc, ps, md in self.patches:
+                z = _direct_coeffs(md, nb, rng).reshape((nb,) + tuple(ps)) * mloc[None]
+                num_avg[(slice(None),) + sl] += z
+                num_w[(slice(None),) + sl] += wloc[None] * z
+            fld = self._blend(num_avg, num_w, self.cnt[None], self.den_w[None], self.den_w2[None])
+            out.append(fld[:, self.mask])
+            done += nb
+        res = np.concatenate(out, 0)
+        self.n_samples += n; self.n_patch_draws += n * self.n_patches
+        self.n_patch_fallbacks += int(round(n * self._q_sum))   # analytic expected fallbacks
+        return res
+
+    @property
+    def fallback_rate(self):
+        """Per-patch mean fallback fraction. For .sample() this is the empirical count; for
+        sample_batch it is the analytic mean per-patch fallback probability (same quantity)."""
+        return self.n_patch_fallbacks / self.n_patch_draws if self.n_patch_draws else float(
+            self._q_sum / self.n_patches) if self.n_patches else 0.0
+
+
+def _patch_fallback_prob(modes, max_draws):
+    """Analytic per-draw fallback probability for one patch: q = (1 - p_acc)^max_draws, with
+    p_acc = prod_{m<k_check} P(|a_m| >= b_m) and a_m ~ N(0, sd_m^2) independent across modes."""
+    from scipy.stats import norm
+    sd = np.asarray(modes["sd"]).reshape(-1); bar = np.asarray(modes["bar"]).reshape(-1)
+    kc = int(modes["k_check"])
+    if kc <= 0:
+        return 0.0
+    s = sd[:kc]; b = bar[:kc]
+    pm = np.where(s > 0, 2.0 * norm.cdf(-np.where(s > 0, b / np.where(s > 0, s, 1.0), 0.0)),
+                  np.where(b > 0, 0.0, 1.0))      # P(|a_m| >= b_m); sd=0 & b>0 -> impossible
+    p_acc = float(np.prod(pm))
+    return float((1.0 - p_acc) ** max_draws)
+
+
+def _direct_coeffs(modes, n, rng):
+    """Draw n coefficient vectors directly from the mechanism's OUTPUT law and return n noise vectors
+    z = A @ Vk^T, shape (n, p). Checked modes (m < k_check): folded tail of N(0, sd_m^2) beyond bar_m
+    (the accept-conditional, == the tail-fill law). Unchecked modes: natural N(0, sd_m^2)."""
+    from scipy.stats import norm
+    V = np.asarray(modes["V"]); sd = np.asarray(modes["sd"]).reshape(-1)
+    bar = np.asarray(modes["bar"]).reshape(-1)
+    k_noise = int(modes["k_noise"]); k_check = int(min(modes["k_check"], k_noise))
+    Vk = V[:, :k_noise]
+    A = np.empty((n, k_noise))
+    if k_noise > k_check:                                   # natural modes
+        A[:, k_check:] = rng.standard_normal((n, k_noise - k_check)) * sd[k_check:]
+    if k_check > 0:                                         # folded-tail-beyond-bar modes
+        s = sd[:k_check]; b = bar[:k_check]
+        safe = s > 0
+        alpha = np.where(safe, norm.cdf(np.where(safe, b / np.where(safe, s, 1.0), 0.0)), 0.0)
+        u = alpha[None, :] + (1.0 - alpha[None, :]) * rng.random((n, k_check))
+        u = np.clip(u, None, 1.0 - 1e-12)
+        mag = norm.ppf(u) * s[None, :]
+        sign = np.where(rng.random((n, k_check)) < 0.5, -1.0, 1.0)
+        Achk = mag * sign
+        A[:, :k_check] = np.where(safe[None, :], Achk, 0.0)
+    return A @ Vk.T
