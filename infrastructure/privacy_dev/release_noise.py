@@ -112,6 +112,12 @@ class ReleaseSingle:
         cov = np.abs(self._proj[:, :kc]) <= self.bar[None, :kc]
         return {"overall": float(cov.mean()), "min_subject": float(cov.mean(1).min())}
 
+    def delta_coverage(self, direction):
+        """Fraction of the attack direction's energy that lies in the noise span (span of V).
+        1.0 = the noise can fully mask Δ; <1 = a component gets ZERO noise at any scale."""
+        d = np.asarray(direction, float).reshape(-1); dp = self.V.T @ d
+        n = float(d @ d); return float((dp @ dp) / n) if n > 0 else float("nan")
+
     def fallback_rate(self, scale, k_check):
         return fallback_prob(self.lam, self.bar, scale, k_check)
 
@@ -122,28 +128,42 @@ class ReleaseSingle:
 class ReleasePatched:
     kind = "patched"
     def __init__(self, volumes, mask, pipeline_name, patch_size, overlap, blend="pou_energy",
-                 bar_kind="permax", min_frac=0.5, cover=True):
+                 bar_kind="permax", min_frac=0.5, cover=True, boxes=None, n_build_jobs=1):
+        """`boxes`: explicit list of patch origins (x0,y0,z0) of size `patch_size`; if None, tile the
+        whole mask. `n_build_jobs`>1 parallelises the per-patch loo+SVD across THREADS (BLAS is capped
+        to 1 thread, and LAPACK releases the GIL, so threads give real speed-up and share the volumes
+        without pickling). Use it only when there is NO outer process parallelism, to avoid oversubscription."""
         if blend not in ("average", "pou", "pou_energy"):
             raise ValueError(blend)
         self.mask = np.asarray(mask).astype(bool); self.shape = self.mask.shape; self.blend = blend
         pipe = T.PIPELINES[pipeline_name]
-        boxes, fracs, stride = T.tile_boxes(self.shape, patch_size, overlap, self.mask, min_frac, cover=cover)
+        if boxes is None:
+            boxes, fracs, stride = T.tile_boxes(self.shape, patch_size, overlap, self.mask, min_frac, cover=cover)
+        else:
+            boxes = list(boxes); stride = None
         if len(boxes) == 0:
             raise RuntimeError(f"no patches for {patch_size} overlap {overlap}")
         win = T._hann_window(patch_size); px, py, pz = patch_size
-        m = self.mask.astype(float)
-        self.cnt = np.zeros(self.shape); self.den_w = np.zeros(self.shape); self.den_w2 = np.zeros(self.shape)
-        self.patches = []
-        vols = np.asarray(volumes)
-        for (x0, y0, z0) in boxes:
+        m = self.mask.astype(float); vols = np.asarray(volumes)
+        def _build_one(origin):
+            x0, y0, z0 = origin
             sl = (slice(x0, x0+px), slice(y0, y0+py), slice(z0, z0+pz))
             sub = vols[:, x0:x0+px, y0:y0+py, z0:z0+pz]
             _, D, _ = ph.loo_artifacts(sub, pipe)
             V, lam, bar, proj = mode_bundle(D.reshape(D.shape[0], -1), bar_kind)
             mloc = m[sl]; wloc = win * mloc
+            return {"sl": sl, "V": V, "lam": lam, "bar": bar, "proj": proj,
+                    "mloc": mloc.reshape(-1), "wloc": wloc.reshape(-1), "ps": tuple(patch_size),
+                    "_mloc3": mloc, "_wloc3": wloc}
+        if n_build_jobs and n_build_jobs > 1 and len(boxes) > 1:
+            from joblib import Parallel as _P, delayed as _d
+            self.patches = _P(n_jobs=n_build_jobs, prefer="threads")(_d(_build_one)(b) for b in boxes)
+        else:
+            self.patches = [_build_one(b) for b in boxes]
+        self.cnt = np.zeros(self.shape); self.den_w = np.zeros(self.shape); self.den_w2 = np.zeros(self.shape)
+        for P in self.patches:                                   # serial accumulation (avoids a data race)
+            sl = P["sl"]; mloc = P.pop("_mloc3"); wloc = P.pop("_wloc3")
             self.cnt[sl] += mloc; self.den_w[sl] += wloc; self.den_w2[sl] += wloc ** 2
-            self.patches.append({"sl": sl, "V": V, "lam": lam, "bar": bar, "proj": proj,
-                                 "mloc": mloc.reshape(-1), "wloc": wloc.reshape(-1), "ps": tuple(patch_size)})
         self.n_patches = len(self.patches); self.stride = stride
         self.clean = pipe(vols).reshape(-1)[self.mask.reshape(-1)]
         self.p = int(self.mask.sum())
@@ -215,6 +235,17 @@ class ReleasePatched:
             covs.append((np.abs(P["proj"][:, :kc]) <= P["bar"][None, :kc]).mean())
         return {"overall": float(np.mean(covs)), "min_subject": float(np.min(covs))}
 
+    def delta_coverage(self, direction):
+        """Fraction of the (blend-weighted) attack direction's energy the noise span covers, summed
+        over patches: Σ‖V_pᵀc_p‖² / Σ‖c_p‖². <1 ⇒ a part of Δ sees zero noise at any scale."""
+        dv = self._as_vol(direction); covered = 0.0; total = 0.0
+        for P in self.patches:
+            sl = P["sl"]; box = dv[sl].reshape(-1); den = self._den[sl].reshape(-1); wnum = P[self._wkey]
+            denom = np.sqrt(den) if self._energy else den
+            c = np.where(denom > 1e-9, box * wnum / np.where(denom > 1e-9, denom, 1.0), 0.0)
+            d = P["V"].T @ c; covered += float(d @ d); total += float(c @ c)
+        return covered / total if total > 0 else float("nan")
+
     def fallback_rate(self, scale, k_check):
         return float(np.mean([fallback_prob(P["lam"], P["bar"], scale, k_check) for P in self.patches]))
 
@@ -222,11 +253,14 @@ class ReleasePatched:
 # ---------------------------------------------------------------------------
 # builders + two-world attack
 # ---------------------------------------------------------------------------
-def build_release(volumes, mask, stat, patch, overlap=0.5, blend="pou_energy", bar_kind="permax"):
-    """patch='single' -> whole-brain single field; a tuple (e.g. (5,5,5)) -> tiled+blended."""
+def build_release(volumes, mask, stat, patch, overlap=0.5, blend="pou_energy", bar_kind="permax",
+                  boxes=None, n_build_jobs=1):
+    """patch='single' -> whole-brain single field; a tuple (e.g. (5,5,5)) -> tiled+blended.
+    `boxes` (explicit origins) and `n_build_jobs` (threaded patch build) forward to ReleasePatched."""
     if patch == "single" or patch is None:
         return ReleaseSingle(volumes, mask, stat, bar_kind)
-    return ReleasePatched(volumes, mask, stat, tuple(patch), overlap, blend, bar_kind)
+    return ReleasePatched(volumes, mask, stat, tuple(patch), overlap, blend, bar_kind,
+                          boxes=boxes, n_build_jobs=n_build_jobs)
 
 
 def select_targets(cohort, mask, stat):
@@ -242,7 +276,8 @@ def select_targets(cohort, mask, stat):
     return {"worst": worst, "istar": istar, "ksigma": ksigma}
 
 
-def two_worlds(cohort, mask, stat, patch, overlap, blend, target, bar_kind="permax", rel_full=None):
+def two_worlds(cohort, mask, stat, patch, overlap, blend, target, bar_kind="permax", rel_full=None,
+               n_build_jobs=1):
     """Remove-one worlds. `target` is a subject index (real target) OR an array (synthetic, e.g. ksigma).
     Returns g_in, g_out (clean stats over in-mask), release_in, release_out, direction (=g_in-g_out).
 
@@ -260,13 +295,58 @@ def two_worlds(cohort, mask, stat, patch, overlap, blend, target, bar_kind="perm
     vols_in = np.vstack([background, tvol[None]])                  # N subjects
     vols_out = background                                          # N-1
     g_out = pipe(vols_out).reshape(-1)[mflat]
-    rel_out = build_release(vols_out, mask, stat, patch, overlap, blend, bar_kind)
+    rel_out = build_release(vols_out, mask, stat, patch, overlap, blend, bar_kind, n_build_jobs=n_build_jobs)
     if real and rel_full is not None:
         rel_in = rel_full; g_in = rel_full.clean                  # vols_in == full cohort set
     else:
-        rel_in = build_release(vols_in, mask, stat, patch, overlap, blend, bar_kind)
+        rel_in = build_release(vols_in, mask, stat, patch, overlap, blend, bar_kind, n_build_jobs=n_build_jobs)
         g_in = pipe(vols_in).reshape(-1)[mflat]
     return g_in, g_out, rel_in, rel_out, (g_in - g_out)
+
+
+def grid_origins(center, patch_size, stride, k, shape, mask=None, min_frac=0.3):
+    """k patch origins on a `stride`-spaced grid aligned so one box is centred on `center`, taken in
+    order of distance to `center`, keeping boxes with >= min_frac in-mask. stride = patch_size ->
+    non-overlapping; stride = patch_size//2 -> 50% overlap."""
+    import itertools
+    ps = np.array(patch_size, int); st = np.array(stride, int); shp = np.array(shape, int); c = np.array(center, int)
+    base = c - ps // 2; axpts = []
+    for ax in range(3):
+        n_neg = base[ax] // st[ax] + 1; start = base[ax] - n_neg * st[ax]
+        pts = np.arange(start, shp[ax] - ps[ax] + 1, st[ax]); axpts.append(pts[pts >= 0])
+    origins = sorted(itertools.product(*axpts), key=lambda o: float(np.sum((np.array(o) + ps // 2 - c) ** 2)))
+    out = []
+    for o in origins:
+        o = tuple(int(x) for x in o); sl = tuple(slice(a, a + p) for a, p in zip(o, ps))
+        if mask is not None and np.asarray(mask)[sl].mean() < min_frac:
+            continue
+        out.append(o)
+        if len(out) >= k:
+            break
+    return out
+
+
+def two_worlds_boxes(cohort, mask, stat, origins, patch_size, blend, target, bar_kind="permax", n_build_jobs=1):
+    """Remove-one worlds for a release made of EXACTLY the given `origins` (k patches). The attack is
+    restricted to the released region (union of the boxes ∩ mask), so advantage reflects that region
+    only. Returns g_in, g_out, rel_in, rel_out, direction, n_region_voxels."""
+    mask = np.asarray(mask).astype(bool); px, py, pz = patch_size
+    submask = np.zeros(mask.shape, bool)
+    for (x0, y0, z0) in origins:
+        sl = (slice(x0, x0+px), slice(y0, y0+py), slice(z0, z0+pz)); submask[sl] = mask[sl]
+    pipe = T.PIPELINES[stat]; N = cohort.shape[0]; sflat = submask.reshape(-1)
+    real = np.isscalar(target) or np.ndim(target) == 0
+    if real:
+        keep = np.ones(N, bool); keep[int(target)] = False; background = cohort[keep]; tvol = cohort[int(target)]
+    else:
+        background = cohort[1:]; tvol = np.asarray(target)
+    vols_in = np.vstack([background, tvol[None]]); vols_out = background
+    g_in = pipe(vols_in).reshape(-1)[sflat]; g_out = pipe(vols_out).reshape(-1)[sflat]
+    ri = build_release(vols_in, submask, stat, tuple(patch_size), 0.5, blend, bar_kind,
+                       boxes=origins, n_build_jobs=n_build_jobs)
+    ro = build_release(vols_out, submask, stat, tuple(patch_size), 0.5, blend, bar_kind,
+                       boxes=origins, n_build_jobs=n_build_jobs)
+    return g_in, g_out, ri, ro, (g_in - g_out), int(submask.sum())
 
 
 def _center_box(shape, center, patch_size):
